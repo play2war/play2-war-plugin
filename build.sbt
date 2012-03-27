@@ -11,5 +11,13 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "play"			%% "play"          % "2.0"
-//  ,"play"			%% "sbt-plugin"    % "2.0"
 )
+
+libraryDependencies <++= (scalaVersion, sbtVersion) { (scalaVersion, sbtVersion) => 
+	Seq(
+		"play"			% "sbt-plugin"    % "2.0" extra("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion)
+	)
+}
+
+// Download sources when executing "eclipse" command
+EclipseKeys.withSource := true
