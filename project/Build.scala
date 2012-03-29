@@ -34,6 +34,6 @@ def commonSettings = Defaults.defaultSettings ++
     Seq(
       organization := "com.github.play2.warplugin",
       // version is defined in version.sbt in order to support sbt-release
-      scalacOptions ++= Seq("-unchecked", "-deprecation"),
+      scalacOptions ++= Seq("-unchecked", "-deprecation")
     )						   
 }
