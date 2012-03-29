@@ -28,7 +28,7 @@ object Build extends Build {
 										)
 									}
 								)
-							) dependsOn(play2WarCore)
+							)/* dependsOn(play2WarCore) */
 
 def commonSettings = Defaults.defaultSettings ++
     Seq(
