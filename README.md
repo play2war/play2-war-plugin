@@ -41,12 +41,12 @@ This project is a module for Play 2 to package your apps into standard WAR packa
   <tr>
     <td>Data sources</td>
 	<td>Built-in<br/>(<a href="http://jolbox.com/">Bone CP</a>)</td>
-	<td colspan="2">Built-in via (<a href="http://jolbox.com/">Bone CP</a>)<br/>External DS support : TBD</td>
+	<td colspan="2">Built-in (<a href="http://jolbox.com/">Bone CP</a>)<br/>External DS support : TBD</td>
   </tr>
   <tr>
     <td>WAR customization<br/>(web.xml, ...)</td>
 	<td>N/A</td>
-	<td>N/A</td>
+	<td>TBD</td>
 	<td>TBD</td>  
   </tr>
 </table>
@@ -71,10 +71,10 @@ This project is a module for Play 2 to package your apps into standard WAR packa
   </tr>
   <tr>
     <td>PaaS</td>
-	<td>TBD<br/>(Cloudbees, JElastic)</td>
-	<td>TBD<br/>(JElastic)</td>
+	<td>TBD<br/>(Cloudbees, Jelastic)</td>
+	<td>TBD<br/>(Jelastic)</td>
 	<td>TBD<br/>(Cloudbees, Openshift)</td>
-	<td>TBD<br/>(JElastic)</td>
+	<td>TBD<br/>(Jelastic)</td>
 	<td>-</td>
   </tr>
 </table>
