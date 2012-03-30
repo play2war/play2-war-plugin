@@ -32,7 +32,7 @@ object Build extends Build {
 
 def commonSettings = Defaults.defaultSettings ++
     Seq(
-      organization := "com.github.play2.warplugin",
+      organization := "com.github.play2war",
       // version is defined in version.sbt in order to support sbt-release
       scalacOptions ++= Seq("-unchecked", "-deprecation")
     )						   
