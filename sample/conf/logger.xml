@@ -8,7 +8,7 @@
     </encoder>
   </appender>
   
-  <logger name="play" level="INFO" />
+  <logger name="play" level="TRACE" />
   <logger name="application" level="INFO" />
   
   <!-- Off these ones as they are annoying, and anyway we manage configuration ourself -->
@@ -16,7 +16,7 @@
   <logger name="com.avaje.ebeaninternal.server.core.XmlConfigLoader" level="OFF" />
   <logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread" level="OFF" />
 
-  <root level="ERROR">
+  <root level="DEBUG">
     <appender-ref ref="STDOUT" />
   </root>
   
