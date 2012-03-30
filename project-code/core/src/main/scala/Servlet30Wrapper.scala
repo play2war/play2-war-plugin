@@ -18,20 +18,20 @@ import server.Server
 
 import scala.collection.JavaConverters._
 
-object PlayServletWrapper {
-  var playServletServer: PlayServletServer = null
+object Servlet30Wrapper {
+  var playServer: Play2WarServer = null
 }
 
 @WebServlet(name = "Play", urlPatterns = Array { "/" }, asyncSupported = true)
 @WebListener
-class PlayServletWrapper extends HttpServlet with ServletContextListener {
+class Servlet30Wrapper extends HttpServlet with ServletContextListener {
 
   protected override def service(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
     Logger("play").trace("Http request received: " + servletRequest)
 
     val aSyncContext = servletRequest.startAsync
 
-    val server = PlayServletWrapper.playServletServer
+    val server = Servlet30Wrapper.playServer
 
     //    val keepAlive -> non-sens
     //    val websocketableRequest -> non-sens
@@ -321,7 +321,7 @@ class PlayServletWrapper extends HttpServlet with ServletContextListener {
 
     val classLoader = e.getServletContext.getClassLoader;
 
-    PlayServletWrapper.playServletServer = new PlayServletServer(new WarApplication(classLoader, Mode.Prod))
+    Servlet30Wrapper.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod))
   }
 
   override def contextDestroyed(e: ServletContextEvent) = {
@@ -337,11 +337,11 @@ class PlayServletWrapper extends HttpServlet with ServletContextListener {
   }
 
   def stopPlayServer(sc: ServletContext) = {
-    PlayServletWrapper.playServletServer match {
+    Servlet30Wrapper.playServer match {
       case null =>
       case _ =>
-        PlayServletWrapper.playServletServer.stop()
-        PlayServletWrapper.playServletServer = null
+        Servlet30Wrapper.playServer.stop()
+        Servlet30Wrapper.playServer = null
         sc.log("Play server stopped")
     }
   }

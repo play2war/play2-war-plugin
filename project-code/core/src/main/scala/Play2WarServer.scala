@@ -12,7 +12,7 @@ import play.api.libs.concurrent._
 
 import scala.collection.JavaConverters._
 
-class PlayServletServer(appProvider: WarApplication) extends Server with ServerWithStop {
+class Play2WarServer(appProvider: WarApplication) extends Server with ServerWithStop {
 
   def mode = appProvider.mode
 
