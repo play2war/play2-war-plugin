@@ -40,8 +40,8 @@ This project is a module for Play 2 to package your apps into standard WAR packa
   </tr>
   <tr>
     <td>Data sources</td>
-	<td>Built-in<br/>via [Bone CP](http://jolbox.com/)</td>
-	<td colspan="2">Built-in via [Bone CP](http://jolbox.com/)<br/>External DS support : TBD</td>
+	<td>Built-in<br/>(<a href="http://jolbox.com/">Bone CP</a>)</td>
+	<td colspan="2">Built-in via (<a href="http://jolbox.com/">Bone CP</a>)<br/>External DS support : TBD</td>
   </tr>
   <tr>
     <td>WAR customization<br/>(web.xml, ...)</td>
