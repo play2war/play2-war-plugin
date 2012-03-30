@@ -6,8 +6,6 @@
 
 This project is a module for Play 2 to package your apps into standard WAR packages :)
 
-----------
-
 ## Features matrix
 <table style="text-align: center;">
   <tr>
@@ -42,8 +40,8 @@ This project is a module for Play 2 to package your apps into standard WAR packa
   </tr>
   <tr>
     <td>Data sources</td>
-	<td>Built-in<br/>([Bone CP](http://jolbox.com/))</td>
-	<td colspan="2">Built-in ([Bone CP](http://jolbox.com/))<br/>External DS support : TBD</td>
+	<td>Built-in<br/>via [Bone CP](http://jolbox.com/)</td>
+	<td colspan="2">Built-in via [Bone CP](http://jolbox.com/)<br/>External DS support : TBD</td>
   </tr>
   <tr>
     <td>WAR customization<br/>(web.xml, ...)</td>
@@ -52,7 +50,6 @@ This project is a module for Play 2 to package your apps into standard WAR packa
 	<td>TBD</td>  
   </tr>
 </table>
-----------
 
 ## Server compatibility matrix
 <table style="text-align: center;">
@@ -81,7 +78,6 @@ This project is a module for Play 2 to package your apps into standard WAR packa
 	<td>-</td>
   </tr>
 </table>
-----------
 
 ## Issues
 Please file issues here: https://github.com/dlecan/play2-war-plugin/issues
