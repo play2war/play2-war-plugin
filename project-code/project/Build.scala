@@ -3,6 +3,11 @@ import Keys._
 
 object Build extends Build {
 
+  val play2WarReleases = "Play2 War Plugin Releases Repository" at "http://TBD"
+  val play2WarSnapshots = "Play2 War Plugin Snapshot Repository" at "http://TBD"
+  val play2WarRepository = if(version.toString.endsWith("SNAPSHOT")) play2WarSnapshots else play2WarReleases
+
+
     lazy val root = Project(id = "play2-war",
 								base = file("."),
 								settings = commonSettings ++ Seq(
@@ -34,6 +39,9 @@ def commonSettings = Defaults.defaultSettings ++
     Seq(
       organization := "com.github.play2war",
       // version is defined in version.sbt in order to support sbt-release
-      scalacOptions ++= Seq("-unchecked", "-deprecation")
+      scalacOptions ++= Seq("-unchecked", "-deprecation"),
+      resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
+      publishTo := Some(play2WarRepository),
+      publishMavenStyle := true
     )						   
 }
