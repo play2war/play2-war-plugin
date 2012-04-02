@@ -16,7 +16,7 @@ import scala.collection.JavaConverters._
 
 private[servlet] trait Helpers {
 
-  def getHeaders(request: HttpServletRequest): Headers = {
+  def getPlayHeaders(request: HttpServletRequest): Headers = {
 
     val headers = request.getHeaderNames.asScala.map {
       key =>
@@ -32,7 +32,7 @@ private[servlet] trait Helpers {
 
   }
 
-  def getCookies(request: HttpServletRequest): Cookies = {
+  def getPlayCookies(request: HttpServletRequest): Cookies = {
 
     val cookies: Map[String, play.api.mvc.Cookie] = request.getCookies match {
       case null => Map.empty

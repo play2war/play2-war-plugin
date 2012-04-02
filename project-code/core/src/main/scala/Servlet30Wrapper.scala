@@ -39,8 +39,8 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
     val version = servletRequest.getProtocol.substring("HTTP/".length, servletRequest.getProtocol.length)
     val servletUri = servletRequest.getServletPath
     val parameters = Map.empty[String, Seq[String]] ++ servletRequest.getParameterMap.asScala.mapValues(Arrays.asList(_: _*).asScala)
-    val rHeaders = getHeaders(servletRequest)
-    val rCookies = getCookies(servletRequest)
+    val rHeaders = getPlayHeaders(servletRequest)
+    val rCookies = getPlayCookies(servletRequest)
     val httpMethod = servletRequest.getMethod
 
     val requestHeader = new RequestHeader {
