@@ -25,7 +25,7 @@ object Servlet30Wrapper {
 
 @WebServlet(name = "Play", urlPatterns = Array { "/" }, asyncSupported = true)
 @WebListener
-class Servlet30Wrapper extends HttpServlet with ServletContextListener with Helpers  {
+class Servlet30Wrapper extends HttpServlet with ServletContextListener with Helpers {
 
   protected override def service(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
     Logger("play").trace("Http request received: " + servletRequest)
