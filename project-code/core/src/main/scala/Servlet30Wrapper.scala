@@ -31,6 +31,8 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
     Logger("play").trace("Http request received: " + servletRequest)
 
     val aSyncContext = servletRequest.startAsync
+    val aSyncCtxListener = new ASyncCtxListener
+    aSyncContext.addListener(aSyncCtxListener)
 
     val server = Servlet30Wrapper.playServer
 
@@ -61,105 +63,95 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
     val response = new Response {
 
       def handle(result: Result) {
-        result match {
 
-          case AsyncResult(p) => p.extend1 {
-            case Redeemed(v) => handle(v)
-            case Thrown(e) => {
-              Logger("play").error("Waiting for a promise, but got an error: " + e.getMessage, e)
-              handle(Results.InternalServerError)
-            }
-          }
+        aSyncContext.getResponse match {
+          
+          // Handle only HttpServletResponse
+          case httpResponse: HttpServletResponse => {
 
-          case r @ SimpleResult(ResponseHeader(status, headers), body) /* if (!websocketableRequest.check)*/ => {
-            //                val nettyResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.valueOf(status))
+            result match {
 
-            Logger("play").trace("Sending simple result: " + r)
-            
-            // Set response headers
-            headers.filterNot(_ == (CONTENT_LENGTH, "-1")).foreach {
-
-              // Fix a bug for Set-Cookie header. 
-              // Multiple cookies could be merged in a single header
-              // but it's not properly supported by some browsers
-              case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
-                // TODO
-                //                    nettyResponse.setHeader(name, Cookies.decode(value).map { c => Cookies.encode(Seq(c)) }.asJava)
-              }
-
-              case (name, value) =>
-                aSyncContext.getResponse match {
-                  case r: HttpServletResponse => r.setHeader(name, value)
-                  case unexpected => Logger("play").error("Oops, unexpected message received in Play server (please report this problem): " + unexpected)
-                }
-            }
-
-            // Response header Connection: Keep-Alive is needed for HTTP 1.0
-            //                if (keepAlive && version == HttpVersion.HTTP_1_0) {
-            //                  nettyResponse.setHeader(CONNECTION, KEEP_ALIVE)
-            //                }
-
-            // Stream the result
-            headers.get(CONTENT_LENGTH).map { contentLength =>
-
-              Logger("play").trace("Result with Content-length: " + contentLength)
-
-              val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
-                //                    if (e.getChannel.isConnected())
-                //                      NettyPromise(e.getChannel.write(ChannelBuffers.wrappedBuffer(r.writeable.transform(x))))
-                //                        .extend1{ case Redeemed(()) => () ; case Thrown(ex) => Logger("play").debug(ex.toString)}
-                /*else*/ Promise.pure(())
-              }
-
-              val bodyIteratee = {
-                val writeIteratee = Iteratee.fold1(
-                  //                      if (e.getChannel.isConnected())
-                  //                        NettyPromise( e.getChannel.write(nettyResponse))
-                  //                        .extend1{ case Redeemed(()) => () ; case Thrown(ex) => Logger("play").debug(ex.toString)}
-                  /*else*/ Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
-
-                Enumeratee.breakE[r.BODY_CONTENT](_ =>
-                  //                                  !e.getChannel.isConnected()
-                  true).transform(writeIteratee).mapDone { _ =>
-                  //                      if (e.getChannel.isConnected()) {
-                  //                        if (!keepAlive) e.getChannel.close()
-                  //                      }
+              case AsyncResult(p) => p.extend1 {
+                case Redeemed(v) => handle(v)
+                case Thrown(e) => {
+                  Logger("play").error("Waiting for a promise, but got an error: " + e.getMessage, e)
+                  handle(Results.InternalServerError)
                 }
               }
 
-              body(bodyIteratee)
+              case r @ SimpleResult(ResponseHeader(status, headers), body) /* if (!websocketableRequest.check)*/ => {
+                //                val nettyResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.valueOf(status))
 
-            }.getOrElse {
-              Logger("play").trace("Result without Content-length")
+                Logger("play").trace("Sending simple result: " + r)
 
-              // No Content-Length header specified, buffer in-memory
-              val byteBuffer = new ByteArrayOutputStream
-              val writer: Function2[ByteArrayOutputStream, r.BODY_CONTENT, Unit] = (b, x) => b.write(r.writeable.transform(x))
-              val stringIteratee = Iteratee.fold(byteBuffer)((b, e: r.BODY_CONTENT) => { writer(b, e); b })
-              val p = body |>> stringIteratee
-              try {
-                p.flatMap(i => i.run)
-                  .onRedeem { buffer =>
-                    Logger("play").trace("Buffer size to send: " + buffer.size)
-                    aSyncContext.getResponse.setContentLength(buffer.size)
-                    buffer.writeTo(aSyncContext.getResponse.getOutputStream)
+                // Set response headers
+                headers.filterNot(_ == (CONTENT_LENGTH, "-1")).foreach {
+
+                  // Fix a bug for Set-Cookie header. 
+                  // Multiple cookies could be merged in a single header
+                  // but it's not properly supported by some browsers
+                  case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
+                    // TODO
+                    //                    nettyResponse.setHeader(name, Cookies.decode(value).map { c => Cookies.encode(Seq(c)) }.asJava)
                   }
-              } finally {
-                aSyncContext.complete
-              }
-            }
-          }
 
-          case defaultResponse @ _ =>
-            Logger("play").trace("Default response: " + defaultResponse)
-          //                val channelBuffer = ChannelBuffers.dynamicBuffer(512)
-          //                val nettyResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.valueOf(500))
-          //                nettyResponse.setContent(channelBuffer)
-          //                nettyResponse.setHeader(CONTENT_LENGTH, 0)
-          //                val f = e.getChannel.write(nettyResponse)
-          //                if (!keepAlive) f.addListener(ChannelFutureListener.CLOSE)
-        }
-      }
+                  case (name, value) => httpResponse.setHeader(name, value)
+                }
+
+                // Response header Connection: Keep-Alive is needed for HTTP 1.0
+                //                if (keepAlive && version == HttpVersion.HTTP_1_0) {
+                //                  nettyResponse.setHeader(CONNECTION, KEEP_ALIVE)
+                //                }
+
+                // Stream the result
+                headers.get(CONTENT_LENGTH).map { contentLength =>
+                  Logger("play").trace("Result with Content-length: " + contentLength)
+
+                  val writer: Function2[AsyncContext, r.BODY_CONTENT, Unit] = (a, x) => {
+                    a.getResponse.getOutputStream.write(r.writeable.transform(x))
+                  }
+                  val bodyIteratee = Iteratee.fold(aSyncContext)((a, e: r.BODY_CONTENT) => { writer(a, e); a })
+                  val p = body |>> bodyIteratee
+
+                  p.flatMap(i => i.run)
+                    .onRedeem { buffer =>
+                      aSyncContext.complete()
+                    }
+                }.getOrElse {
+                  Logger("play").trace("Result without Content-length")
+
+                  // No Content-Length header specified, buffer in-memory
+                  val byteBuffer = new ByteArrayOutputStream
+                  val writer: Function2[ByteArrayOutputStream, r.BODY_CONTENT, Unit] = (b, x) => b.write(r.writeable.transform(x))
+                  val stringIteratee = Iteratee.fold(byteBuffer)((b, e: r.BODY_CONTENT) => { writer(b, e); b })
+                  val p = body |>> stringIteratee
+
+                  p.flatMap(i => i.run)
+                    .onRedeem { buffer =>
+                      Logger("play").trace("Buffer size to send: " + buffer.size)
+                      aSyncContext.getResponse.setContentLength(buffer.size)
+                      buffer.writeTo(aSyncContext.getResponse.getOutputStream)
+                      aSyncContext.complete()
+                    }
+                }
+              }
+
+              case defaultResponse @ _ =>
+                Logger("play").trace("Default response: " + defaultResponse)
+              //                val channelBuffer = ChannelBuffers.dynamicBuffer(512)
+              //                val nettyResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.valueOf(500))
+              //                nettyResponse.setContent(channelBuffer)
+              //                nettyResponse.setHeader(CONTENT_LENGTH, 0)
+              //                val f = e.getChannel.write(nettyResponse)
+              //                if (!keepAlive) f.addListener(ChannelFutureListener.CLOSE)
+            } // end match result
+
+          } // end case HttpServletResponse
+
+          case unexpected => Logger("play").error("Oops, unexpected message received in Play server (please report this problem): " + unexpected)
+
+        } // end match getResponse
+      } // end handle method
     }
 
     // get handler for request
@@ -338,12 +330,32 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
   }
 
   private def stopPlayServer(sc: ServletContext) = {
-    Servlet30Wrapper.playServer match {
-      case null =>
-      case _ =>
-        Servlet30Wrapper.playServer.stop()
+    Option(Servlet30Wrapper.playServer).map {
+      s =>
+        s.stop()
         Servlet30Wrapper.playServer = null
         sc.log("Play server stopped")
-    }
+    } // if playServer is null, nothing to do
   }
+}
+
+class ASyncCtxListener extends AsyncListener {
+
+  var eventReceived: Boolean = false
+
+  override def onComplete(event: AsyncEvent) = {
+    eventReceived = true;
+  }
+
+  override def onTimeout(event: AsyncEvent) = {
+    eventReceived = true;
+  }
+
+  override def onError(event: AsyncEvent) = {
+    eventReceived = true;
+  }
+
+  override def onStartAsync(event: AsyncEvent) = {
+  }
+
 }
