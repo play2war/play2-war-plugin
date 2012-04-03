@@ -34,6 +34,7 @@ object Build extends Build {
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
       publishTo := Some(play2WarRepository),
-      publishMavenStyle := true),
+      publishMavenStyle := true,
       publishArtifact in Test := false
+    )
 }
