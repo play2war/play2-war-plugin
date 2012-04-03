@@ -3,9 +3,9 @@ import Keys._
 
 object Build extends Build {
 
-  val play2WarReleases = "Play2 War Plugin Releases Repository" at "http://TBD"
-  val play2WarSnapshots = "Play2 War Plugin Snapshot Repository" at "http://TBD"
-  val play2WarRepository = if (version.toString.endsWith("SNAPSHOT")) play2WarSnapshots else play2WarReleases
+  val play2WarReleases = "Play2 War Plugin Releases Repository" at "http://repository-play-war.forge.cloudbees.com/release/"
+  val play2WarSnapshots = "Play2 War Plugin Snapshot Repository" at "http://repository-play-war.forge.cloudbees.com/snapshot/"
+  val play2WarRepository = if (version.toString.trim.endsWith("SNAPSHOT")) play2WarSnapshots else play2WarReleases
 
   lazy val root = Project(id = "play2-war",
     base = file("."),
@@ -34,5 +34,6 @@ object Build extends Build {
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
       publishTo := Some(play2WarRepository),
-      publishMavenStyle := true)
+      publishMavenStyle := true),
+      publishArtifact in Test := false
 }
