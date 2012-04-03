@@ -72,12 +72,14 @@ Live demo : http://play2war.jelastic.dogado.eu/
   <tr>
 	<td>JBoss 7.0</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td>TBD<br/>(Cloudbees)<br/>See <a href="https://github.com/dlecan/play2-war-plugin/issues/15">#15</a></td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Doesn't work">
+		<br/>(Cloudbees)<br/>See <a href="https://github.com/dlecan/play2-war-plugin/issues/15">#15</a>
+	</td>
   </tr>
   <tr>
 	<td>JBoss 7.1</td>
 	<td>TBD</td>
-	<td>TBD<br/>(Openshift)<br/>See <a href="https://github.com/dlecan/play2-war-plugin/issues/15">#15</a></td>
+	<td>TBD<br/>(Openshift)</td>
   </tr>
   <tr>
 	<td>Glassfish 3</td>
