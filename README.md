@@ -52,13 +52,13 @@ Live demo : http://play2war.jelastic.dogado.eu/
   </tr>
   <tr>
     <td>Root context path
-    <br/><span style="font-size: smaller;">Eg: http://local/</span></td>
+    <br/>Eg: http://local/</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20" title="Always deployed at root context"></td>
 	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.pngg" title="WAR package must be deployed at root context" height="20"></td>
   </tr>
   <tr>
     <td>Non root context path
-    <br/><span style="font-size: smaller;">Eg: http://local/myAppContext</span></td>
+    <br/>Eg: http://local/myAppContext</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context"></td>
 	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD ?</td>
   </tr>
