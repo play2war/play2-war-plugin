@@ -3,8 +3,8 @@ import Keys._
 
 object Build extends Build {
 
-  val play2WarReleases = "Play2 War Plugin Releases Repository" at "http://play-war.forge.cloudbees.com/release/"
-  val play2WarSnapshots = "Play2 War Plugin Snapshot Repository" at "http://play-war.forge.cloudbees.com/snapshot/"
+  val play2WarReleases = "Play2 War Plugin Releases Repository" at "http://repository-play-war.forge.cloudbees.com/release/"
+  val play2WarSnapshots = "Play2 War Plugin Snapshot Repository" at "http://repository-play-war.forge.cloudbees.com/snapshot/"
   val play2WarRepository = if (version.toString.trim.endsWith("SNAPSHOT")) play2WarSnapshots else play2WarReleases
 
   lazy val root = Project(id = "play2-war",
