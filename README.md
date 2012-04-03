@@ -11,12 +11,16 @@ Live demo : http://play2war.jelastic.dogado.eu/
 ## Features matrix
 <table>
   <tr>
-	<th>Container</th>
-    <th>Native Play 2</th>
-	<th>Servlet 3.0</th>
-	<th>Servlet 2.4/2.5</th>
+	<th rownspan="2" colspan="2">Feature</th>
+    <th rownspan="2">Native Play 2</th>
+	<th colspan="2">Servlet engine</th>
   </tr>
   <tr>
+	<th>3.0</th>
+	<th>2.4/2.5</th>
+  </tr>
+  <tr>
+	<td rownspan="4">HTTP</td>
     <td>Asynchronous request<br/>processing</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
@@ -41,9 +45,22 @@ Live demo : http://play2war.jelastic.dogado.eu/
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>  
   </tr>
   <tr>
+	<td rowspan="4">Container</td>
     <td>Data sources</td>
 	<td>Built-in<br/>(<a href="http://jolbox.com/">Bone CP</a>)</td>
 	<td colspan="2">Built-in (<a href="http://jolbox.com/">Bone CP</a>)<br/>External DS support : TBD</td>
+  </tr>
+  <tr>
+    <td>Root context path
+    <br/>Eg: http://...:80/</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20" title="Always deployed at root context"></td>
+	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.pngg" title="WAR package must be deployed at root context" height="20"></td>
+  </tr>
+  <tr>
+    <td>Non root context path
+    <br/>Eg: http://...:80/myAppContext</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context"></td>
+	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD ?</td>
   </tr>
   <tr>
     <td>WAR customization<br/>(web.xml, ...)</td>
