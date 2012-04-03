@@ -56,13 +56,13 @@ Live demo : http://play2war.jelastic.dogado.eu/
 ## Server compatibility matrix
 <table>
   <tr>
-	<th>Servers</th>
-    <th>Servlet engine</th>
+	<th>Servlet engine</th>
+    <th>Servers</th>
 	<th>Standalone deployment</th>
 	<th>PaaS</th>
   </tr>
   <tr>
-	<td rowspan="2">Servlet 3.0</td>
+	<td rowspan="4">Servlet 3.0</td>
 	<td>Tomcat 7</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"> 
