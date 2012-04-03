@@ -1,13 +1,13 @@
 # WAR Plugin for Play framework 2.0
 
-    Current version: 0.1-SNAPSHOT
+    Current version: 0.2-SNAPSHOT
 
     Project-status: ALPHA
 
 This project is a module for Play framework 2 to package your apps into standard WAR packages.
 
 ## Features matrix
-<table style="text-align: center;">
+<table>
   <tr>
 	<th>Container</th>
     <th>Native Play 2</th>
@@ -52,7 +52,7 @@ This project is a module for Play framework 2 to package your apps into standard
 </table>
 
 ## Server compatibility matrix
-<table style="text-align: center;">
+<table>
   <tr>
 	<th>Server</th>
     <th>Tomcat 6.x</th>
