@@ -6,6 +6,8 @@
 
 This project is a module for Play framework 2 to package your apps into standard WAR packages.
 
+Live demo : http://play2war.jelastic.dogado.eu/
+
 ## Features matrix
 <table>
   <tr>
@@ -54,28 +56,44 @@ This project is a module for Play framework 2 to package your apps into standard
 ## Server compatibility matrix
 <table>
   <tr>
-	<th>Server</th>
-    <th>Tomcat 6.x</th>
-	<th>Tomcat 7.x</th>
-	<th>JBoss 7.x</th>
-    <th>Glassfish 3.x</th>
-    <th>WAS x.x</th>
+	<th>Servers</th>
+    <th>Servlet engine</th>
+	<th>Standalone deployment</th>
+	<th>PaaS</th>
   </tr>
   <tr>
-    <td>Standalone deployment</td>
-	<td>TBD</td>
+	<td rowspan="2">Servlet 3.0</td>
+	<td>Tomcat 7</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td>TBD</td>
-	<td>-</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"> 
+		<a href="http://play2war.jelastic.dogado.eu/" title="Play 2 WAR demo hosted at Jelastic PaaS provider">Demo</a> @Jelastic
+	</td>
   </tr>
   <tr>
-    <td>PaaS</td>
-	<td>TBD<br/>(Cloudbees, Jelastic)</td>
+	<td>JBoss 7.0</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+	<td>TBD<br/>(Cloudbees)<br/>See <a href="https://github.com/dlecan/play2-war-plugin/issues/15">#15</a></td>
+  </tr>
+  <tr>
+	<td>JBoss 7.1</td>
+	<td>TBD</td>
+	<td>TBD<br/>(Openshift)<br/>See <a href="https://github.com/dlecan/play2-war-plugin/issues/15">#15</a></td>
+  </tr>
+  <tr>
+	<td>Glassfish 3</td>
+	<td>TBD</td>
 	<td>TBD<br/>(Jelastic)</td>
-	<td>TBD<br/>(Cloudbees, Openshift)</td>
+  </tr>
+  <tr>
+	<td rowspan="2">Servlet 2.4/2.5</td>
+	<td>Tomcat 6</td>
+	<td>TBD</td>
+	<td>TBD<br/>(Cloudbees)</td>
+  </tr>
+  <tr>
+	<td>Jetty 6</td>
+	<td>TBD</td>
 	<td>TBD<br/>(Jelastic)</td>
-	<td>-</td>
   </tr>
 </table>
 
