@@ -20,7 +20,7 @@ Live demo : http://play2war.jelastic.dogado.eu/
 	<th>2.4/2.5</th>
   </tr>
   <tr>
-	<td rownspan="4">HTTP</td>
+	<td rowspan="4">HTTP</td>
     <td>Asynchronous request<br/>processing</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
