@@ -57,7 +57,7 @@ Live demo : http://play2war.jelastic.dogado.eu/
 <table>
   <tr>
 	<th>Servlet engine</th>
-    <th>Servers</th>
+    <th>Server</th>
 	<th>Standalone deployment</th>
 	<th>PaaS</th>
   </tr>
