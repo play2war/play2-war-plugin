@@ -11,8 +11,8 @@ Live demo : http://play2war.jelastic.dogado.eu/
 ## Features matrix
 <table>
   <tr>
-	<th rownspan="2" colspan="2">Feature</th>
-    <th rownspan="2">Native Play 2</th>
+	<th rowspan="2" colspan="2">Feature</th>
+    <th rowspan="2">Native Play 2</th>
 	<th colspan="2">Servlet engine</th>
   </tr>
   <tr>
