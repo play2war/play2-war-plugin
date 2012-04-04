@@ -116,6 +116,10 @@ Live demo : http://play2war.jelastic.dogado.eu/
   </tr>
 </table>
 
+## Usage
+
+No public release, so coming soon ...
+
 ## Issues
 Please file issues here: https://github.com/dlecan/play2-war-plugin/issues
 
