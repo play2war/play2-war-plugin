@@ -36,7 +36,7 @@ object Build extends Build {
 		  if (version.trim.endsWith("SNAPSHOT")) Some("snapshot" at cloudbees + "snapshot/")
 		  else                                   Some("release"  at cloudbees + "release/")
 	  },
-      credentials += Credentials(file("/private/.credentials")),
+      credentials += Credentials(file("/private/play-war/.credentials")),
       publishMavenStyle := true,
       publishArtifact in Test := false
     )
