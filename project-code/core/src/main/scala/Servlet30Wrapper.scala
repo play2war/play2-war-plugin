@@ -138,12 +138,9 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
 
               case defaultResponse @ _ =>
                 Logger("play").trace("Default response: " + defaultResponse)
-              //                val channelBuffer = ChannelBuffers.dynamicBuffer(512)
-              //                val nettyResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.valueOf(500))
-              //                nettyResponse.setContent(channelBuffer)
-              //                nettyResponse.setHeader(CONTENT_LENGTH, 0)
-              //                val f = e.getChannel.write(nettyResponse)
-              //                if (!keepAlive) f.addListener(ChannelFutureListener.CLOSE)
+                httpResponse.setContentLength(0);
+                httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+                aSyncContext.complete()
             } // end match result
 
           } // end case HttpServletResponse
