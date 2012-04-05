@@ -65,7 +65,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
       def handle(result: Result) {
 
         aSyncContext.getResponse match {
-          
+
           // Handle only HttpServletResponse
           case httpResponse: HttpServletResponse => {
 
@@ -156,13 +156,8 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
 
         val bodyParser = action.parser
 
-        //                    e.getChannel.setReadable(false)
-        //
-        //                    ctx.setAttachment(scala.collection.mutable.ListBuffer.empty[org.jboss.netty.channel.MessageEvent])
-        //
         val eventuallyBodyParser = server.getBodyParser[action.BODY_CONTENT](requestHeader, bodyParser)
 
-        Logger("play").trace("Before: eventuallyResultOrBody")
         val eventuallyResultOrBody =
           eventuallyBodyParser.flatMap { bodyParser =>
 
@@ -180,22 +175,6 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
               }
               case _ => Logger("play").trace("Expect header:" + requestHeader.headers.get("Expect"))
             }
-            //
-            //                if (nettyHttpRequest.isChunked) {
-            //
-            //                  val (result, handler) = newRequestBodyHandler(bodyParser, allChannels, server)
-            //
-            //                  val intermediateChunks = ctx.getAttachment.asInstanceOf[scala.collection.mutable.ListBuffer[org.jboss.netty.channel.MessageEvent]]
-            //                  intermediateChunks.foreach(handler.messageReceived(ctx, _))
-            //                  ctx.setAttachment(null)
-            //
-            //                  val p: ChannelPipeline = ctx.getChannel().getPipeline()
-            //                  p.replace("handler", "handler", handler)
-            //                  e.getChannel.setReadable(true)
-            //
-            //                  result
-            //                } else {
-            //                  e.getChannel.setReadable(true)
 
             lazy val bodyEnumerator = {
               val body = Stream.continually(aSyncContext.getRequest.getInputStream.read).takeWhile(-1 !=).map(_.toByte).toArray
@@ -209,9 +188,6 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
             }
             //                            }
           }
-        Logger("play").trace("After: eventuallyResultOrBody: " + eventuallyResultOrBody)
-
-        Logger("play").trace("Before: eventuallyResultOrRequest")
 
         val eventuallyResultOrRequest =
           eventuallyResultOrBody
@@ -229,10 +205,6 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                 })
             }
 
-        Logger("play").trace("After: eventuallyResultOrRequest: " + eventuallyResultOrRequest)
-
-        Logger("play").trace("Before: eventuallyResultOrRequest.extend")
-
         eventuallyResultOrRequest.extend(_.value match {
           case Redeemed(Left(result)) => {
             Logger("play").trace("Got direct result from the BodyParser: " + result)
@@ -245,54 +217,22 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
           case error => {
             Logger("play").error("Cannot invoke the action, eventually got an error: " + error)
             response.handle(Results.InternalServerError)
-            //            e.getChannel.setReadable(true)
           }
         })
-        Logger("play").trace("After: eventuallyResultOrRequest.extend")
 
       }
 
-      //execute websocket action
-      case Right((ws @ WebSocket(f), app)) /* if (websocketableRequest.check)*/ => {
+      //handle websocket action
+      case Right((ws @ WebSocket(f), app)) => {
+        Logger("play").error("Impossible to serve Web Socket request:" + ws)
+        response.handle(Results.InternalServerError)
 
-        Logger("play").trace("Serving this request with: " + ws)
-        //
-        //            try {
-        //              val enumerator = websocketHandshake(ctx, nettyHttpRequest, e)(ws.frameFormatter)
-        //              f(requestHeader)(enumerator, socketOut(ctx)(ws.frameFormatter))
-        //            } catch {
-        //              case e => e.printStackTrace
-        //            }
-        //          }
-        //
-        //          //handle bad websocket request
-        //          case Right((WebSocket(_), _)) => {
-        //
-        //            Logger("play").trace("Bad websocket request")
-        //
-        //            response.handle(Results.BadRequest)
-        //          }
-        //
-        //          //handle errors
-        //          case Left(e) => {
-        //
-        //            Logger("play").trace("No handler, got direct result: " + e)
-        //
-        //            response.handle(e)
-        //          }
-        //
       }
-      //
-      //      case chunk: org.jboss.netty.handler.codec.http.HttpChunk => {
-      //        val intermediateChunks = ctx.getAttachment.asInstanceOf[scala.collection.mutable.ListBuffer[org.jboss.netty.channel.MessageEvent]]
-      //        if (intermediateChunks != null) {
-      //          intermediateChunks += e
-      //          ctx.setAttachment(intermediateChunks)
-      //        }
-      //      }
-      //
-      case unexpected => Logger("play").error("Oops, unexpected message received in Play server (please report this problem): " + unexpected)
-      //
+      
+      case unexpected => {
+        Logger("play").error("Oops, unexpected message received in Play server (please report this problem): " + unexpected)
+        response.handle(Results.InternalServerError)
+      }
     }
 
   }
