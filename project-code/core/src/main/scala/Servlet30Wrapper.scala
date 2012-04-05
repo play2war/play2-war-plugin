@@ -79,9 +79,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                 }
               }
 
-              case r @ SimpleResult(ResponseHeader(status, headers), body) /* if (!websocketableRequest.check)*/ => {
-                //                val nettyResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.valueOf(status))
-
+              case r @ SimpleResult(ResponseHeader(status, headers), body) => {
                 Logger("play").trace("Sending simple result: " + r)
 
                 // Set response headers
@@ -97,11 +95,6 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
 
                   case (name, value) => httpResponse.setHeader(name, value)
                 }
-
-                // Response header Connection: Keep-Alive is needed for HTTP 1.0
-                //                if (keepAlive && version == HttpVersion.HTTP_1_0) {
-                //                  nettyResponse.setHeader(CONNECTION, KEEP_ALIVE)
-                //                }
 
                 // Stream the result
                 headers.get(CONTENT_LENGTH).map { contentLength =>
