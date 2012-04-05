@@ -128,9 +128,22 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                     }
                 }
               }
+              
+              case r @ ChunkedResult(ResponseHeader(status, headers), chunks) => {
+                Logger("play").trace("Sending chunked result: " + r)
+                Logger("play").error("Unhandle chunked result (TODO): " + chunks)
+                
+                // TODO : handle Play chunked result
+
+                httpResponse.setContentLength(0);
+                httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+                aSyncContext.complete()
+              }
 
               case defaultResponse @ _ =>
                 Logger("play").trace("Default response: " + defaultResponse)
+                Logger("play").error("Unhandle default response: " + defaultResponse)
+                
                 httpResponse.setContentLength(0);
                 httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
                 aSyncContext.complete()
@@ -226,7 +239,6 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
       case Right((ws @ WebSocket(f), app)) => {
         Logger("play").error("Impossible to serve Web Socket request:" + ws)
         response.handle(Results.InternalServerError)
-
       }
       
       case unexpected => {
