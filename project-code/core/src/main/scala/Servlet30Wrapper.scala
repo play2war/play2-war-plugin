@@ -102,6 +102,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
 
                   val writer: Function2[AsyncContext, r.BODY_CONTENT, Unit] = (a, x) => {
                     a.getResponse.getOutputStream.write(r.writeable.transform(x))
+                    aSyncContext.getResponse.getOutputStream.flush
                   }
                   val bodyIteratee = Iteratee.fold(aSyncContext)((a, e: r.BODY_CONTENT) => { writer(a, e); a })
                   val p = body |>> bodyIteratee
@@ -123,7 +124,9 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                     .onRedeem { buffer =>
                       Logger("play").trace("Buffer size to send: " + buffer.size)
                       aSyncContext.getResponse.setContentLength(buffer.size)
+                      aSyncContext.getResponse.getOutputStream.flush
                       buffer.writeTo(aSyncContext.getResponse.getOutputStream)
+                      aSyncContext.getResponse.getOutputStream.flush
                       aSyncContext.complete()
                     }
                 }
