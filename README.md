@@ -6,9 +6,11 @@
 
 This project is a module for Play framework 2 to package your apps into standard WAR packages.
 
-Live demo : http://play2war.jelastic.dogado.eu/
+Live demos :
+ - Tomcat7@Jelastic : http://play2war.jelastic.dogado.eu/
+ - Jboss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
 
-## Features matrix
+## Features
 <table>
   <tr>
 	<th rowspan="2" colspan="2">Feature</th>
@@ -70,7 +72,7 @@ Live demo : http://play2war.jelastic.dogado.eu/
   </tr>
 </table>
 
-## Server compatibility matrix
+## Server compatibility
 <table>
   <tr>
 	<th>Servlet engine</th>
@@ -89,8 +91,9 @@ Live demo : http://play2war.jelastic.dogado.eu/
   <tr>
 	<td>JBoss 7.0</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Doesn't work">
-		<br/>(Cloudbees)<br/>See <a href="https://github.com/dlecan/play2-war-plugin/issues/15">#15</a>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
+		<a href="http://servlet30.play-war.cloudbees.net/" title="Play 2 WAR demo hosted at Cloudbees PaaS provider">Demo</a> @Cloudbees
+		<br/>Need extra configuration "disableProxyBuffering=true" when deploying
 	</td>
   </tr>
   <tr>
