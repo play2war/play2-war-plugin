@@ -7,8 +7,9 @@
 This project is a module for Play framework 2 to package your apps into standard WAR packages.
 
 Live demos :
- - Tomcat7@Jelastic : http://play2war.jelastic.dogado.eu/
- - Jboss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
+
+- Tomcat7@Jelastic : http://play2war.jelastic.dogado.eu/
+- JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
 
 ## Features
 <table>
