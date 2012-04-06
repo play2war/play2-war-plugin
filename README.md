@@ -11,6 +11,7 @@ Live demos :
 - Tomcat7@Jelastic : http://play2war.jelastic.dogado.eu/
 - JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
 
+<a name="features">
 ## Features
 <table>
   <tr>
@@ -73,6 +74,7 @@ Live demos :
   </tr>
 </table>
 
+<a name="compatibility">
 ## Server compatibility
 <table>
   <tr>
@@ -94,7 +96,7 @@ Live demos :
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
 		<a href="http://servlet30.play-war.cloudbees.net/" title="Play 2 WAR demo hosted at Cloudbees PaaS provider">Demo</a> @Cloudbees
-		<br/>Need extra configuration "disableProxyBuffering=true" when deploying
+		<br/><a href="https://github.com/dlecan/play2-war-plugin/wiki/FAQ#jboss7-deployment-at-cloudbees">Need extra configuration</a>when deploying
 	</td>
   </tr>
   <tr>
@@ -197,7 +199,7 @@ And your WAR package is available in ``APP_HOME/target/<MY_PROJECT>_version.war`
 	
 ## Upload or deploy your WAR file
 
-Upload or deploy your WAR file to your favorite Application Server if compatible (see Compatibility matrix above).
+Upload or deploy your WAR file to your favorite Application Server if compatible (see <a href="#compatibility">Compatibility matrix above</a>).
 
 ## FAQ
 
