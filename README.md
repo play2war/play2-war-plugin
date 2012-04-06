@@ -173,7 +173,7 @@ Create a file ``APP_HOME/conf/logger.xml`` with the following content :
     </encoder>
   </appender>
   
-  <logger name="play" level="TRACE" />
+  <logger name="play" level="INFO" />
   <logger name="application" level="INFO" />
   
   <!-- Off these ones as they are annoying, and anyway we manage configuration ourself -->
