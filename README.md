@@ -136,12 +136,12 @@ addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "<HERE GOES CURRENT PL
 
 ### Add play2war runtime
 
-In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` to add:
+In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` values to add:
 
 ```scala
 val appDependencies = Seq(
   ...
-  "com.github.play2war" %% "play2-war-core" % "0.2-SNAPSHOT"
+  "com.github.play2war" %% "play2-war-core" % "<HERE GOES CURRENT PLUGIN VERSION>"
   ...
 )
 
@@ -190,7 +190,10 @@ Create a file ``APP_HOME/conf/logger.xml`` with the following content :
 ## Package
 
 Run
+
     play war
+
+And your WAR package is available in ``APP_HOME/target/<MY_PROJECT>_version.war``
 	
 ## Upload or deploy your WAR file
 
