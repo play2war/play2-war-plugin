@@ -122,7 +122,83 @@ Live demos :
 
 ## Usage
 
-No public release, so coming soon ...
+In the next descriptions, APP_HOME is the root of your Play 2.0 application you want to package as a WAR file.
+
+### Add play2war plugin
+
+In ``APP_HOME/project/plugins.sbt``, add:
+
+```scala
+resolvers += "Play2war plugins snapshot" at "http://repository-play-war.forge.cloudbees.com/snapshot/"
+
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "<HERE GOES CURRENT PLUGIN VERSION>")
+```
+
+### Add play2war runtime
+
+In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` to add:
+
+```scala
+val appDependencies = Seq(
+  ...
+  "com.github.play2war" %% "play2-war-core" % "0.2-SNAPSHOT"
+  ...
+)
+
+val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
+  ...
+  resolvers += resolvers += "Play2war plugins snapshot" at "http://repository-play-war.forge.cloudbees.com/snapshot/"
+  ...
+)
+```
+
+### Configure logging
+
+You probably need to override default Play 2.0 logging configuration because :
+
+- An external file will be written in ``$USER_HOME/logs/...``
+
+- STDOUT appender pattern can be improved
+
+Create a file ``APP_HOME/conf/logger.xml`` with the following content :
+
+```xml
+<configuration>
+    
+  <conversionRule conversionWord="coloredLevel" converterClass="play.api.Logger$ColoredLevel" />
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%date - [%level] - from %logger in %thread %n%message%n%xException%n</pattern>
+    </encoder>
+  </appender>
+  
+  <logger name="play" level="TRACE" />
+  <logger name="application" level="INFO" />
+  
+  <!-- Off these ones as they are annoying, and anyway we manage configuration ourself -->
+  <logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF" />
+  <logger name="com.avaje.ebeaninternal.server.core.XmlConfigLoader" level="OFF" />
+  <logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread" level="OFF" />
+
+  <root level="ERROR">
+    <appender-ref ref="STDOUT" />
+  </root>
+```
+  
+</configuration>
+## Package
+
+Run
+    play war
+	
+## Upload or deploy your WAR file
+
+Upload or deploy your WAR file to your favorite Application Server if compatible (see Compatibility matrix above).
+
+## FAQ
+
+See https://github.com/dlecan/play2-war-plugin/wiki/FAQ
 
 ## Issues
 Please file issues here: https://github.com/dlecan/play2-war-plugin/issues
