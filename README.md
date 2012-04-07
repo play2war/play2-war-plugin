@@ -149,7 +149,7 @@ val appDependencies = Seq(
 
 val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
   ...
-  resolvers += resolvers += "Play2war plugins snapshot" at "http://repository-play-war.forge.cloudbees.com/snapshot/"
+  resolvers += "Play2war plugins snapshot" at "http://repository-play-war.forge.cloudbees.com/snapshot/"
   ...
 )
 ```
