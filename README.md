@@ -133,7 +133,7 @@ In ``APP_HOME/project/plugins.sbt``, add:
 ```scala
 resolvers += "Play2war plugins snapshot" at "http://repository-play-war.forge.cloudbees.com/snapshot/"
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "<HERE GOES CURRENT PLUGIN VERSION>")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.2-SNAPSHOT")
 ```
 
 ### Add play2war runtime
@@ -143,7 +143,7 @@ In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` val
 ```scala
 val appDependencies = Seq(
   ...
-  "com.github.play2war" %% "play2-war-core" % "<HERE GOES CURRENT PLUGIN VERSION>"
+  "com.github.play2war" %% "play2-war-core" % "0.2-SNAPSHOT"
   ...
 )
 
