@@ -131,7 +131,7 @@ In the next descriptions, APP_HOME is the root of your Play 2.0 application you 
 In ``APP_HOME/project/plugins.sbt``, add:
 
 ```scala
-resolvers += "Play2war plugins snapshot" at "http://repository-play-war.forge.cloudbees.com/snapshot/"
+resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
 
 addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.2")
 ```
@@ -149,7 +149,7 @@ val appDependencies = Seq(
 
 val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
   ...
-  resolvers += "Play2war plugins snapshot" at "http://repository-play-war.forge.cloudbees.com/snapshot/"
+  resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
   ...
 )
 ```
