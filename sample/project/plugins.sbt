@@ -8,4 +8,4 @@ resolvers += "Play2war plugins snapshot" at "http://repository-play-war.forge.cl
 // Use the Play sbt plugin for Play projects
 addSbtPlugin("play" % "sbt-plugin" % "2.0")
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.2")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.3-SNAPSHOT")
