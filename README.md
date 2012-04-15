@@ -1,6 +1,6 @@
 # WAR Plugin for Play framework 2.0
 
-    Current version: 0.2-SNAPSHOT
+    Current version: 0.2
 
     Project-status: ALPHA
 
@@ -133,7 +133,7 @@ In ``APP_HOME/project/plugins.sbt``, add:
 ```scala
 resolvers += "Play2war plugins snapshot" at "http://repository-play-war.forge.cloudbees.com/snapshot/"
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.2-SNAPSHOT")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.2")
 ```
 
 ### Add play2war runtime
@@ -143,7 +143,7 @@ In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` val
 ```scala
 val appDependencies = Seq(
   ...
-  "com.github.play2war" %% "play2-war-core" % "0.2-SNAPSHOT"
+  "com.github.play2war" %% "play2-war-core" % "0.2"
   ...
 )
 
