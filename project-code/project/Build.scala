@@ -4,6 +4,7 @@ import Keys._
 object Build extends Build {
 
   val cloudbees = "https://repository-play-war.forge.cloudbees.com/"
+  val local = Path.userHome.absolutePath + "/.ivy2/publish/"
 
   lazy val root = Project(id = "play2-war",
     base = file("."),
@@ -33,10 +34,12 @@ object Build extends Build {
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
 	  publishTo <<= (version) {
 		version: String =>
+		// Webdav support is buggy on Cloudbees. Pulish on local repository instead
 		  if (version.trim.endsWith("SNAPSHOT")) Some("snapshot" at cloudbees + "snapshot/")
 		  else                                   Some("release"  at cloudbees + "release/")
 	  },
       credentials += Credentials(file("/private/play-war/.credentials")),
+//      credentials += Credentials(file(Path.userHome.absolutePath + "/.ivy2/.credentials")),
       publishMavenStyle := true,
       publishArtifact in Test := false
     )
