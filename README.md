@@ -189,14 +189,19 @@ Create a file ``APP_HOME/conf/logger.xml`` with the following content :
 ```
   
 </configuration>
-## Package
 
-Run
+## Packaging
+
+If Play runtime is available, run
 
     play war
 
-And your WAR package is available in ``APP_HOME/target/<MY_PROJECT>_version.war``
-	
+If Play runtime is not available, you can build Play WAR packages with [SBT](https://github.com/harrah/xsbt). Run 
+
+    sbt war
+
+Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_version.war``
+
 ## Upload or deploy your WAR file
 
 Upload or deploy your WAR file to your favorite Application Server if compatible (see <a href="#compatibility">Compatibility matrix above</a>).
