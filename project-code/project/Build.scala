@@ -31,10 +31,8 @@ object Build extends Build {
     path = file("integration-tests"),
     mainLang = SCALA,
     settings = commonSettings ++ Seq(
-//      libraryDependencies <++= (scalaVersion, sbtVersion) { (scalaVersion, sbtVersion) =>
-//        Seq(
-//          "play" % "sbt-plugin" % "2.0" extra ("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion))
-//      }
+        publishArtifact := false
+//        ,
     )
   ) dependsOn(play2WarCore, play2WarPlugin)
 
