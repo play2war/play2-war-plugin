@@ -1,6 +1,5 @@
 import sbt._
 import Keys._
-import PlayProject._
 
 object Build extends Build {
 
@@ -27,14 +26,12 @@ object Build extends Build {
           "play" % "sbt-plugin" % "2.0" extra ("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion))
       }))
 
-  lazy val play2WarIntegrationTests = PlayProject(name = "integration-tests",
-    path = file("integration-tests"),
-    mainLang = SCALA,
+  lazy val play2WarIntegrationTests = Project(id = "integration-tests",
+    base = file("integration-tests"),
     settings = commonSettings ++ Seq(
-        publishArtifact := false
-//        ,
-    )
-  ) dependsOn(play2WarCore, play2WarPlugin)
+      sbtPlugin := false,
+      publishArtifact := false/*,
+      libraryDependencies ++= Seq("play" %% "play" % "2.0")*/))
 
   def commonSettings = Defaults.defaultSettings ++
     Seq(
