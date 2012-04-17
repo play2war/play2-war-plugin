@@ -1,6 +1,6 @@
 package sbt
 
-import Keys._
+import sbt.{ `package` => _, _ }
 import PlayKeys._
 
 trait Play2WarSettings {
@@ -13,9 +13,12 @@ trait Play2WarSettings {
     //      "Typesafe Snapshots Repository" at "http://repo.typesafe.com/typesafe/snapshots/"
     //    ),
     //
-      
-//    defaultServletVersion <<= "3.x",
-      
+
+    //    defaultServletVersion <<= "3.x",
+//    `package` ~= { result =>
+//      println("in package, something")
+//      result
+//    },
     war <<= warTask //
     // Add new tasks here
     )
