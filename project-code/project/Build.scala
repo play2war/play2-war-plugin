@@ -30,8 +30,15 @@ object Build extends Build {
     base = file("integration-tests"),
     settings = commonSettings ++ Seq(
       sbtPlugin := false,
-      publishArtifact := false/*,
-      libraryDependencies ++= Seq("play" %% "play" % "2.0")*/))
+      publishArtifact := false,
+      libraryDependencies ++= Seq(
+          "org.scalatest" %% "scalatest" % "1.7.2" % "test",
+          "junit" % "junit" % "4.10" % "test",
+          "org.codehaus.cargo" % "cargo-core-uberjar" % "1.2.1" % "test",
+          "net.sourceforge.htmlunit" % "htmlunit" % "2.9" % "test"
+      ),
+      testOptions in Test += Tests.Argument("-oD")
+  ))
 
   def commonSettings = Defaults.defaultSettings ++
     Seq(
