@@ -19,11 +19,18 @@ import org.codehaus.cargo.container.deployable.WAR
 @RunWith(classOf[JUnitRunner])
 class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with BeforeAndAfterAll with BeforeAndAfter {
 
+  private val WAR_KEY = "war"
+
   var container: InstalledLocalContainer = null
 
   var webClient: WebClient = null
 
-  override def beforeAll {
+  override def beforeAll(configMap: Map[String, Any]) {
+
+    val warPath = configMap.get(WAR_KEY).getOrElse("/home/damien/dev/play2-war-plugin/project-code/./../sample/target/a_warification-1.0-SNAPSHOT.war")
+
+    println("WAR file to deploy: " + warPath)
+
     val containerUrl = "http://apache.cict.fr/tomcat/tomcat-7/v7.0.27/bin/apache-tomcat-7.0.27.zip"
     val containerName = "tomcat7x"
 
@@ -45,7 +52,7 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
     println("Configure container home")
     container.setHome(installer.getHome)
 
-    val war = new WAR("/home/damien/dev/play2-war-plugin/sample/target/a_warification-1.0-SNAPSHOT.war")
+    val war = new WAR(warPath.toString)
     war.setContext("/")
     configuration.addDeployable(war);
 

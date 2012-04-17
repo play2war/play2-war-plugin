@@ -1,10 +1,14 @@
 import sbt._
 import Keys._
+import java.io.File
 
 object Build extends Build {
 
   val cloudbees = "https://repository-play-war.forge.cloudbees.com/"
   val local = Path.userHome.absolutePath + "/.ivy2/publish/"
+  val curDir = new File(".")
+  val sampleProjectTargetDir = new File(curDir, "../sample/target")
+  val sampleWarPath = new File(sampleProjectTargetDir, "a_warification-1.0-SNAPSHOT.war").getAbsolutePath
 
   lazy val root = Project(id = "play2-war",
     base = file("."),
@@ -37,7 +41,9 @@ object Build extends Build {
           "org.codehaus.cargo" % "cargo-core-uberjar" % "1.2.1" % "test",
           "net.sourceforge.htmlunit" % "htmlunit" % "2.9" % "test"
       ),
-      testOptions in Test += Tests.Argument("-oD")
+      parallelExecution in Test := false,
+      testOptions in Test += Tests.Argument("-oD"),
+      testOptions in Test += Tests.Argument("-Dwar=" + sampleWarPath)
   ))
 
   def commonSettings = Defaults.defaultSettings ++
