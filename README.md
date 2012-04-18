@@ -196,10 +196,6 @@ If Play runtime is available, run
 
     play war
 
-If Play runtime is not available, you can build Play WAR packages with [SBT](https://github.com/harrah/xsbt). Run 
-
-    sbt war
-
 Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_version.war``
 
 ## Upload or deploy your WAR file
