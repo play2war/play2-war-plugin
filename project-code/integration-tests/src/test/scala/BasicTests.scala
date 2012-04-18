@@ -100,4 +100,28 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
 
     }
   }
+  
+  feature("The container can handle GET requests on sub directories") {	
+    scenario("Handle GET request on HTML page in a sub directory") {
+      given("a page in a sub directory")
+      val pageUrl = "http://localhost:8080/subdir"
+
+      when("page is loaded with GET method")
+      val page = webClient.getPage(pageUrl).asInstanceOf[HtmlPage];
+
+      then("status code should be 200")
+      page.getWebResponse().getStatusCode() should be(200)
+	}
+    
+    scenario("Handle GET request on HTML page in a sub-sub directory") {
+      given("a page in a sub sub directory")
+      val pageUrl = "http://localhost:8080/sub/subdir"
+
+      when("page is loaded with GET method")
+      val page = webClient.getPage(pageUrl).asInstanceOf[HtmlPage];
+
+      then("status code should be 200")
+      page.getWebResponse().getStatusCode() should be(200)
+    }
+  }
 }
