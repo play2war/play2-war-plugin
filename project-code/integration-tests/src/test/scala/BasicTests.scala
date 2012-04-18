@@ -17,11 +17,22 @@ import com.gargoylesoftware.htmlunit.html._
 import org.codehaus.cargo.container.deployable.WAR
 import org.codehaus.cargo.container.property._
 import org.codehaus.cargo.util.log._
+import scala.collection.immutable.Map
+
+object BasicTests {
+  private val WAR_KEY = "war"
+
+  private val ROOT_URL = "http://localhost:8080"
+    
+  private val TOMCAT_CONTAINER_URL = "http://apache.cict.fr/tomcat/tomcat-7/v7.0.27/bin/apache-tomcat-7.0.27.zip"
+    
+  private val TOMCAT_CONTAINER_NAME = "tomcat7x"
+}
 
 @RunWith(classOf[JUnitRunner])
 class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with BeforeAndAfterAll with BeforeAndAfter {
 
-  private val WAR_KEY = "war"
+  import BasicTests._
 
   var container: InstalledLocalContainer = null
 
@@ -33,8 +44,8 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
 
     println("WAR file to deploy: " + warPath)
 
-    val containerUrl = "http://apache.cict.fr/tomcat/tomcat-7/v7.0.27/bin/apache-tomcat-7.0.27.zip"
-    val containerName = "tomcat7x"
+    val containerUrl = TOMCAT_CONTAINER_URL
+    val containerName = TOMCAT_CONTAINER_NAME
 
     println("Download container ...")
     val installer = new ZipURLInstaller(new URL(containerUrl))
@@ -46,8 +57,8 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
 
     val configuration: LocalConfiguration = new DefaultConfigurationFactory().createConfiguration(
       containerName, ContainerType.INSTALLED, ConfigurationType.STANDALONE).asInstanceOf[LocalConfiguration]
-      
-    configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.HIGH.getLevel());
+
+    configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.HIGH.getLevel())
 
     container =
       new DefaultContainerFactory().createContainer(
@@ -55,11 +66,11 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
 
     println("Configure container")
     container.setHome(installer.getHome)
-    container.setLogger(new SimpleLogger());
+    container.setLogger(new SimpleLogger())
 
     val war = new WAR(warPath.toString)
     war.setContext("/")
-    configuration.addDeployable(war);
+    configuration.addDeployable(war)
 
     println("Start the container " + containerName)
     container.start
@@ -76,57 +87,81 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
   }
 
   after {
-    webClient.closeAllWindows();
+    webClient.closeAllWindows()
   }
 
-  feature("The container can handle GET and POST requests") {
-    scenario("Handle GET request on HTML page") {
+  def givenWhenGet(given: String, path: String, root: String = ROOT_URL): Option[Page] = {
 
-      given("a page")
-      val pageUrl = "http://localhost:8080/"
+    this.given(given)
+    val pageUrl = root + path
 
-      when("page is loaded with GET method")
-      val page = webClient.getPage(pageUrl).asInstanceOf[HtmlPage];
+    when("page is loaded with GET method")
+    info("Load page " + pageUrl)
 
-      then("status code should be 200")
-      page.getWebResponse().getStatusCode() should be(200)
-    }
+    // webClient.getPage(pageUrl).asInstanceOf[Page]
+    None
+  }
 
-    scenario("Handle GET request on Assets") {
-
-      given("an image")
-      val pageUrl = "http://localhost:8080/assets/images/favicon.png"
-
-      when("image is loaded with GET method")
-      val page = webClient.getPage(pageUrl).asInstanceOf[Page];
-
-      then("status code should be 200")
-      page.getWebResponse().getStatusCode() should be(200)
-
+  def thenCheckStatusCode(p: Option[Page], s: Int) {
+    then("status code should be " + s)
+    p.map {
+      _.getWebResponse().getStatusCode() should be(s)
     }
   }
-  
-  feature("The container can handle GET requests on sub directories") {	
-    scenario("Handle GET request on HTML page in a sub directory") {
-      given("a page in a sub directory")
-      val pageUrl = "http://localhost:8080/subdir"
 
-      when("page is loaded with GET method")
-      val page = webClient.getPage(pageUrl).asInstanceOf[HtmlPage];
+  val thenCheckOk = (p: Option[Page]) => thenCheckStatusCode(p, 200)
+  val thenCheckRedirect = (p: Option[Page]) => thenCheckStatusCode(p, 301)
+  val thenCheckNotFound = (p: Option[Page]) => thenCheckStatusCode(p, 404)
 
-      then("status code should be 200")
-      page.getWebResponse().getStatusCode() should be(200)
-	}
-    
-    scenario("Handle GET request on HTML page in a sub-sub directory") {
-      given("a page in a sub sub directory")
-      val pageUrl = "http://localhost:8080/sub/subdir"
+  val mapOfUrlOkStatus: Map[String, String] = Map(
+    "home page" -> "/",
+    "page in a sub directory" -> "/subdir",
+    "page in a sub-sub directory" -> "/sub/subdir",
+    "asset as image" -> "/assets/images/favicon.png")
 
-      when("page is loaded with GET method")
-      val page = webClient.getPage(pageUrl).asInstanceOf[HtmlPage];
+  val mapOfUrlNotFoundStatus: Map[String, String] = Map(
+    "not found 1" -> "/notfound",
+    "not found 2" -> "/notfound.jpg",
+    "not found 3" -> "/truc/muche/bidule")
 
-      then("status code should be 200")
-      page.getWebResponse().getStatusCode() should be(200)
+  /*
+   ******************
+   ******************
+   */
+
+  feature("The container has a home page") {
+    scenario("Load home page to init Play application") {
+      val page = givenWhenGet("home page", "/")
+      thenCheckOk(page)
     }
   }
+
+  feature("The container must handle GET requests with OK status in response") {
+
+    mapOfUrlOkStatus.foreach {
+      case (k, v) => {
+
+        scenario("Load " + k) {
+          val page = givenWhenGet(k, v)
+          thenCheckOk(page)
+        }
+
+      }
+    }
+  }
+
+  feature("The container must handle GET requests with 'Not Found' status in response") {
+
+    mapOfUrlNotFoundStatus.foreach {
+      case (k, v) => {
+
+        scenario("Load " + k) {
+          val page = givenWhenGet(k, v)
+          thenCheckNotFound(page)
+        }
+
+      }
+    }
+  }
+
 }
