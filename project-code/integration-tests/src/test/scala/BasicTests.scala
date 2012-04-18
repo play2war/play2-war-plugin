@@ -15,6 +15,8 @@ import org.codehaus.cargo.container.configuration.LocalConfiguration
 import com.gargoylesoftware.htmlunit._
 import com.gargoylesoftware.htmlunit.html._
 import org.codehaus.cargo.container.deployable.WAR
+import org.codehaus.cargo.container.property._
+import org.codehaus.cargo.util.log._
 
 @RunWith(classOf[JUnitRunner])
 class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with BeforeAndAfterAll with BeforeAndAfter {
@@ -44,13 +46,16 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
 
     val configuration: LocalConfiguration = new DefaultConfigurationFactory().createConfiguration(
       containerName, ContainerType.INSTALLED, ConfigurationType.STANDALONE).asInstanceOf[LocalConfiguration]
+      
+    configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.MEDIUM.getLevel());
 
     container =
       new DefaultContainerFactory().createContainer(
         containerName, ContainerType.INSTALLED, configuration).asInstanceOf[InstalledLocalContainer]
 
-    println("Configure container home")
+    println("Configure container")
     container.setHome(installer.getHome)
+    container.setLogger(new SimpleLogger());
 
     val war = new WAR(warPath.toString)
     war.setContext("/")
