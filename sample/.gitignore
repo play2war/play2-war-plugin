@@ -5,3 +5,5 @@ target
 tmp
 .history
 dist
+RUNNING_PID
+
