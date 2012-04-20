@@ -58,7 +58,7 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
     val configuration: LocalConfiguration = new DefaultConfigurationFactory().createConfiguration(
       containerName, ContainerType.INSTALLED, ConfigurationType.STANDALONE).asInstanceOf[LocalConfiguration]
 
-    configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.HIGH.getLevel())
+    configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.MEDIUM.getLevel())
 
     container =
       new DefaultContainerFactory().createContainer(
