@@ -1,0 +1,9 @@
+#! /usr/bin/env sh
+
+echo "[info] Cleaning everything..."
+
+`dirname $0`/clean
+rm -rf `dirname $0`/../repository/*
+rm -rf `dirname $0`/sbt/boot
+
+echo "[info] Done!"

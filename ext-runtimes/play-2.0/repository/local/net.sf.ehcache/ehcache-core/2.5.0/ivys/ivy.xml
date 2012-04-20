@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="net.sf.ehcache"
+		module="ehcache-core"
+		revision="2.5.0"
+		status="release"
+		publication="20120229222305"
+	>
+		<license name="The Apache Software License, Version 2.0" url="src/assemble/EHCACHE-CORE-LICENSE.txt" />
+		<description homepage="http://ehcache.org">
+		This is the ehcache core module. Pair it with other modules for added functionality.
+		</description>
+		<m:properties__testResources>src/test/resources</m:properties__testResources>
+		<m:properties__project.reporting.outputEncoding>UTF-8</m:properties__project.reporting.outputEncoding>
+		<m:dependency.management__org.acegisecurity__acegi-security__version>1.0.3</m:dependency.management__org.acegisecurity__acegi-security__version>
+		<m:dependency.management__dom4j__dom4j__version>1.6.1</m:dependency.management__dom4j__dom4j__version>
+		<m:dependency.management__commons-httpclient__commons-httpclient__scope>test</m:dependency.management__commons-httpclient__commons-httpclient__scope>
+		<m:dependency.management__checkstyle__checkstyle-optional__version>4.4</m:dependency.management__checkstyle__checkstyle-optional__version>
+		<m:dependency.management__org.acegisecurity__acegi-security__scope>test</m:dependency.management__org.acegisecurity__acegi-security__scope>
+		<m:dependency.management__jgroups__jgroups-all__version>2.4.1</m:dependency.management__jgroups__jgroups-all__version>
+		<m:dependency.management__commons-httpclient__commons-httpclient__version>3.0.1</m:dependency.management__commons-httpclient__commons-httpclient__version>
+		<m:dependency.management__org.hibernate__hibernate-ehcache__scope>provided</m:dependency.management__org.hibernate__hibernate-ehcache__scope>
+		<m:dependency.management__org.springframework__spring-mock__version>2.0.2</m:dependency.management__org.springframework__spring-mock__version>
+		<m:properties__surefire.version>2.10</m:properties__surefire.version>
+		<m:dependency.management__org.springframework__spring-aop__version>2.0.2</m:dependency.management__org.springframework__spring-aop__version>
+		<m:dependency.management__javax.servlet__servlet-api__scope>provided</m:dependency.management__javax.servlet__servlet-api__scope>
+		<m:properties__skipJavadoc>false</m:properties__skipJavadoc>
+		<m:properties__build.timestamp>${maven.build.timestamp}</m:properties__build.timestamp>
+		<m:dependency.management__org.springframework__spring-aspects__version>2.0.2</m:dependency.management__org.springframework__spring-aspects__version>
+		<m:dependency.management__jgroups__jgroups-all__exclusion_1>bsh__bsh</m:dependency.management__jgroups__jgroups-all__exclusion_1>
+		<m:dependency.management__commons-logging__commons-logging__version>1.0.4</m:dependency.management__commons-logging__commons-logging__version>
+		<m:dependency.management__jgroups__jgroups-all__exclusion_0>log4j__log4j</m:dependency.management__jgroups__jgroups-all__exclusion_0>
+		<m:properties__terracotta-staging-url>http://nexus.terracotta.lan:8080/content/repositories/terracotta-staging</m:properties__terracotta-staging-url>
+		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>
+		<m:dependency.management__jgroups__jgroups-all__scope>provided</m:dependency.management__jgroups__jgroups-all__scope>
+		<m:properties__net.sf.ehcache.speedAdjustmentFactor>5</m:properties__net.sf.ehcache.speedAdjustmentFactor>
+		<m:dependency.management__javax.servlet__servlet-api__version>2.4</m:dependency.management__javax.servlet__servlet-api__version>
+		<m:dependency.management__org.hibernate__hibernate-core__scope>provided</m:dependency.management__org.hibernate__hibernate-core__scope>
+		<m:dependency.management__org.springframework__spring-aspects__scope>test</m:dependency.management__org.springframework__spring-aspects__scope>
+		<m:properties__testDir>src/test/java</m:properties__testDir>
+		<m:dependency.management__net.sf.jsr107cache__jsr107cache__version>1.0</m:dependency.management__net.sf.jsr107cache__jsr107cache__version>
+		<m:dependency.management__org.hibernate__hibernate-ehcache__version>3.3.2.GA</m:dependency.management__org.hibernate__hibernate-ehcache__version>
+		<m:dependency.management__checkstyle__checkstyle-optional__scope>test</m:dependency.management__checkstyle__checkstyle-optional__scope>
+		<m:dependency.management__commons-logging__commons-logging__scope>compile</m:dependency.management__commons-logging__commons-logging__scope>
+		<m:dependency.management__net.sf.hibernate__hibernate__exclusion_2>javax.transaction__jta</m:dependency.management__net.sf.hibernate__hibernate__exclusion_2>
+		<m:dependency.management__net.sf.hibernate__hibernate__exclusion_1>javax.security__jacc</m:dependency.management__net.sf.hibernate__hibernate__exclusion_1>
+		<m:dependency.management__net.sf.hibernate__hibernate__exclusion_0>net.sf.ehcache__ehcache</m:dependency.management__net.sf.hibernate__hibernate__exclusion_0>
+		<m:properties__skipCheckstyle>false</m:properties__skipCheckstyle>
+		<m:properties__terracotta-releases-url>http://nexus.terracotta.lan:8080/content/repositories/terracotta-releases</m:properties__terracotta-releases-url>
+		<m:dependency.management__org.springframework__spring-aop__scope>test</m:dependency.management__org.springframework__spring-aop__scope>
+		<m:properties__name>ehcache</m:properties__name>
+		<m:dependency.management__org.springframework__spring-mock__scope>test</m:dependency.management__org.springframework__spring-mock__scope>
+		<m:maven.plugins>org.apache.maven.plugins__maven-javadoc-plugin__null|org.apache.maven.plugins__maven-source-plugin__null|org.apache.maven.plugins__maven-compiler-plugin__2.3.2|org.apache.maven.plugins__maven-javadoc-plugin__null|org.apache.maven.plugins__maven-source-plugin__null|org.apache.maven.plugins__maven-compiler-plugin__2.3.2|org.apache.maven.plugins__maven-compiler-plugin__2.3.2|org.apache.maven.plugins__maven-jar-plugin__2.3.1|org.apache.maven.plugins__maven-javadoc-plugin__2.7|org.codehaus.gmaven__gmaven-plugin__1.3|org.apache.maven.plugins__maven-pdf-plugin__1.1|org.apache.maven.plugins__maven-source-plugin__2.0.3|org.apache.maven.plugins__maven-surefire-plugin__2.10|org.apache.maven.plugins__maven-checkstyle-plugin__2.7|org.apache.maven.plugins__maven-site-plugin__2.1|org.codehaus.mojo__xml-maven-plugin__1.0|null__maven-assembly-plugin__2.2-beta-5|org.apache.maven.plugins__maven-dependency-plugin__2.2|org.codehaus.mojo__rmic-maven-plugin__1.1</m:maven.plugins>
+		<m:dependency.management__net.sf.hibernate__hibernate__scope>provided</m:dependency.management__net.sf.hibernate__hibernate__scope>
+		<m:dependency.management__org.hibernate__hibernate-core__exclusion_1>javax.transaction__jta</m:dependency.management__org.hibernate__hibernate-core__exclusion_1>
+		<m:dependency.management__org.hibernate__hibernate-core__exclusion_0>javax.security__jacc</m:dependency.management__org.hibernate__hibernate-core__exclusion_0>
+		<m:dependency.management__httpunit__httpunit__version>1.6</m:dependency.management__httpunit__httpunit__version>
+		<m:dependency.management__net.sf.hibernate__hibernate__version>2.1.8</m:dependency.management__net.sf.hibernate__hibernate__version>
+		<m:dependency.management__org.hibernate__hibernate-core__version>3.3.2.GA</m:dependency.management__org.hibernate__hibernate-core__version>
+		<m:dependency.management__org.springframework__spring__version>2.0.2</m:dependency.management__org.springframework__spring__version>
+		<m:dependency.management__net.sf.jsr107cache__jsr107cache__scope>compile</m:dependency.management__net.sf.jsr107cache__jsr107cache__scope>
+		<m:dependency.management__org.hibernate__hibernate-core__exclusion_2>net.sf.ehcache__ehcache</m:dependency.management__org.hibernate__hibernate-core__exclusion_2>
+		<m:dependency.management__org.acegisecurity__acegi-security__exclusion_0>log4j__log4j</m:dependency.management__org.acegisecurity__acegi-security__exclusion_0>
+		<m:dependency.management__dom4j__dom4j__scope>provided</m:dependency.management__dom4j__dom4j__scope>
+		<m:properties__terracotta-snapshots-url>http://nexus.terracotta.lan:8080/content/repositories/terracotta-snapshots</m:properties__terracotta-snapshots-url>
+		<m:dependency.management__httpunit__httpunit__scope>test</m:dependency.management__httpunit__httpunit__scope>
+		<m:dependency.management__org.springframework__spring__scope>test</m:dependency.management__org.springframework__spring__scope>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+		<artifact name="ehcache-core" type="jar" ext="jar" conf="master"/>
+	</publications>
+	<dependencies>
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.6.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="org.slf4j" name="slf4j-jdk14" rev="1.6.1" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="javax.servlet" name="servlet-api" rev="2.4" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="org.hibernate" name="hibernate-core" rev="3.5.1-Final" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)">
+			<exclude org="javax.transaction" module="jta" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="javax.security" module="jacc" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="net.sf.ehcache" module="ehcache" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="org.codehaus.btm" name="btm" rev="2.0.1" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="javax.transaction" name="jta" rev="1.1" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="net.sf.ehcache" name="sizeof-agent" rev="1.0.0" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="net.sf.hibernate" name="hibernate" rev="2.1.8" force="true" conf="test->runtime(*),master(*)">
+			<exclude org="javax.transaction" module="jta" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="javax.security" module="jacc" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="net.sf.ehcache" module="ehcache" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="junit" name="junit-dep" rev="4.5" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.hamcrest" name="hamcrest-core" rev="1.2" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.hamcrest" name="hamcrest-library" rev="1.2" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="dom4j" name="dom4j" rev="1.6.1" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="javassist" name="javassist" rev="3.4.GA" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.hibernate" name="hibernate-ehcache" rev="3.3.2.GA" force="true" conf="test->runtime(*),master(*)">
+			<exclude org="net.sf.ehcache" module="ehcache" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="commons-logging" name="commons-logging" rev="1.1.1" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.apache.derby" name="derby" rev="10.5.3.0_1" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.mockito" name="mockito-core" rev="1.8.2" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="com.sun.xsom" name="xsom" rev="20100725" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.beanshell" name="bsh" rev="1.3.0" force="true" conf="test->runtime(*),master(*)"/>
+		<override org="net.sf.jsr107cache" module="jsr107cache" matcher="exact" rev="1.0"/>
+		<override org="org.hibernate" module="hibernate-ehcache" matcher="exact" rev="3.3.2.GA"/>
+		<override org="checkstyle" module="checkstyle-optional" matcher="exact" rev="4.4"/>
+		<override org="commons-logging" module="commons-logging" matcher="exact" rev="1.0.4"/>
+		<override org="org.acegisecurity" module="acegi-security" matcher="exact" rev="1.0.3"/>
+		<override org="dom4j" module="dom4j" matcher="exact" rev="1.6.1"/>
+		<override org="net.sf.hibernate" module="hibernate" matcher="exact" rev="2.1.8"/>
+		<override org="net.sf.hibernate" module="hibernate" matcher="exact" rev="2.1.8"/>
+		<override org="org.acegisecurity" module="acegi-security" matcher="exact" rev="1.0.3"/>
+		<override org="checkstyle" module="checkstyle-optional" matcher="exact" rev="4.4"/>
+		<override org="commons-httpclient" module="commons-httpclient" matcher="exact" rev="3.0.1"/>
+		<override org="net.sf.hibernate" module="hibernate" matcher="exact" rev="2.1.8"/>
+		<override org="jgroups" module="jgroups-all" matcher="exact" rev="2.4.1"/>
+		<override org="commons-httpclient" module="commons-httpclient" matcher="exact" rev="3.0.1"/>
+		<override org="org.hibernate" module="hibernate-ehcache" matcher="exact" rev="3.3.2.GA"/>
+		<override org="org.springframework" module="spring-mock" matcher="exact" rev="2.0.2"/>
+		<override org="org.springframework" module="spring-aop" matcher="exact" rev="2.0.2"/>
+		<override org="org.springframework" module="spring-aop" matcher="exact" rev="2.0.2"/>
+		<override org="javax.servlet" module="servlet-api" matcher="exact" rev="2.4"/>
+		<override org="org.springframework" module="spring-mock" matcher="exact" rev="2.0.2"/>
+		<override org="net.sf.hibernate" module="hibernate" matcher="exact" rev="2.1.8"/>
+		<override org="org.springframework" module="spring-aspects" matcher="exact" rev="2.0.2"/>
+		<override org="org.hibernate" module="hibernate-core" matcher="exact" rev="3.3.2.GA"/>
+		<override org="org.hibernate" module="hibernate-core" matcher="exact" rev="3.3.2.GA"/>
+		<override org="httpunit" module="httpunit" matcher="exact" rev="1.6"/>
+		<override org="net.sf.hibernate" module="hibernate" matcher="exact" rev="2.1.8"/>
+		<override org="jgroups" module="jgroups-all" matcher="exact" rev="2.4.1"/>
+		<override org="commons-logging" module="commons-logging" matcher="exact" rev="1.0.4"/>
+		<override org="jgroups" module="jgroups-all" matcher="exact" rev="2.4.1"/>
+		<override org="org.hibernate" module="hibernate-core" matcher="exact" rev="3.3.2.GA"/>
+		<override org="org.springframework" module="spring" matcher="exact" rev="2.0.2"/>
+		<override org="net.sf.jsr107cache" module="jsr107cache" matcher="exact" rev="1.0"/>
+		<override org="org.hibernate" module="hibernate-core" matcher="exact" rev="3.3.2.GA"/>
+		<override org="org.acegisecurity" module="acegi-security" matcher="exact" rev="1.0.3"/>
+		<override org="dom4j" module="dom4j" matcher="exact" rev="1.6.1"/>
+		<override org="jgroups" module="jgroups-all" matcher="exact" rev="2.4.1"/>
+		<override org="httpunit" module="httpunit" matcher="exact" rev="1.6"/>
+		<override org="org.springframework" module="spring-aspects" matcher="exact" rev="2.0.2"/>
+		<override org="org.springframework" module="spring" matcher="exact" rev="2.0.2"/>
+		<override org="org.hibernate" module="hibernate-core" matcher="exact" rev="3.3.2.GA"/>
+		<override org="javax.servlet" module="servlet-api" matcher="exact" rev="2.4"/>
+	</dependencies>
+</ivy-module>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="net.sourceforge.htmlunit"
+		module="htmlunit"
+		revision="2.9"
+		status="release"
+		publication="20120229222346"
+	>
+		<license name="Apache License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt" />
+		<description homepage="http://htmlunit.sourceforge.net">
+		A headless browser intended for use in testing web-based applications.
+		</description>
+		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>
+		<m:properties__sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</m:properties__sonatypeOssDistMgmtSnapshotsUrl>
+		<m:maven.plugins>org.apache.maven.plugins__maven-enforcer-plugin__1.0|org.apache.maven.plugins__maven-enforcer-plugin__1.0|org.apache.maven.plugins__maven-compiler-plugin__2.3|org.apache.maven.plugins__maven-checkstyle-plugin__2.4|org.apache.maven.plugins__maven-jar-plugin__2.3|org.apache.maven.plugins__maven-site-plugin__2.3|org.apache.maven.plugins__maven-assembly-plugin__2.2.1|org.apache.maven.plugins__maven-source-plugin__2.1|null__maven-antrun-plugin__1.3|org.apache.maven.plugins__maven-eclipse-plugin__2.7|org.apache.maven.plugins__maven-gpg-plugin__1.2</m:maven.plugins>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+		<artifact name="htmlunit" type="jar" ext="jar" conf="master"/>
+	</publications>
+	<dependencies>
+		<dependency org="xalan" name="xalan" rev="2.7.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)">
+			<exclude org="xerces" module="xercesImpl" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="commons-collections" name="commons-collections" rev="3.2.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="commons-lang" name="commons-lang" rev="2.6" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.1.2" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.1.2" force="true" conf="test->runtime(*),master(*)">
+			<artifact name="httpclient" type="test-jar" ext="jar" conf="" m:classifier="tests"/>
+		</dependency>
+		<dependency org="org.apache.httpcomponents" name="httpmime" rev="4.1.2" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="commons-codec" name="commons-codec" rev="1.4" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="net.sourceforge.htmlunit" name="htmlunit-core-js" rev="2.9" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="xerces" name="xercesImpl" rev="2.9.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="net.sourceforge.nekohtml" name="nekohtml" rev="1.9.15" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)">
+			<exclude org="xerces" module="xercesImpl" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="net.sourceforge.cssparser" name="cssparser" rev="0.9.5" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="commons-io" name="commons-io" rev="2.0.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="commons-logging" name="commons-logging" rev="1.1.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="junit" name="junit" rev="4.8.2" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="gsbase" name="gsbase" rev="2.0.1" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.easymock" name="easymock" rev="3.0" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="log4j" name="log4j" rev="1.2.16" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.mortbay.jetty" name="jetty" rev="6.1.26" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.6.1" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.1" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="jfree" name="jfreechart" rev="1.0.12" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.seleniumhq.selenium" name="selenium-htmlunit-driver" rev="2.1.0" force="true" conf="test->runtime(*),master(*)">
+			<exclude org="net.sourceforge.htmlunit" module="htmlunit" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="org.seleniumhq.selenium" name="selenium-ie-driver" rev="2.1.0" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.seleniumhq.selenium" name="selenium-firefox-driver" rev="2.1.0" force="true" conf="test->runtime(*),master(*)"/>
+	</dependencies>
+</ivy-module>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="org.avaje"
+		module="ebean"
+		revision="2.7.3"
+		status="release"
+		publication="20120229222240"
+	>
+		<license name="LGPL version 2.1 or later" url="http://www.gnu.org/licenses/lgpl-2.1.txt" />
+		<description homepage="http://www.avaje.org">
+		Ebean
+		</description>
+		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>
+		<m:properties__sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</m:properties__sonatypeOssDistMgmtSnapshotsUrl>
+		<m:maven.plugins>org.apache.maven.plugins__maven-enforcer-plugin__1.0-beta-1|org.apache.maven.plugins__maven-enforcer-plugin__1.0-beta-1|org.codehaus.mojo__build-helper-maven-plugin__1.5|org.apache.maven.plugins__maven-jar-plugin__null|org.apache.maven.plugins__maven-source-plugin__null|org.apache.maven.plugins__maven-antrun-plugin__null|org.apache.maven.plugins__maven-surefire-plugin__2.5|org.apache.maven.plugins__maven-assembly-plugin__2.2-beta-5|org.apache.maven.plugins__maven-install-plugin__2.3|org.apache.maven.plugins__maven-javadoc-plugin__2.6.1|org.apache.maven.plugins__maven-site-plugin__2.0</m:maven.plugins>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+		<artifact name="ebean" type="jar" ext="jar" conf="master"/>
+	</publications>
+	<dependencies>
+		<dependency org="javax.persistence" name="persistence-api" rev="1.0" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="javax.transaction" name="jta" rev="1.1" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="javax.servlet" name="servlet-api" rev="2.4" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="javax.xml.bind" name="jaxb-api" rev="2.1" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="org.apache.lucene" name="lucene-core" rev="3.0.1" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="org.apache.ant" name="ant" rev="1.7.0" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="joda-time" name="joda-time" rev="1.6" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="org.scala-lang" name="scala-library" rev="2.8.0" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="org.apache.maven" name="maven-plugin-api" rev="2.2.1" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="junit" name="junit" rev="4.4" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="com.h2database" name="h2" rev="1.3.153" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="postgresql" name="postgresql" rev="8.4-701.jdbc4" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.hsqldb" name="hsqldb" rev="2.0.0" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="mysql" name="mysql-connector-java" rev="5.1.15" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="com.oracle" name="oracle" rev="10.2.0.2.0" force="true" conf="test->runtime(*),master(*)"/>
+	</dependencies>
+</ivy-module>

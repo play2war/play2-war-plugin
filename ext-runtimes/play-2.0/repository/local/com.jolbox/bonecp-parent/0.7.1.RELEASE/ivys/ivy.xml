@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="com.jolbox"
+		module="bonecp-parent"
+		revision="0.7.1.RELEASE"
+		status="release"
+		publication="20120229222245"
+	>
+		<license name="Apache v2" url="http://www.apache.org/licenses/LICENSE-2.0.html" />
+		<description homepage="http://jolbox.com">
+		The fast Java JDBC Database Connection pool
+		</description>
+		<m:dependency.management__commons-cli__commons-cli__version>1.2</m:dependency.management__commons-cli__commons-cli__version>
+		<m:dependency.management__org.easymock__easymock__scope>test</m:dependency.management__org.easymock__easymock__scope>
+		<m:properties__project.reporting.outputEncoding>UTF-8</m:properties__project.reporting.outputEncoding>
+		<m:dependency.management__com.thoughtworks.qdox__qdox__version>1.9</m:dependency.management__com.thoughtworks.qdox__qdox__version>
+		<m:dependency.management__com.jolbox__bonecp-test-commons__version>0.7.1.RELEASE</m:dependency.management__com.jolbox__bonecp-test-commons__version>
+		<m:properties__javac.src.version>1.6</m:properties__javac.src.version>
+		<m:dependency.management__org.slf4j__slf4j-api__version>1.5.10</m:dependency.management__org.slf4j__slf4j-api__version>
+		<m:dependency.management__junit__junit__version>4.7</m:dependency.management__junit__junit__version>
+		<m:dependency.management__c3p0__c3p0__version>0.9.1.2</m:dependency.management__c3p0__c3p0__version>
+		<m:dependency.management__org.easymock__easymock__version>2.4</m:dependency.management__org.easymock__easymock__version>
+		<m:properties__maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssZ</m:properties__maven.build.timestamp.format>
+		<m:maven.plugins>org.apache.maven.plugins__maven-compiler-plugin__2.3.2|com.google.code.maven-replacer-plugin__maven-replacer-plugin__null|org.apache.maven.plugins__maven-site-plugin__2.0-beta-7|org.apache.maven.plugins__maven-surefire-plugin__2.7.2|com.mycila.maven-license-plugin__maven-license-plugin__1.5.1</m:maven.plugins>
+		<m:dependency.management__log4j__log4j__version>1.2.14</m:dependency.management__log4j__log4j__version>
+		<m:dependency.management__junit__junit__scope>test</m:dependency.management__junit__junit__scope>
+		<m:properties__javac.target.version>1.6</m:properties__javac.target.version>
+		<m:dependency.management__org.hibernate__hibernate-core__version>3.5.2-Final</m:dependency.management__org.hibernate__hibernate-core__version>
+		<m:dependency.management__org.springframework__spring__version>2.5.6</m:dependency.management__org.springframework__spring__version>
+		<m:properties__project.build.resourceEncoding>UTF-8</m:properties__project.build.resourceEncoding>
+		<m:dependency.management__commons-dbcp__commons-dbcp__scope>test</m:dependency.management__commons-dbcp__commons-dbcp__scope>
+		<m:dependency.management__com.thoughtworks.qdox__qdox__scope>test</m:dependency.management__com.thoughtworks.qdox__qdox__scope>
+		<m:dependency.management__com.jolbox__bonecp__version>0.7.1.RELEASE</m:dependency.management__com.jolbox__bonecp__version>
+		<m:dependency.management__c3p0__c3p0__scope>test</m:dependency.management__c3p0__c3p0__scope>
+		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>
+		<m:dependency.management__org.easymock__easymockclassextension__scope>test</m:dependency.management__org.easymock__easymockclassextension__scope>
+		<m:dependency.management__org.slf4j__slf4j-log4j12__version>1.5.10</m:dependency.management__org.slf4j__slf4j-log4j12__version>
+		<m:properties__implementation.build>${maven.build.timestamp}</m:properties__implementation.build>
+		<m:dependency.management__org.easymock__easymockclassextension__version>2.4</m:dependency.management__org.easymock__easymockclassextension__version>
+		<m:dependency.management__com.google.guava__guava__version>r08</m:dependency.management__com.google.guava__guava__version>
+		<m:dependency.management__commons-dbcp__commons-dbcp__version>1.2.2</m:dependency.management__commons-dbcp__commons-dbcp__version>
+		<m:dependency.management__org.hibernate__hibernate-core__scope>provided</m:dependency.management__org.hibernate__hibernate-core__scope>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+	</publications>
+</ivy-module>

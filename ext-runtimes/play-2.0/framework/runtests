@@ -1,0 +1,67 @@
+echo "[info]"
+echo "[info] ---- PLAYFRAMEWORK CORE TEST RUNNER"
+echo "[info]"
+
+set -e
+export CURRENT=`pwd`
+export SCRIPT=`dirname $0`
+
+cd $SCRIPT
+export PLAY=`pwd`/../play
+
+./build "$@" publish-local
+
+echo "[info]"
+echo "[info] ---- RUNNING FRAMEWORK SPECS"
+echo "[info]"
+
+./build "$@" test
+
+rm -rf ./logs
+
+cd ./test/integrationtest
+
+echo "[info]"
+echo "[info] ---- RUNNING INTEGRATION TEST"
+echo "[info]"
+
+$PLAY "$@" clean test
+cd $CURRENT
+
+cd ./test/integrationtest-java
+
+echo "[info]"
+echo "[info] ---- RUNNING JAVA INTEGRATION TEST"
+echo "[info]"
+
+$PLAY "$@" clean test
+cd $CURRENT
+
+cd ./test/integrationtest-scala
+
+echo "[info]"
+echo "[info] ---- RUNNING SCALA INTEGRATION TEST"
+echo "[info]"
+
+$PLAY "$@" clean test
+
+cd $CURRENT
+
+echo "[info]"
+echo "[info] ---- TESTING SAMPLE APPLICATIONS"
+echo "[info]"
+
+x=`find ../samples -name app`
+for i in $(echo $x | tr ";" "\n")
+do
+  echo "[info]"
+  echo "[info] ---- TESTING ${i/app/}"
+  echo "[info]"
+  cd ${i/app/}
+  $PLAY "$@" clean test
+  cd $CURRENT
+done
+
+echo "[info]"
+echo "[info] ALL TESTS PASSED"
+echo "[info]"

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="org.seleniumhq.selenium"
+		module="selenium-htmlunit-driver"
+		revision="2.16.1"
+		status="release"
+		publication="20120304040341"
+	>
+		<description homepage="" />
+		<m:dependency.management__com.opera__operadriver__version>0.8.1</m:dependency.management__com.opera__operadriver__version>
+		<m:dependency.management__net.java.dev.jna__jna__version>3.4.0</m:dependency.management__net.java.dev.jna__jna__version>
+		<m:dependency.management__org.apache.httpcomponents__httpcore__version>4.1.3</m:dependency.management__org.apache.httpcomponents__httpcore__version>
+		<m:dependency.management__org.testng__testng__version>6.0.1</m:dependency.management__org.testng__testng__version>
+		<m:dependency.management__net.jcip__jcip-annotations__version>1.0</m:dependency.management__net.jcip__jcip-annotations__version>
+		<m:dependency.management__org.apache.httpcomponents__httpclient__version>4.1.2</m:dependency.management__org.apache.httpcomponents__httpclient__version>
+		<m:dependency.management__org.hamcrest__hamcrest-all__version>1.1</m:dependency.management__org.hamcrest__hamcrest-all__version>
+		<m:dependency.management__cglib__cglib-nodep__version>2.1_3</m:dependency.management__cglib__cglib-nodep__version>
+		<m:dependency.management__org.json__json__version>20080701</m:dependency.management__org.json__json__version>
+		<m:dependency.management__junit__junit__version>4.10</m:dependency.management__junit__junit__version>
+		<m:dependency.management__commons-io__commons-io__version>2.0.1</m:dependency.management__commons-io__commons-io__version>
+		<m:dependency.management__com.google.guava__guava__version>10.0.1</m:dependency.management__com.google.guava__guava__version>
+		<m:dependency.management__commons-codec__commons-codec__version>1.4</m:dependency.management__commons-codec__commons-codec__version>
+		<m:properties__maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</m:properties__maven.build.timestamp.format>
+		<m:maven.plugins>null__maven-antrun-plugin__null</m:maven.plugins>
+		<m:dependency.management__net.java.dev.jna__platform__version>3.4.0</m:dependency.management__net.java.dev.jna__platform__version>
+		<m:dependency.management__org.apache.commons__commons-exec__version>1.1</m:dependency.management__org.apache.commons__commons-exec__version>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+		<artifact name="selenium-htmlunit-driver" type="jar" ext="jar" conf="master"/>
+	</publications>
+	<dependencies>
+		<dependency org="org.seleniumhq.selenium" name="selenium-api" rev="2.16.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="net.sourceforge.htmlunit" name="htmlunit" rev="2.9" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)">
+			<exclude org="org.apache.httpcomponents" module="httpclient" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.1.2" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)">
+			<exclude org="commons-codec" module="commons-codec" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<override org="com.opera" module="operadriver" matcher="exact" rev="0.8.1"/>
+		<override org="net.java.dev.jna" module="jna" matcher="exact" rev="3.4.0"/>
+		<override org="org.apache.httpcomponents" module="httpcore" matcher="exact" rev="4.1.3"/>
+		<override org="org.testng" module="testng" matcher="exact" rev="6.0.1"/>
+		<override org="net.jcip" module="jcip-annotations" matcher="exact" rev="1.0"/>
+		<override org="org.apache.httpcomponents" module="httpclient" matcher="exact" rev="4.1.2"/>
+		<override org="org.hamcrest" module="hamcrest-all" matcher="exact" rev="1.1"/>
+		<override org="cglib" module="cglib-nodep" matcher="exact" rev="2.1_3"/>
+		<override org="org.json" module="json" matcher="exact" rev="20080701"/>
+		<override org="junit" module="junit" matcher="exact" rev="4.10"/>
+		<override org="commons-io" module="commons-io" matcher="exact" rev="2.0.1"/>
+		<override org="com.google.guava" module="guava" matcher="exact" rev="10.0.1"/>
+		<override org="commons-codec" module="commons-codec" matcher="exact" rev="1.4"/>
+		<override org="net.java.dev.jna" module="platform" matcher="exact" rev="3.4.0"/>
+		<override org="org.apache.commons" module="commons-exec" matcher="exact" rev="1.1"/>
+	</dependencies>
+</ivy-module>
