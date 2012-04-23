@@ -84,6 +84,7 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
   before {
     webClient = new WebClient
     webClient.setJavaScriptEnabled(false)
+    webClient.setThrowExceptionOnFailingStatusCode(false)
   }
 
   after {
