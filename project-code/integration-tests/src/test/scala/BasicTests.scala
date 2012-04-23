@@ -98,8 +98,7 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
     when("page is loaded with GET method")
     info("Load page " + pageUrl)
 
-    // webClient.getPage(pageUrl).asInstanceOf[Page]
-    None
+    Some(webClient.getPage(pageUrl).asInstanceOf[Page])
   }
 
   def thenCheckStatusCode(p: Option[Page], s: Int) {
