@@ -1,0 +1,12 @@
+@(cookies: Map[String, String])
+
+@main("Display cookies content") {
+	<p>Cookies: </p>
+	<ul>
+	@cookies.foreach {
+	  case (name, value) => {
+	    <li>@name: @value</li>
+	  }
+	}
+	</ul>
+}

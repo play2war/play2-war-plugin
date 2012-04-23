@@ -9,5 +9,7 @@ GET     /sub/subdir                 controllers.Application.index
 
 GET     /setCookies                 controllers.Application.setCookies
 
+GET     /getCookies                 controllers.Application.getCookies
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
