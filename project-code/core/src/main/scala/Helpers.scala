@@ -3,7 +3,7 @@ package play.core.server.servlet
 import java.util.Arrays
 import java.util.concurrent._
 
-import javax.servlet.http._
+import javax.servlet.http.{Cookie => ServletCookie, _}
 
 import play.core._
 import play.api._
@@ -46,5 +46,18 @@ private[servlet] trait Helpers {
       def get(name: String) = cookies.get(name)
       override def toString = cookies.toString
     }
+  }
+
+  def getServletCookie(flatCookie: String): java.util.List[ServletCookie] = {
+    Cookies.decode(flatCookie).map {
+      pCookie =>
+        	val sc = new ServletCookie(pCookie.name, pCookie.value)
+        	pCookie.domain.map(sc.setDomain(_))
+        	sc.setHttpOnly(pCookie.httpOnly)
+        	sc.setMaxAge(pCookie.maxAge)
+        	sc.setPath(pCookie.path)
+        	sc.setSecure(pCookie.secure)
+        	sc
+    }.asJava
   }
 }
