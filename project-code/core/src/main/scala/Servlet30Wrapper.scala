@@ -81,6 +81,8 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
 
               case r @ SimpleResult(ResponseHeader(status, headers), body) => {
                 Logger("play").trace("Sending simple result: " + r)
+                
+                httpResponse.setStatus(status)
 
                 // Set response headers
                 headers.filterNot(_ == (CONTENT_LENGTH, "-1")).foreach {
@@ -137,10 +139,9 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                 Logger("play").error("Unhandle chunked result (TODO): " + chunks)
                 
                 // TODO : handle Play chunked result
+                // httpResponse.setStatus(status)
 
-                httpResponse.setContentLength(0);
-                httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-                aSyncContext.complete()
+                handle(Results.NotImplemented)
               }
 
               case defaultResponse @ _ =>
