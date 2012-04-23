@@ -164,4 +164,33 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
     }
   }
 
+  /*
+   ******************
+   ******************
+   */
+  
+  feature("The container should handle cookies") {
+    
+    scenario("Container sets cookies") {
+      
+      given("A page")
+      
+      when("page sets cookies")
+      
+      then("response should contain theses cookies")
+      
+    }
+
+    scenario("Container gets cookies") {
+      
+      given("Two pages: page1")
+      and("page2")
+      
+      when("page1 sets cookies")
+      and("browser sends them back to page2")
+      
+      then("page2 body should contain cookies values")
+      
+    }
+  }
 }
