@@ -18,14 +18,15 @@ import org.codehaus.cargo.container.deployable.WAR
 import org.codehaus.cargo.container.property._
 import org.codehaus.cargo.util.log._
 import scala.collection.immutable.Map
+import scala.collection.JavaConverters._
 
 object BasicTests {
   private val WAR_KEY = "war"
 
   private val ROOT_URL = "http://localhost:8080"
-    
+
   private val TOMCAT_CONTAINER_URL = "http://apache.cict.fr/tomcat/tomcat-7/v7.0.27/bin/apache-tomcat-7.0.27.zip"
-    
+
   private val TOMCAT_CONTAINER_NAME = "tomcat7x"
 }
 
@@ -57,9 +58,9 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
 
     val configuration: LocalConfiguration = new DefaultConfigurationFactory().createConfiguration(
       containerName, ContainerType.INSTALLED, ConfigurationType.STANDALONE).asInstanceOf[LocalConfiguration]
-    
+
     configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.MEDIUM.getLevel());
-    
+
     container =
       new DefaultContainerFactory().createContainer(
         containerName, ContainerType.INSTALLED, configuration).asInstanceOf[InstalledLocalContainer]
@@ -85,6 +86,7 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
     webClient = new WebClient
     webClient.setJavaScriptEnabled(false)
     webClient.setThrowExceptionOnFailingStatusCode(false)
+    webClient.getCookieManager.setCookiesEnabled(true)
   }
 
   after {
@@ -168,29 +170,29 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
    ******************
    ******************
    */
-  
+
   feature("The container should handle cookies") {
-    
+
     scenario("Container sets cookies") {
-      
-      given("A page")
-      
-      when("page sets cookies")
-      
-      then("response should contain theses cookies")
-      
+
+      givenWhenGet("a page", "/setCookies")
+
+      then("response should contain cookies")
+
+      val cookies = webClient.getCookieManager().getCookies().asScala
+      cookies should have size (2)
     }
 
     scenario("Container gets cookies") {
-      
+
       given("Two pages: page1")
       and("page2")
-      
+
       when("page1 sets cookies")
       and("browser sends them back to page2")
-      
+
       then("page2 body should contain cookies values")
-      
+
     }
   }
 }
