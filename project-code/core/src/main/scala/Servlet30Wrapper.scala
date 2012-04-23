@@ -87,12 +87,10 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                 // Set response headers
                 headers.filterNot(_ == (CONTENT_LENGTH, "-1")).foreach {
 
-                  // Fix a bug for Set-Cookie header. 
-                  // Multiple cookies could be merged in a single header
-                  // but it's not properly supported by some browsers
                   case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
-                    // TODO
-                    //                    nettyResponse.setHeader(name, Cookies.decode(value).map { c => Cookies.encode(Seq(c)) }.asJava)
+                    getServletCookies(value).map {
+                      c => httpResponse.addCookie(c)
+                    }
                   }
 
                   case (name, value) => httpResponse.setHeader(name, value)

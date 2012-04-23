@@ -181,6 +181,13 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
 
       val cookies = webClient.getCookieManager().getCookies().asScala
       cookies should have size (2)
+      
+      cookies.map {
+        c => (c.getName, c.getValue)
+      }.toMap should (
+    	contain ("cookie1" -> "value1")
+    	and contain ("cookie2" -> "value2")
+      )
     }
 
     scenario("Container gets cookies") {

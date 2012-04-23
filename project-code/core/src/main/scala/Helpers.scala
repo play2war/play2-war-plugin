@@ -48,7 +48,7 @@ private[servlet] trait Helpers {
     }
   }
 
-  def getServletCookie(flatCookie: String): java.util.List[ServletCookie] = {
+  def getServletCookies(flatCookie: String): Seq[ServletCookie] = {
     Cookies.decode(flatCookie).map {
       pCookie =>
         	val sc = new ServletCookie(pCookie.name, pCookie.value)
@@ -58,6 +58,6 @@ private[servlet] trait Helpers {
         	sc.setPath(pCookie.path)
         	sc.setSecure(pCookie.secure)
         	sc
-    }.asJava
+    }
   }
 }
