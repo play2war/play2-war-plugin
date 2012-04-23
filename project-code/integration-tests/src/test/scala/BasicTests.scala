@@ -119,10 +119,10 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
     "page in a sub-sub directory" -> "/sub/subdir",
     "asset as image" -> "/assets/images/favicon.png")
 
-  val mapOfUrlNotFoundStatus: Map[String, String] = Map(
+  val mapOfUrlNotFoundStatus: Map[String, String] = Map.empty/*Map(
     "not found 1" -> "/notfound",
     "not found 2" -> "/notfound.jpg",
-    "not found 3" -> "/truc/muche/bidule")
+    "not found 3" -> "/truc/muche/bidule")*/
 
   /*
    ******************
