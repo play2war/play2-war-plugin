@@ -45,4 +45,8 @@ object Application extends Controller {
   def redirect = Action {
     Redirect(routes.Application.redirectLanding) 
   }
+  
+  def internalServerError = Action {  request =>
+    throw new RuntimeException("This a desired exception in order to test exception interception")
+  }
 }

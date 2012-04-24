@@ -117,6 +117,7 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
   val thenCheckOk = (p: Option[Page]) => thenCheckStatusCode(p, 200)
   val thenCheckRedirect = (p: Option[Page]) => thenCheckStatusCode(p, 301)
   val thenCheckNotFound = (p: Option[Page]) => thenCheckStatusCode(p, 404)
+  val thenCheckInternalServerError = (p: Option[Page]) => thenCheckStatusCode(p, 500)
 
   val mapOfUrlOkStatus: Map[String, String] = Map(
     "home page" -> "/",
@@ -129,6 +130,9 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
     "not found 2" -> "/notfound.jpg",
     "not found 3" -> "/truc/muche/bidule")
 
+  val mapOfUrlInternalServerError: Map[String, String] = Map(
+    "not found 1" -> "/internalServerError")
+    
   /*
    ******************
    ******************
@@ -163,6 +167,20 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
         scenario("Load " + k) {
           val page = givenWhenGet(k, v)
           thenCheckNotFound(page)
+        }
+
+      }
+    }
+  }
+
+  feature("The container must handle GET requests with 'Internal server error' status in response") {
+
+    mapOfUrlInternalServerError.foreach {
+      case (k, v) => {
+
+        scenario("Load " + k) {
+          val page = givenWhenGet(k, v)
+          thenCheckInternalServerError(page)
         }
 
       }
