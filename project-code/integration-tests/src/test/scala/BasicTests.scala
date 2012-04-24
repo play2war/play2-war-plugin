@@ -210,4 +210,25 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
       }
     }
   }
+
+  /*
+   ******************
+   ******************
+   */
+
+  feature("The container must handle GET requests with 'Redirect' status in response") {
+
+    scenario("container sends redirect") {
+
+      val page = givenWhenGet("a page which will redirect", "/redirect")
+
+      then("response page should be a redirected page")
+      
+      page.map { p =>
+        p.getWebResponse.getContentAsString should include("redirect landing")
+      }.getOrElse {
+        fail("Page not found")
+      }
+    }
+  }
 }

@@ -37,4 +37,12 @@ object Application extends Controller {
 
     Ok(views.html.getCookies(mapCookies))
   }
+
+  def redirectLanding = Action {
+    Ok(views.html.redirectLanding())
+  }
+  
+  def redirect = Action {
+    Redirect(routes.Application.redirectLanding) 
+  }
 }
