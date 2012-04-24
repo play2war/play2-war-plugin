@@ -14,6 +14,7 @@ import org.codehaus.cargo.generic.DefaultContainerFactory
 import org.codehaus.cargo.container.configuration.LocalConfiguration
 import com.gargoylesoftware.htmlunit._
 import com.gargoylesoftware.htmlunit.html._
+import com.gargoylesoftware.htmlunit.util._
 import org.codehaus.cargo.container.deployable.WAR
 import org.codehaus.cargo.container.property._
 import org.codehaus.cargo.util.log._
@@ -59,7 +60,7 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
     val configuration: LocalConfiguration = new DefaultConfigurationFactory().createConfiguration(
       containerName, ContainerType.INSTALLED, ConfigurationType.STANDALONE).asInstanceOf[LocalConfiguration]
 
-    configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.MEDIUM.getLevel());
+    configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.MEDIUM.getLevel);
 
     container =
       new DefaultContainerFactory().createContainer(
@@ -67,7 +68,7 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
 
     println("Configure container")
     container.setHome(installer.getHome)
-    container.setLogger(new SimpleLogger())
+    container.setLogger(new SimpleLogger)
 
     val war = new WAR(warPath.toString)
     war.setContext("/")
@@ -90,15 +91,15 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
   }
 
   after {
-    webClient.closeAllWindows()
+    webClient.closeAllWindows
   }
 
-  def givenWhenGet(given: String, path: String, root: String = ROOT_URL): Option[Page] = {
+  def givenWhenGet(given: String, path: String, when: String = "page is loaded with GET method", root: String = ROOT_URL): Option[Page] = {
 
     this.given(given)
     val pageUrl = root + path
 
-    when("page is loaded with GET method")
+    this.when(when)
     info("Load page " + pageUrl)
 
     Some(webClient.getPage(pageUrl).asInstanceOf[Page])
@@ -107,7 +108,9 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
   def thenCheckStatusCode(p: Option[Page], s: Int) {
     then("status code should be " + s)
     p.map {
-      _.getWebResponse().getStatusCode() should be(s)
+      _.getWebResponse.getStatusCode should be(s)
+    }.getOrElse {
+      fail("Page not found")
     }
   }
 
@@ -179,27 +182,32 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
 
       then("response should contain cookies")
 
-      val cookies = webClient.getCookieManager().getCookies().asScala
+      val cookies = webClient.getCookieManager.getCookies.asScala
       cookies should have size (2)
-      
+
       cookies.map {
         c => (c.getName, c.getValue)
       }.toMap should (
-    	contain ("cookie1" -> "value1")
-    	and contain ("cookie2" -> "value2")
-      )
+        contain("cookie1" -> "value1")
+        and contain("cookie2" -> "value2"))
     }
 
     scenario("Container gets cookies") {
 
-      given("Two pages: page1")
-      and("page2")
+      // Load cookies
+      webClient.getPage(ROOT_URL + "/setCookies")
 
-      when("page1 sets cookies")
-      and("browser sends them back to page2")
+      val page = givenWhenGet("a page", "/getCookies", "client sends cookies")
 
-      then("page2 body should contain cookies values")
-
+      then("page body should contain cookies values")
+      page.map { p =>
+        p.getWebResponse.getContentAsString should (
+          include("cookie1") and include("value1")
+          and
+          include("cookie2") and include("value2"))
+      }.getOrElse {
+        fail("Page not found")
+      }
     }
   }
 }

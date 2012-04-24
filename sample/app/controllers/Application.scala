@@ -19,19 +19,21 @@ object Application extends Controller {
   }
 
   def getCookies = Action { request =>
-    val listCookies: List[Cookie] = List.empty
-
-    request.cookies.get("cookies1").map { cookie =>
-      listCookies ++ Seq(cookie)
+    var listCookies = List[Cookie]()
+    
+    request.cookies.get("cookie1").map { cookie =>
+        listCookies ++= Seq(cookie)
     }
 
-    request.cookies.get("cookies2").map { cookie =>
-      listCookies ++ Seq(cookie)
+    request.cookies.get("cookie2").map { cookie =>
+      listCookies ++= Seq(cookie)
     }
 
     val mapCookies: Map[String, String] = listCookies.map {
       c => (c.name, c.value)
     }.toMap
+    
+    println("Cookies sent to view:" + mapCookies)
 
     Ok(views.html.getCookies(mapCookies))
   }
