@@ -204,15 +204,19 @@ Upload or deploy your WAR file to your favorite Application Server if compatible
 
 ## FAQ
 
-See https://github.com/dlecan/play2-war-plugin/wiki/FAQ
+See [FAQ](/dlecan/play2-war-plugin/wiki/FAQ).
 
 ## Issues
 
-Please file issues here: https://github.com/dlecan/play2-war-plugin/issues
+Please file issues here: https://github.com/dlecan/play2-war-plugin/issues.
 
 ## Continous integration
 
-See it here : [https://play-war.ci.cloudbees.com/](https://play-war.ci.cloudbees.com/)
+Watch it in action here : [https://play-war.ci.cloudbees.com/](https://play-war.ci.cloudbees.com/).
+
+## How to help ?
+
+Discover [how you can help the project](/dlecan/play2-war-plugin/wiki/How-to-help).
 
 ## Licence
 
