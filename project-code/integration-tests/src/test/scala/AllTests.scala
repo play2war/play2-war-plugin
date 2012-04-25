@@ -273,3 +273,12 @@ class TomcatTests extends AbstractPlay2WarTests {
   override def containerName = "tomcat7x"
 
 }
+
+//@RunWith(classOf[JUnitRunner])
+//class JBossTests extends AbstractPlay2WarTests {
+
+//  override def containerUrl = "TODO"
+  
+//  override def containerName = "TODO"
+
+//}
