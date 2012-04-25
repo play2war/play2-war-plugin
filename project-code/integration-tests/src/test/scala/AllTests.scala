@@ -39,6 +39,10 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
   var container: InstalledLocalContainer = null
 
   var webClient: WebClient = null
+  
+  def getContainer = container
+  
+  def setContainer(container: InstalledLocalContainer) = this.container = container
 
   override def beforeAll(configMap: Map[String, Any]) {
 
@@ -62,7 +66,7 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
 
     configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.MEDIUM.getLevel);
 
-    container =
+    val container =
       new DefaultContainerFactory().createContainer(
         containerName, ContainerType.INSTALLED, configuration).asInstanceOf[InstalledLocalContainer]
 
@@ -75,12 +79,13 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
     configuration.addDeployable(war)
 
     println("Start the container " + containerName)
+    setContainer(container)
     container.start
   }
 
   override def afterAll {
     println("Stop the container")
-    Some(container).map(_ => container.stop)
+    Some(getContainer).map(_ => container.stop)
   }
 
   before {
