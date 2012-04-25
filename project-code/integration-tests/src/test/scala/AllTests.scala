@@ -33,6 +33,8 @@ trait CargoContainerManager extends BeforeAndAfterAll {
   def containerUrl: String
   
   def containerName: String
+  
+  def context = "/"
 
   abstract override def beforeAll(configMap: Map[String, Any]) {
 
@@ -62,7 +64,7 @@ trait CargoContainerManager extends BeforeAndAfterAll {
     container.setLogger(new SimpleLogger)
 
     val war = new WAR(warPath.toString)
-    war.setContext("/")
+    war.setContext(context)
     configuration.addDeployable(war)
 
     println("Start the container " + containerName)
@@ -266,19 +268,40 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 }
 
 @RunWith(classOf[JUnitRunner])
-class TomcatTests extends AbstractPlay2WarTests {
-
+class Tomcat7xTests extends AbstractPlay2WarTests {
   override def containerUrl = "http://apache.cict.fr/tomcat/tomcat-7/v7.0.27/bin/apache-tomcat-7.0.27.zip"
-  
   override def containerName = "tomcat7x"
-
 }
 
+// Doesn't work yet : sample war is not deployed (on Windows)
 //@RunWith(classOf[JUnitRunner])
-//class JBossTests extends AbstractPlay2WarTests {
+//class Jetty8xTests extends AbstractPlay2WarTests {
+//  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
+//  override def containerName = "jetty8x"
+//  override def context = "/"
+//}
 
-//  override def containerUrl = "TODO"
-  
-//  override def containerName = "TODO"
+// Doesn't work yet : deployment of sample war fails : Command deploy requires an operand of type class java.io.File
+//@RunWith(classOf[JUnitRunner])
+//class Glassfish3xTests extends AbstractPlay2WarTests {
+//  override def containerUrl = "http://download.java.net/glassfish/3.1.2/release/glassfish-3.1.2.zip"
+//  override def containerName = "glassfish3x"
+//}
 
+//@RunWith(classOf[JUnitRunner])
+//class JOnAS5xTests extends AbstractPlay2WarTests {
+//  override def containerUrl = "http://repo1.maven.org/maven2/org/ow2/jonas/assemblies/profiles/jonas-full/5.2.3/jonas-full-5.2.3-bin.tar.gz"
+//  override def containerName = "jonas5x"
+//}
+
+//@RunWith(classOf[JUnitRunner])
+//class JBoss7xTests extends AbstractPlay2WarTests {
+//  override def containerUrl = "http://download.jboss.org/jbossas/7.0/jboss-as-7.0.2.Final/jboss-as-7.0.2.Final.zip"
+//  override def containerName = "jboss7x"
+//}
+
+//@RunWith(classOf[JUnitRunner])
+//class JBoss71xTests extends AbstractPlay2WarTests {
+//  override def containerUrl = "http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.zip"
+//  override def containerName = "jboss71x"
 //}
