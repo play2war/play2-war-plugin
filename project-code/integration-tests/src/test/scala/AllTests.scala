@@ -21,39 +21,26 @@ import org.codehaus.cargo.util.log._
 import scala.collection.immutable.Map
 import scala.collection.JavaConverters._
 
-object BasicTests {
+trait CargoContainerManager extends BeforeAndAfterAll {
+  self: Suite =>
+  
   private val WAR_KEY = "war"
 
-  private val ROOT_URL = "http://localhost:8080"
-
-  private val TOMCAT_CONTAINER_URL = "http://apache.cict.fr/tomcat/tomcat-7/v7.0.27/bin/apache-tomcat-7.0.27.zip"
-
-  private val TOMCAT_CONTAINER_NAME = "tomcat7x"
-}
-
-@RunWith(classOf[JUnitRunner])
-class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with BeforeAndAfterAll with BeforeAndAfter {
-
-  import BasicTests._
-
-  var container: InstalledLocalContainer = null
-
-  var webClient: WebClient = null
+  def getContainer: InstalledLocalContainer
   
-  def getContainer = container
+  def setContainer(container: InstalledLocalContainer): Unit
   
-  def setContainer(container: InstalledLocalContainer) = this.container = container
+  def containerUrl: String
+  
+  def containerName: String
 
-  override def beforeAll(configMap: Map[String, Any]) {
+  abstract override def beforeAll(configMap: Map[String, Any]) {
 
     val warPath = configMap.get(WAR_KEY).getOrElse("/home/damien/dev/play2-war-plugin/project-code/./../sample/target/a_warification-1.0-SNAPSHOT.war")
 
     println("WAR file to deploy: " + warPath)
 
-    val containerUrl = TOMCAT_CONTAINER_URL
-    val containerName = TOMCAT_CONTAINER_NAME
-
-    println("Download container ...")
+    println("Download container " + containerName + " from " + containerUrl + " ...")
     val installer = new ZipURLInstaller(new URL(containerUrl))
     println("Download container done")
 
@@ -83,10 +70,32 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
     container.start
   }
 
-  override def afterAll {
+  abstract override def afterAll {
     println("Stop the container")
-    Some(getContainer).map(_ => container.stop)
+    Some(getContainer).map {
+        _.stop
+    }
   }
+
+}
+
+object AbstractPlay2WarTests {
+
+  private val ROOT_URL = "http://localhost:8080"
+
+}
+
+abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with CargoContainerManager with BeforeAndAfter {
+
+  import AbstractPlay2WarTests._
+
+  var container: InstalledLocalContainer = null
+
+  var webClient: WebClient = null
+  
+  override def getContainer = container
+  
+  override def setContainer(container: InstalledLocalContainer) = this.container = container
 
   before {
     webClient = new WebClient
@@ -254,4 +263,13 @@ class BasicTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with
       }
     }
   }
+}
+
+@RunWith(classOf[JUnitRunner])
+class TomcatTests extends AbstractPlay2WarTests {
+
+  override def containerUrl = "http://apache.cict.fr/tomcat/tomcat-7/v7.0.27/bin/apache-tomcat-7.0.27.zip"
+  
+  override def containerName = "tomcat7x"
+
 }
