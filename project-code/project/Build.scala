@@ -58,7 +58,7 @@ object Build extends Build {
 		  else                                   Some("release"  at cloudbees + "release/")
 	  },
 //      credentials += Credentials(file("/private/play-war/.credentials")),
-      credentials += Credentials(file(Path.userHome.absolutePath + "/.ivy2/.credentials")),
+//      credentials += Credentials(file(Path.userHome.absolutePath + "/.ivy2/.credentials")),
       publishMavenStyle := true,
       publishArtifact in Test := false
     )
