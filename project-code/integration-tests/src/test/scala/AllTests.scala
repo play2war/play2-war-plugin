@@ -273,12 +273,10 @@ class Tomcat7xTests extends AbstractPlay2WarTests {
   override def containerName = "tomcat7x"
 }
 
-// Doesn't work yet : sample war is not deployed (on Windows)
 //@RunWith(classOf[JUnitRunner])
 //class Jetty8xTests extends AbstractPlay2WarTests {
 //  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
 //  override def containerName = "jetty8x"
-//  override def context = "/"
 //}
 
 // Doesn't work yet : deployment of sample war fails : Command deploy requires an operand of type class java.io.File
