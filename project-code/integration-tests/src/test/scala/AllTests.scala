@@ -91,14 +91,18 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
   import AbstractPlay2WarTests._
 
-  var container: InstalledLocalContainer = null
-
   var webClient: WebClient = null
   
-  override def getContainer = container
-  
-  override def setContainer(container: InstalledLocalContainer) = this.container = container
+  var container: InstalledLocalContainer = null
 
+  def getContainer = container
+  
+  def setContainer(container: InstalledLocalContainer) = this.container = container
+
+  def containerUrl = ""
+  
+  def containerName = ""
+  
   before {
     webClient = new WebClient
     webClient.setJavaScriptEnabled(false)
@@ -260,6 +264,53 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
       
       page.map { p =>
         p.getWebResponse.getContentAsString should include("redirect landing")
+      }.getOrElse {
+        fail("Page not found")
+      }
+    }
+  }
+
+  /*
+   ******************
+   ******************
+   */
+
+  feature("The container must handle GET requests of big content") {
+
+    scenario("container sends big files with Content-length header") {
+
+      val page = givenWhenGet("a page which sends big content", "/bigContent")
+
+      then("response page should be downloaded")
+      
+      page.map { p =>
+        p.getWebResponse.getStatusCode should be(200)
+
+        and("have a specified Content-length")
+        p.getWebResponse.getResponseHeaderValue("Content-length") should be((2 * 1024 * 1024).toString)
+        
+        and("have a specified size")
+        p.getWebResponse.getContentAsStream.available should be(2 * 1024 * 1024)
+        
+      }.getOrElse {
+        fail("Page not found")
+      }
+    }
+
+    scenario("container sends big files with chunked Transfer-Encoding") {
+
+      val page = givenWhenGet("a page which sends big content", "/chunkedBigContent")
+
+      then("response page should be downloaded")
+      
+      page.map { p =>
+        p.getWebResponse.getStatusCode should be(200)
+
+        and("have a specified the Transfer-Encoding header")
+        p.getWebResponse.getResponseHeaderValue("Transfer-Encoding") should be("chunked")
+        
+        and("have a specified size")
+        p.getWebResponse.getContentAsStream.available should be(10485760)
       }.getOrElse {
         fail("Page not found")
       }

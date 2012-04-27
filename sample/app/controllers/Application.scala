@@ -55,7 +55,7 @@ object Application extends Controller {
   
   def bigContent = Action {
     
-    val data = new Array[Byte](10 * 1024 * 1024)
+    val data = new Array[Byte](2 * 1024 * 1024)
     val dataContent: Enumerator[Array[Byte]] = Enumerator.fromStream(new ByteArrayInputStream(data))
     
     SimpleResult(
@@ -66,7 +66,7 @@ object Application extends Controller {
   
   def chunkedBigContent = Action {
     
-    val data = new Array[Byte](10 * 1024 * 1024)
+    val data = new Array[Byte](2 * 1024 * 1024)
     val dataContent: Enumerator[Array[Byte]] = Enumerator.fromStream(new ByteArrayInputStream(data))
     
     Ok.stream(dataContent)
