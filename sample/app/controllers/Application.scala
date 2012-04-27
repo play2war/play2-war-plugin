@@ -1,7 +1,10 @@
 package controllers
 
+import java.io._
+
 import play.api._
 import play.api.mvc._
+import play.api.libs.iteratee._
 
 object Application extends Controller {
 
@@ -48,5 +51,24 @@ object Application extends Controller {
   
   def internalServerError = Action {  request =>
     throw new RuntimeException("This a desired exception in order to test exception interception")
+  }
+  
+  def bigContent = Action {
+    
+    val data = new Array[Byte](10 * 1024 * 1024)
+    val dataContent: Enumerator[Array[Byte]] = Enumerator.fromStream(new ByteArrayInputStream(data))
+    
+    SimpleResult(
+      header = ResponseHeader(200, Map(CONTENT_LENGTH -> data.length.toString)),
+      body = dataContent
+    )
+  }
+  
+  def chunkedBigContent = Action {
+    
+    val data = new Array[Byte](10 * 1024 * 1024)
+    val dataContent: Enumerator[Array[Byte]] = Enumerator.fromStream(new ByteArrayInputStream(data))
+    
+    Ok.stream(dataContent)
   }
 }
