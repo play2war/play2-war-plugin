@@ -16,8 +16,10 @@ GET     /redirect                   controllers.Application.redirect
 
 GET     /internalServerError        controllers.Application.internalServerError
 
-GET     /bigContent                    controllers.Application.bigContent
-GET     /chunkedBigContent             controllers.Application.chunkedBigContent
+GET     /bigContent                 controllers.Application.bigContent
+GET     /chunkedBigContent          controllers.Application.chunkedBigContent
+
+GET		/echo						controllers.Application.echo
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

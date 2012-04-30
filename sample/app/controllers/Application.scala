@@ -70,4 +70,8 @@ object Application extends Controller {
 
     Ok.stream(dataContent)
   }
+  
+  def echo = Action { request =>
+      Ok(views.html.echo(request.queryString))
+  }
 }

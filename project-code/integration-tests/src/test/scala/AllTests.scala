@@ -23,17 +23,17 @@ import scala.collection.JavaConverters._
 
 trait CargoContainerManager extends BeforeAndAfterAll {
   self: Suite =>
-  
+
   private val WAR_KEY = "war"
 
   def getContainer: InstalledLocalContainer
-  
+
   def setContainer(container: InstalledLocalContainer): Unit
-  
+
   def containerUrl: String
-  
+
   def containerName: String
-  
+
   def context = "/"
 
   abstract override def beforeAll(configMap: Map[String, Any]) {
@@ -75,7 +75,7 @@ trait CargoContainerManager extends BeforeAndAfterAll {
   abstract override def afterAll {
     println("Stop the container")
     Some(getContainer).map {
-        _.stop
+      _.stop
     }
   }
 
@@ -114,15 +114,30 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     webClient.closeAllWindows
   }
 
-  def givenWhenGet(given: String, path: String, when: String = "page is loaded with GET method", root: String = ROOT_URL): Option[Page] = {
+  def sendRequest(pageUrl: String, method: String = "GET", parameters: Map[String, String] = Map.empty): Option[Page] = {
+
+    val strictMethod = HttpMethod.valueOf(method)
+    val requestSettings = new WebRequest(new URL(pageUrl), strictMethod)
+
+    val listParam = parameters.map {
+      case (param, value) =>
+        new NameValuePair(param, value)
+    }.toList.asJava
+
+    requestSettings.setRequestParameters(listParam)
+
+    Some(webClient.getPage(requestSettings))
+  }
+
+  def givenWhenGet(given: String, path: String, when: String = "page is loaded with %s method", root: String = ROOT_URL, method: String = "GET", parameters: Map[String, String] = Map.empty): Option[Page] = {
 
     this.given(given)
     val pageUrl = root + path
 
-    this.when(when)
+    this.when(when.format(method))
     info("Load page " + pageUrl)
 
-    Some(webClient.getPage(pageUrl).asInstanceOf[Page])
+    sendRequest(pageUrl, method, parameters)
   }
 
   def thenCheckStatusCode(p: Option[Page], s: Int) {
@@ -152,7 +167,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
   val mapOfUrlInternalServerError: Map[String, String] = Map(
     "not found 1" -> "/internalServerError")
-    
+
   /*
    ******************
    ******************
@@ -212,6 +227,45 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
    ******************
    */
 
+  feature("The container should query parameters") {
+
+    scenario("Container reads GET parameters") {
+
+      val page = givenWhenGet("a page", "/echo", parameters = Map("param1" -> "value1", "param2" -> "value2"))
+
+      then("page body should contain parameters values")
+      page.map { p =>
+        p.getWebResponse.getContentAsString should (
+          include("param1") and include("value1")
+          and
+          include("param2") and include("value2"))
+      }.getOrElse {
+        fail("Page not found")
+      }
+    }
+
+    scenario("Container reads POST parameters") {
+
+      val page = givenWhenGet("a page", "/echo", method = "POST", parameters = Map("param1" -> "value1", "param2" -> "value2"))
+
+      then("page body should contain parameters values")
+      page.map { p =>
+        p.getWebResponse.getContentAsString should (
+          include("param1") and include("value1")
+          and
+          include("param2") and include("value2"))
+      }.getOrElse {
+        fail("Page not found")
+      }
+    }
+
+  }
+
+  /*
+   ******************
+   ******************
+   */
+
   feature("The container should handle cookies") {
 
     scenario("Container sets cookies") {
@@ -261,7 +315,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
       val page = givenWhenGet("a page which will redirect", "/redirect")
 
       then("response page should be a redirected page")
-      
+
       page.map { p =>
         p.getWebResponse.getContentAsString should include("redirect landing")
       }.getOrElse {

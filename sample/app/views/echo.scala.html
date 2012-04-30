@@ -1,0 +1,16 @@
+@(parameters: Map[String, Seq[String]])
+
+@main("Display all parameters") {
+	<p>Parameters: @parameters.size</p>
+	<ul>
+	@for((name, value) <- parameters) {
+		<li>@name:
+	        <ul>
+	            @for((paramValue) <- value) {
+	                <li>@paramValue</li>
+	            }
+	        </ul>
+	    </li>
+	}
+	</ul>
+}
