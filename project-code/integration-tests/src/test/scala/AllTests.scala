@@ -335,20 +335,25 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
       
       //100 000 => 588890
-      //300 000 => 
+      //300 000 => 1988890
+      //500 000 => 3388890
+      //700 000 => 4788890
+      //900 000 => Ca craque
       val page = givenWhenGet("a page which sends big content", "/bigContent", parameters = Map("maxRange" -> "300000"))
 
       then("response page should be downloaded")
       
       page.map { p =>
+        val expectedSize = 1988890
+        
         p.getWebResponse.getStatusCode should be(200)
 
         and("have a specified Content-length")
         info("Detected Content-length: " + p.getWebResponse.getResponseHeaderValue("Content-length"))
-//        p.getWebResponse.getResponseHeaderValue("Content-length") should be()
+        p.getWebResponse.getResponseHeaderValue("Content-length") should be(expectedSize.toString)
         
         and("have a specified size")
-//        p.getWebResponse.getContentAsStream.available should be(2 * 1024 * 1024)
+        p.getWebResponse.getContentAsStream.available should be(expectedSize)
         
       }.getOrElse {
         fail("Page not found")
