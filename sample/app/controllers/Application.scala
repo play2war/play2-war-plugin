@@ -53,9 +53,22 @@ object Application extends Controller {
     throw new RuntimeException("This a desired exception in order to test exception interception")
   }
 
-  def bigContent = Action {
+  def bigContent = Action { request =>
+    
+    val sb = new StringBuilder;
+    
+    request.queryString.get("maxRange").map {
+      maxRange =>
+        
+        for(i <- 0 until maxRange.head.toInt) {
+          sb.append(i)
+          sb.append("\n")
+        }
+    }.getOrElse {
+      sb.append("fixed length\n")
+    }
 
-    val data = new Array[Byte](2 * 1024 * 1024)
+    val data = sb.toString.getBytes
     val dataContent: Enumerator[Array[Byte]] = Enumerator.fromStream(new ByteArrayInputStream(data))
 
     SimpleResult(
