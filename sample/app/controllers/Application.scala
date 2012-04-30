@@ -49,4 +49,8 @@ object Application extends Controller {
   def internalServerError = Action { request =>
     throw new RuntimeException("This a desired exception in order to test exception interception")
   }
+
+  def echo = Action { request =>
+      Ok(views.html.echo(request.queryString))
+  }
 }
