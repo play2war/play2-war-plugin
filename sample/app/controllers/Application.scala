@@ -5,6 +5,7 @@ import java.io._
 import play.api._
 import play.api.mvc._
 import play.api.libs.iteratee._
+import play.api.libs.concurrent._
 
 object Application extends Controller {
 
@@ -53,19 +54,20 @@ object Application extends Controller {
     throw new RuntimeException("This a desired exception in order to test exception interception")
   }
 
+  // All in memory
   def bigContent = Action { request =>
-    
+
     val sb = new StringBuilder;
-    
+
     request.queryString.get("maxRange").map {
       maxRange =>
-        
-        for(i <- 0 until maxRange.head.toInt) {
+
+        for (i <- 0 until maxRange.head.toInt) {
           sb.append(i)
           sb.append("\n")
         }
     }.getOrElse {
-      sb.append("fixed length\n")
+      sb.append("Max range not found\n")
     }
 
     val data = sb.toString.getBytes
@@ -76,15 +78,46 @@ object Application extends Controller {
       body = dataContent)
   }
 
-  def chunkedBigContent = Action {
+  // Streaming of big content
+  def chunkedBigContent = Action { request =>
 
-    val data = new Array[Byte](2 * 1024 * 1024)
-    val dataContent: Enumerator[Array[Byte]] = Enumerator.fromStream(new ByteArrayInputStream(data))
+    val dataContent: Enumerator[String] =
+      request.queryString.get("maxRange").map {
+        maxRange =>
+          val iMaxRange = maxRange.head.toInt
+          var counter = 0
 
-    Ok.stream(dataContent)
+          Enumerator.fromCallback(() => {
+
+            if (counter >= iMaxRange) {
+              Promise.pure(None)
+            } else {
+
+              val tempCounter = counter + 50000
+
+              import scala.math._
+              val minCounter = min(tempCounter, iMaxRange)
+
+              val sb = new StringBuilder
+
+              for (i <- counter until minCounter) {
+                sb.append(i)
+                sb.append("\n")
+              }
+
+              counter = tempCounter
+
+              Promise.pure(Some(sb.toString))
+            }
+          })
+      }.getOrElse {
+        Enumerator("Max range not found\n")
+      }
+
+    Ok.stream(dataContent >>> Enumerator.eof)
   }
-  
+
   def echo = Action { request =>
-      Ok(views.html.echo(request.queryString))
+    Ok(views.html.echo(request.queryString))
   }
 }
