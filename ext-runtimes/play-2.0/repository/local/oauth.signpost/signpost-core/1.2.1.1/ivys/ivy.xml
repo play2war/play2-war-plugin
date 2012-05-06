@@ -4,7 +4,7 @@
 		module="signpost-core"
 		revision="1.2.1.1"
 		status="release"
-		publication="20120229222255"
+		publication="20120330020255"
 	>
 		<description homepage="" />
 		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>

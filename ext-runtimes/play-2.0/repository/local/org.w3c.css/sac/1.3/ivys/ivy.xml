@@ -4,7 +4,7 @@
 		module="sac"
 		revision="1.3"
 		status="release"
-		publication="20120229222351"
+		publication="20120330020934"
 	>
 		<license name="The W3C Software License" url="http://www.w3.org/Consortium/Legal/copyright-software-19980720" />
 		<description homepage="http://www.w3.org/Style/CSS/SAC/">

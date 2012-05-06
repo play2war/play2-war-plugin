@@ -4,7 +4,7 @@
 		module="jerkson_2.9.1"
 		revision="0.5.0"
 		status="release"
-		publication="20120229222257"
+		publication="20120330020301"
 	>
 		<license name="The MIT License" url="http://codahale.com/mit.txt" />
 		<description homepage="" />

@@ -4,7 +4,7 @@
 		module="validation-api"
 		revision="1.0.0.GA"
 		status="release"
-		publication="20120229222248"
+		publication="20120330020237"
 	>
 		<license name="Apache License, Version 2.0" url="license.txt" />
 		<description homepage="">

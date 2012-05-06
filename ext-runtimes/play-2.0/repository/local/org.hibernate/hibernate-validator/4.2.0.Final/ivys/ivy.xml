@@ -4,7 +4,7 @@
 		module="hibernate-validator"
 		revision="4.2.0.Final"
 		status="release"
-		publication="20120229222247"
+		publication="20120330020232"
 	>
 		<description homepage="">
 		Hibernate&apos;s Bean Validation (JSR-303) reference implementation.

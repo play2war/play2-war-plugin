@@ -4,7 +4,7 @@
 		module="oss-parent"
 		revision="7"
 		status="release"
-		publication="20120229222228"
+		publication="20120330020140"
 	>
 		<description homepage="http://nexus.sonatype.org/oss-repository-hosting.html">
 		Sonatype helps open source projects to set up Maven repositories on https://oss.sonatype.org/

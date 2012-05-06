@@ -4,7 +4,7 @@
 		module="ebean"
 		revision="2.7.3"
 		status="release"
-		publication="20120229222240"
+		publication="20120330020205"
 	>
 		<license name="LGPL version 2.1 or later" url="http://www.gnu.org/licenses/lgpl-2.1.txt" />
 		<description homepage="http://www.avaje.org">

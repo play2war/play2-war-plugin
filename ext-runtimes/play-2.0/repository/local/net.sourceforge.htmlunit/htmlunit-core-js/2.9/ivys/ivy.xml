@@ -4,7 +4,7 @@
 		module="htmlunit-core-js"
 		revision="2.9"
 		status="release"
-		publication="20120229222350"
+		publication="20120330020930"
 	>
 		<license name="Mozilla Public License version 1.1" url="http://www.mozilla.org/MPL/MPL-1.1.html" />
 		<description homepage="http://htmlunit.sourceforge.net">

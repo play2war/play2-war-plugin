@@ -4,7 +4,7 @@
 		module="commons-lang"
 		revision="2.6"
 		status="release"
-		publication="20120229222253"
+		publication="20120330013635"
 	>
 		<description homepage="http://commons.apache.org/lang/">
 		Commons Lang, a package of Java utility classes for the

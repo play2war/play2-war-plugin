@@ -4,7 +4,7 @@
 		module="platform"
 		revision="3.4.0"
 		status="release"
-		publication="20120229222054"
+		publication="20120330013659"
 	>
 		<license name="LGPL, version 2.1" url="http://creativecommons.org/licenses/LGPL/2.1/" />
 		<description homepage="https://github.com/twall/jna">
