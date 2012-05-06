@@ -4,7 +4,7 @@
 		module="spring-core"
 		revision="3.0.7.RELEASE"
 		status="release"
-		publication="20120229222251"
+		publication="20120330020243"
 	>
 		<description homepage="" />
 		<m:dependency.management__org.easymock__easymock__scope>test</m:dependency.management__org.easymock__easymock__scope>

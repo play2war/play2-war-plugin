@@ -4,7 +4,7 @@
 		module="async-http-client"
 		revision="1.7.0"
 		status="release"
-		publication="20120229222254"
+		publication="20120330020253"
 	>
 		<license name="Apache License 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.html" />
 		<description homepage="http://github.com/sonatype/async-http-client">

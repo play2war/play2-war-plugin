@@ -4,7 +4,7 @@
 		module="junit-interface"
 		revision="0.8"
 		status="release"
-		publication="20120229222330"
+		publication="20120330020847"
 	>
 		<license name="Two-clause BSD-style license" url="http://github.com/szeiger/junit-interface/blob/master/LICENSE.txt" />
 		<description homepage="http://github.com/szeiger/junit-interface/">

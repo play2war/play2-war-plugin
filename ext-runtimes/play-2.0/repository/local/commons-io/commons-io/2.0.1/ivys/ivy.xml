@@ -4,7 +4,7 @@
 		module="commons-io"
 		revision="2.0.1"
 		status="release"
-		publication="20120229222352"
+		publication="20120330014656"
 	>
 		<description homepage="http://commons.apache.org/io/">
 		Commons-IO contains utility classes, stream implementations, file filters, file comparators and endian classes.

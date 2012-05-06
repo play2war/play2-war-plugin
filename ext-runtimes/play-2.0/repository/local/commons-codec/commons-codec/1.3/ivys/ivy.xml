@@ -4,7 +4,7 @@
 		module="commons-codec"
 		revision="1.3"
 		status="release"
-		publication="20120229222257"
+		publication="20120330020300"
 	>
 		<license name="The Apache Software License, Version 2.0" url="/LICENSE.txt" />
 		<description homepage="http://jakarta.apache.org/commons/codec/">

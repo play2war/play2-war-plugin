@@ -4,7 +4,7 @@
 		module="asm-analysis"
 		revision="3.3.1"
 		status="release"
-		publication="20120229222119"
+		publication="20120330020344"
 	>
 		<description homepage="" />
 		<m:dependency.management__asm__asm-xml__version>3.3.1</m:dependency.management__asm__asm-xml__version>

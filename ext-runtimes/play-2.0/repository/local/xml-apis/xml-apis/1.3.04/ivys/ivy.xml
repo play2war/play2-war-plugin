@@ -4,7 +4,7 @@
 		module="xml-apis"
 		revision="1.3.04"
 		status="release"
-		publication="20120229222347"
+		publication="20120330020925"
 	>
 		<description homepage="http://xml.apache.org/commons/components/external/">
 		xml-commons provides an Apache-hosted set of DOM, SAX, and 

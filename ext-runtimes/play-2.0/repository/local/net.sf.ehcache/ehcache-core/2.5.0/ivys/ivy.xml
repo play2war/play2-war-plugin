@@ -4,7 +4,7 @@
 		module="ehcache-core"
 		revision="2.5.0"
 		status="release"
-		publication="20120229222305"
+		publication="20120330020325"
 	>
 		<license name="The Apache Software License, Version 2.0" url="src/assemble/EHCACHE-CORE-LICENSE.txt" />
 		<description homepage="http://ehcache.org">
