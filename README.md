@@ -1,10 +1,12 @@
 # WAR Plugin for Play framework 2.0
 
-    Current version: 0.3
+    Current version: 0.3.1
 
     Project-status: ALPHA
 
 This project is a module for Play framework 2 to package your apps into standard WAR packages.
+
+As of version 0.3.1, it is only compatible with Play2 **2.0.1**.
 
 Live demos :
 
@@ -133,7 +135,7 @@ In ``APP_HOME/project/plugins.sbt``, add:
 ```scala
 resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.3")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.3.1")
 ```
 
 ### Add play2war runtime
@@ -143,7 +145,7 @@ In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` val
 ```scala
 val appDependencies = Seq(
   ...
-  "com.github.play2war" %% "play2-war-core" % "0.3"
+  "com.github.play2war" %% "play2-war-core" % "0.3.1"
   ...
 )
 
