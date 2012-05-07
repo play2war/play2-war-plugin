@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="io.netty"
+		module="netty"
+		revision="3.3.0.Final"
+		status="release"
+		publication="20120229222228"
+	>
+		<license name="Apache License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0" />
+		<description homepage="http://netty.io/">
+		The Netty project is an effort to provide an asynchronous event-driven
+    network application framework and tools for rapid development of
+    maintainable high performance and high scalability protocol servers and
+    clients.  In other words, Netty is a NIO client server framework which
+    enables quick and easy development of network applications such as protocol
+    servers and clients. It greatly simplifies and streamlines network
+    programming such as TCP and UDP socket server.
+		</description>
+		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>
+		<m:properties__jdk.min.version>1.5</m:properties__jdk.min.version>
+		<m:properties__attach-distribution>false</m:properties__attach-distribution>
+		<m:properties__sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</m:properties__sonatypeOssDistMgmtSnapshotsUrl>
+		<m:properties__maven.min.version>2.2.1</m:properties__maven.min.version>
+		<m:maven.plugins>org.apache.maven.plugins__maven-enforcer-plugin__1.0|org.apache.maven.plugins__maven-enforcer-plugin__1.0|null__maven-enforcer-plugin__1.0.1|null__maven-compiler-plugin__2.3.2|null__maven-resources-plugin__2.5|null__maven-surefire-plugin__2.10|org.apache.felix__maven-bundle-plugin__2.3.4|null__maven-source-plugin__2.1.2|null__maven-antrun-plugin__1.7|null__maven-javadoc-plugin__2.8|null__maven-jxr-plugin__2.2|null__maven-assembly-plugin__2.2.1|null__maven-gpg-plugin__1.4|null__maven-release-plugin__2.2.1|null__maven-eclipse-plugin__2.8|null__maven-checkstyle-plugin__2.8</m:maven.plugins>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+		<artifact name="netty" type="bundle" ext="jar" conf="master"/>
+	</publications>
+	<dependencies>
+		<dependency org="com.google.protobuf" name="protobuf-java" rev="2.4.1" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="javax.servlet" name="servlet-api" rev="2.5" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="org.apache.felix" name="org.osgi.core" rev="1.4.0" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="org.apache.felix" name="org.osgi.compendium" rev="1.4.0" force="true" conf="optional->compile(*),master(*)">
+			<exclude org="org.apache.felix" module="javax.servlet" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="org.apache.felix" module="org.osgi.foundation" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.6.4" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="commons-logging" name="commons-logging" rev="1.1.1" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="org.jboss.logging" name="jboss-logging-spi" rev="2.1.2.GA" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="log4j" name="log4j" rev="1.2.16" force="true" conf="optional->compile(*),master(*)">
+			<exclude org="javax.mail" module="mail" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="javax.jms" module="jms" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="com.sun.jdmk" module="jmxtools" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="com.sun.jmx" module="jmxri" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="junit" name="junit" rev="4.10" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.easymock" name="easymock" rev="3.1" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.easymock" name="easymockclassextension" rev="3.1" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.slf4j" name="slf4j-simple" rev="1.6.4" force="true" conf="test->runtime(*),master(*)"/>
+	</dependencies>
+</ivy-module>

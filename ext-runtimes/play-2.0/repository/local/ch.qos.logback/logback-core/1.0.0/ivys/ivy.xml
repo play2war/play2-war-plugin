@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="ch.qos.logback"
+		module="logback-core"
+		revision="1.0.0"
+		status="release"
+		publication="20120229222234"
+	>
+		<license name="Eclipse Public License - v 1.0" url="http://www.eclipse.org/legal/epl-v10.html" />
+		<license name="GNU Lesser General Public License" url="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html" />
+		<description homepage="http://logback.qos.ch">
+		Logback: the generic, reliable, fast and flexible logging library for Java.
+		</description>
+		<m:dependency.management__org.codehaus.groovy__groovy-all__version>1.7.6</m:dependency.management__org.codehaus.groovy__groovy-all__version>
+		<m:dependency.management__dom4j__dom4j__version>1.6.1</m:dependency.management__dom4j__dom4j__version>
+		<m:properties__scala.version>2.9.1</m:properties__scala.version>
+		<m:dependency.management__janino__janino__version>2.5.10</m:dependency.management__janino__janino__version>
+		<m:dependency.management__mysql__mysql-connector-java__version>5.1.9</m:dependency.management__mysql__mysql-connector-java__version>
+		<m:dependency.management__com.h2database__h2__version>1.2.132</m:dependency.management__com.h2database__h2__version>
+		<m:properties__groovy.version>1.7.6</m:properties__groovy.version>
+		<m:dependency.management__org.slf4j__slf4j-api__version>1.6.4</m:dependency.management__org.slf4j__slf4j-api__version>
+		<m:properties__consolePlugin.version>1.1.0</m:properties__consolePlugin.version>
+		<m:dependency.management__org.apache.tomcat__tomcat-catalina__version>7.0.21</m:dependency.management__org.apache.tomcat__tomcat-catalina__version>
+		<m:dependency.management__hsqldb__hsqldb__version>1.8.0.7</m:dependency.management__hsqldb__hsqldb__version>
+		<m:dependency.management__org.scala-lang__scala-library__version>2.9.1</m:dependency.management__org.scala-lang__scala-library__version>
+		<m:dependency.management__javax.mail__mail__version>1.4</m:dependency.management__javax.mail__mail__version>
+		<m:maven.plugins>org.codehaus.mojo__build-helper-maven-plugin__1.7|org.apache.maven.plugins__maven-compiler-plugin__2.3.2|org.apache.maven.plugins__maven-surefire-plugin__2.10|org.apache.maven.plugins__maven-source-plugin__2.1.2|org.apache.maven.plugins__maven-jar-plugin__2.3.1|org.apache.maven.plugins__maven-eclipse-plugin__2.8|org.apache.maven.plugins__maven-assembly-plugin__2.1|org.apache.felix__maven-bundle-plugin__2.1.0|org.scala-tools__maven-scala-plugin__2.15.2|org.codehaus.groovy.maven__gmaven-plugin__1.0|org.apache.maven.plugins__maven-site-plugin__3.0|org.codehaus.mojo__build-helper-maven-plugin__1.7|org.apache.maven.plugins__maven-compiler-plugin__2.3.2|org.apache.maven.plugins__maven-surefire-plugin__2.10|org.apache.maven.plugins__maven-source-plugin__2.1.2|org.apache.maven.plugins__maven-jar-plugin__2.3.1|org.apache.maven.plugins__maven-eclipse-plugin__2.8|org.apache.maven.plugins__maven-assembly-plugin__2.1|org.apache.felix__maven-bundle-plugin__2.1.0|org.scala-tools__maven-scala-plugin__2.15.2|org.codehaus.groovy.maven__gmaven-plugin__1.0|org.apache.maven.plugins__maven-site-plugin__3.0|org.apache.maven.plugins__maven-compiler-plugin__null|org.scala-tools__maven-scala-plugin__null|org.apache.maven.plugins__maven-surefire-plugin__null|org.apache.maven.plugins__maven-jar-plugin__null|org.apache.felix__maven-bundle-plugin__null</m:maven.plugins>
+		<m:dependency.management__ch.qos.logback__logback-core__version>1.0.0</m:dependency.management__ch.qos.logback__logback-core__version>
+		<m:dependency.management__postgresql__postgresql__version>8.4-701.jdbc4</m:dependency.management__postgresql__postgresql__version>
+		<m:dependency.management__org.apache.geronimo.specs__geronimo-jms_1.1_spec__version>1.0</m:dependency.management__org.apache.geronimo.specs__geronimo-jms_1.1_spec__version>
+		<m:properties__janino.version>2.5.10</m:properties__janino.version>
+		<m:properties__tomcat.version>7.0.21</m:properties__tomcat.version>
+		<m:properties__slf4j.version>1.6.4</m:properties__slf4j.version>
+		<m:properties__jetty.version>7.5.1.v20110908</m:properties__jetty.version>
+		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>
+		<m:dependency.management__org.eclipse.jetty__jetty-server__version>7.5.1.v20110908</m:dependency.management__org.eclipse.jetty__jetty-server__version>
+		<m:properties__junit.version>4.8.2</m:properties__junit.version>
+		<m:dependency.management__ch.qos.logback__logback-access__version>1.0.0</m:dependency.management__ch.qos.logback__logback-access__version>
+		<m:dependency.management__ch.qos.logback__logback-classic__version>1.0.0</m:dependency.management__ch.qos.logback__logback-classic__version>
+		<m:dependency.management__javax.servlet__servlet-api__version>2.5</m:dependency.management__javax.servlet__servlet-api__version>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+		<artifact name="logback-core" type="jar" ext="jar" conf="master"/>
+	</publications>
+	<dependencies>
+		<dependency org="janino" name="janino" rev="2.5.10" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="org.codehaus.groovy" name="groovy-all" rev="1.7.6" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="javax.mail" name="mail" rev="1.4" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="org.apache.geronimo.specs" name="geronimo-jms_1.1_spec" rev="1.0" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="org.easymock" name="easymock" rev="2.4" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="javax.servlet" name="servlet-api" rev="2.5" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="org.scala-lang" name="scala-library" rev="2.9.1" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="junit" name="junit" rev="4.8.2" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.easytesting" name="fest-assert" rev="1.2" force="true" conf="test->runtime(*),master(*)"/>
+		<override org="org.codehaus.groovy" module="groovy-all" matcher="exact" rev="1.7.6"/>
+		<override org="dom4j" module="dom4j" matcher="exact" rev="1.6.1"/>
+		<override org="janino" module="janino" matcher="exact" rev="2.5.10"/>
+		<override org="mysql" module="mysql-connector-java" matcher="exact" rev="5.1.9"/>
+		<override org="com.h2database" module="h2" matcher="exact" rev="1.2.132"/>
+		<override org="org.slf4j" module="slf4j-api" matcher="exact" rev="1.6.4"/>
+		<override org="org.scala-lang" module="scala-library" matcher="exact" rev="2.9.1"/>
+		<override org="hsqldb" module="hsqldb" matcher="exact" rev="1.8.0.7"/>
+		<override org="org.apache.tomcat" module="tomcat-catalina" matcher="exact" rev="7.0.21"/>
+		<override org="javax.mail" module="mail" matcher="exact" rev="1.4"/>
+		<override org="ch.qos.logback" module="logback-core" matcher="exact" rev="1.0.0"/>
+		<override org="postgresql" module="postgresql" matcher="exact" rev="8.4-701.jdbc4"/>
+		<override org="org.apache.geronimo.specs" module="geronimo-jms_1.1_spec" matcher="exact" rev="1.0"/>
+		<override org="org.eclipse.jetty" module="jetty-server" matcher="exact" rev="7.5.1.v20110908"/>
+		<override org="ch.qos.logback" module="logback-access" matcher="exact" rev="1.0.0"/>
+		<override org="ch.qos.logback" module="logback-classic" matcher="exact" rev="1.0.0"/>
+		<override org="javax.servlet" module="servlet-api" matcher="exact" rev="2.5"/>
+	</dependencies>
+</ivy-module>

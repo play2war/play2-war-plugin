@@ -1,0 +1,3 @@
+play-2.0/framework/sbt/boot
+play-2.0/repository/.sbt.ivy.lock
+play-2.0/repository/cache

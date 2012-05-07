@@ -1,0 +1,10 @@
+@(cookies: Map[String, String])
+
+@main("Display cookies content") {
+	<p>Cookies: @cookies.size</p>
+	<ul>
+	@for((name, value) <- cookies) {
+		<li>@name: @value</li>
+	}
+	</ul>
+}

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="com.codahale"
+		module="jerkson_2.9.1"
+		revision="0.5.0"
+		status="release"
+		publication="20120229222257"
+	>
+		<license name="The MIT License" url="http://codahale.com/mit.txt" />
+		<description homepage="" />
+		<m:properties__jackson.version>[1.9.0,2.0.0)</m:properties__jackson.version>
+		<m:properties__scala.version>2.9.1</m:properties__scala.version>
+		<m:maven.plugins>org.scala-tools__maven-scala-plugin__2.15.2|org.apache.maven.plugins__maven-compiler-plugin__2.3.2|org.apache.maven.plugins__maven-source-plugin__2.1.2|org.apache.maven.plugins__maven-resources-plugin__2.5|org.apache.maven.plugins__maven-surefire-plugin__2.8.1</m:maven.plugins>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+		<artifact name="jerkson_2.9.1" type="jar" ext="jar" conf="master"/>
+	</publications>
+	<dependencies>
+		<dependency org="org.scala-lang" name="scala-library" rev="2.9.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="org.codehaus.jackson" name="jackson-core-asl" rev="[1.9.0,2.0.0)" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="org.codehaus.jackson" name="jackson-mapper-asl" rev="[1.9.0,2.0.0)" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="com.codahale" name="simplespec_2.9.1" rev="[0.5.0,0.6.0)" force="true" conf="test->runtime(*),master(*)"/>
+	</dependencies>
+</ivy-module>

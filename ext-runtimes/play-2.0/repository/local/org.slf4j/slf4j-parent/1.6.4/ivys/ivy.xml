@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="org.slf4j"
+		module="slf4j-parent"
+		revision="1.6.4"
+		status="release"
+		publication="20120229222230"
+	>
+		<license name="MIT License" url="http://www.opensource.org/licenses/mit-license.php" />
+		<description homepage="http://www.slf4j.org" />
+		<m:dependency.management__org.slf4j__slf4j-api__version>1.6.4</m:dependency.management__org.slf4j__slf4j-api__version>
+		<m:properties__cal10n.version>0.7.4</m:properties__cal10n.version>
+		<m:properties__slf4j.api.minimum.compatible.version>1.6.0
+    </m:properties__slf4j.api.minimum.compatible.version>
+		<m:properties__log4j.version>1.2.16</m:properties__log4j.version>
+		<m:maven.plugins>org.apache.maven.plugins__maven-compiler-plugin__2.3.2|org.apache.maven.plugins__maven-jar-plugin__2.3.1|org.apache.maven.plugins__maven-surefire-plugin__2.10|org.apache.maven.plugins__maven-source-plugin__2.1.2|org.apache.maven.plugins__maven-assembly-plugin__2.2|org.codehaus.mojo__build-helper-maven-plugin__1.7|org.apache.maven.plugins__maven-site-plugin__3.0</m:maven.plugins>
+		<m:dependency.management__ch.qos.cal10n__cal10n-api__version>0.7.4</m:dependency.management__ch.qos.cal10n__cal10n-api__version>
+		<m:dependency.management__log4j__log4j__version>1.2.16</m:dependency.management__log4j__log4j__version>
+		<m:dependency.management__org.slf4j__slf4j-jdk14__version>1.6.4</m:dependency.management__org.slf4j__slf4j-jdk14__version>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+	</publications>
+	<dependencies>
+		<dependency org="junit" name="junit" rev="3.8.1" force="true" conf="test->runtime(*),master(*)"/>
+		<override org="org.slf4j" module="slf4j-api" matcher="exact" rev="1.6.4"/>
+		<override org="org.slf4j" module="slf4j-jdk14" matcher="exact" rev="1.6.4"/>
+		<override org="log4j" module="log4j" matcher="exact" rev="1.2.16"/>
+		<override org="ch.qos.cal10n" module="cal10n-api" matcher="exact" rev="0.7.4"/>
+	</dependencies>
+</ivy-module>

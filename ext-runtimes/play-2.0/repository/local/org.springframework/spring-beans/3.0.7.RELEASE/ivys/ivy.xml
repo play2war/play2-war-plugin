@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="org.springframework"
+		module="spring-beans"
+		revision="3.0.7.RELEASE"
+		status="release"
+		publication="20120229222251"
+	>
+		<description homepage="" />
+		<m:dependency.management__org.easymock__easymock__scope>test</m:dependency.management__org.easymock__easymock__scope>
+		<m:dependency.management__log4j__log4j__scope>test</m:dependency.management__log4j__log4j__scope>
+		<m:dependency.management__junit__junit__scope>test</m:dependency.management__junit__junit__scope>
+		<m:dependency.management__javax.inject__com.springsource.javax.inject__version>1.0.0</m:dependency.management__javax.inject__com.springsource.javax.inject__version>
+		<m:dependency.management__javax.inject__com.springsource.javax.inject__scope>provided</m:dependency.management__javax.inject__com.springsource.javax.inject__scope>
+		<m:dependency.management__javax.xml.ws__jaxws-api__exclusion_0>javax.jws__jsr181</m:dependency.management__javax.xml.ws__jaxws-api__exclusion_0>
+		<m:dependency.management__org.slf4j__slf4j-api__version>1.5.10</m:dependency.management__org.slf4j__slf4j-api__version>
+		<m:dependency.management__log4j__log4j__exclusion_2>javax.mail__mail</m:dependency.management__log4j__log4j__exclusion_2>
+		<m:dependency.management__org.slf4j__slf4j-log4j12__version>1.5.10</m:dependency.management__org.slf4j__slf4j-log4j12__version>
+		<m:dependency.management__log4j__log4j__exclusion_3>javax.jms__jms</m:dependency.management__log4j__log4j__exclusion_3>
+		<m:dependency.management__junit__junit__version>4.7</m:dependency.management__junit__junit__version>
+		<m:dependency.management__log4j__log4j__exclusion_0>com.sun.jdmk__jmxtools</m:dependency.management__log4j__log4j__exclusion_0>
+		<m:dependency.management__org.aspectj__aspectjweaver__version>1.6.8</m:dependency.management__org.aspectj__aspectjweaver__version>
+		<m:dependency.management__log4j__log4j__exclusion_1>com.sun.jmx__jmxri</m:dependency.management__log4j__log4j__exclusion_1>
+		<m:dependency.management__org.easymock__easymock__version>2.5.1</m:dependency.management__org.easymock__easymock__version>
+		<m:maven.plugins>org.apache.maven.plugins__maven-compiler-plugin__null|org.apache.maven.plugins__maven-surefire-plugin__null|org.apache.maven.plugins__maven-compiler-plugin__null|org.apache.maven.plugins__maven-surefire-plugin__null</m:maven.plugins>
+		<m:dependency.management__javax.xml.ws__jaxws-api__version>2.1-1</m:dependency.management__javax.xml.ws__jaxws-api__version>
+		<m:dependency.management__log4j__log4j__version>1.2.15</m:dependency.management__log4j__log4j__version>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+		<artifact name="spring-beans" type="jar" ext="jar" conf="master"/>
+	</publications>
+	<dependencies>
+		<dependency org="javax.el" name="el-api" rev="1.0" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="javax.inject" name="javax.inject" rev="1" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="cglib" name="cglib-nodep" rev="2.2" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="org.springframework" name="spring-core" rev="3.0.7.RELEASE" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="log4j" name="log4j" rev="1.2.15" force="true" conf="test->runtime(*),master(*)">
+			<exclude org="javax.mail" module="mail" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="javax.jms" module="jms" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="com.sun.jdmk" module="jmxtools" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="com.sun.jmx" module="jmxri" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="junit" name="junit" rev="4.7" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.easymock" name="easymock" rev="2.5.1" force="true" conf="test->runtime(*),master(*)"/>
+		<override org="org.easymock" module="easymock" matcher="exact" rev="2.5.1"/>
+		<override org="log4j" module="log4j" matcher="exact" rev="1.2.15"/>
+		<override org="junit" module="junit" matcher="exact" rev="4.7"/>
+		<override org="javax.inject" module="com.springsource.javax.inject" matcher="exact" rev="1.0.0"/>
+		<override org="javax.inject" module="com.springsource.javax.inject" matcher="exact" rev="1.0.0"/>
+		<override org="javax.xml.ws" module="jaxws-api" matcher="exact" rev="2.1-1"/>
+		<override org="org.slf4j" module="slf4j-api" matcher="exact" rev="1.5.10"/>
+		<override org="log4j" module="log4j" matcher="exact" rev="1.2.15"/>
+		<override org="org.slf4j" module="slf4j-log4j12" matcher="exact" rev="1.5.10"/>
+		<override org="log4j" module="log4j" matcher="exact" rev="1.2.15"/>
+		<override org="junit" module="junit" matcher="exact" rev="4.7"/>
+		<override org="log4j" module="log4j" matcher="exact" rev="1.2.15"/>
+		<override org="org.aspectj" module="aspectjweaver" matcher="exact" rev="1.6.8"/>
+		<override org="log4j" module="log4j" matcher="exact" rev="1.2.15"/>
+		<override org="org.easymock" module="easymock" matcher="exact" rev="2.5.1"/>
+		<override org="javax.xml.ws" module="jaxws-api" matcher="exact" rev="2.1-1"/>
+		<override org="log4j" module="log4j" matcher="exact" rev="1.2.15"/>
+	</dependencies>
+</ivy-module>

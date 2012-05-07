@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="org.apache.ivy"
+		module="ivy"
+		revision="2.2.0"
+		status="release"
+		publication="20100924000647"
+	>
+		<description homepage="http://ant.apache.org/ivy/" />
+		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>
+		<m:properties__organization.logo>http://www.apache.org/images/asf_logo_wide.gif</m:properties__organization.logo>
+		<m:properties__distMgmtSnapshotsName>Apache Development Snapshot Repository</m:properties__distMgmtSnapshotsName>
+		<m:properties__distMgmtSnapshotsUrl>https://repository.apache.org/content/repositories/snapshots</m:properties__distMgmtSnapshotsUrl>
+		<m:properties__sourceReleaseAssemblyDescriptor>source-release</m:properties__sourceReleaseAssemblyDescriptor>
+		<m:maven.plugins>org.apache.maven.plugins__maven-remote-resources-plugin__null|org.apache.maven.plugins__maven-remote-resources-plugin__null</m:maven.plugins>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+		<artifact name="ivy" type="jar" ext="jar" conf="master"/>
+	</publications>
+	<dependencies>
+		<dependency org="ant" name="ant" rev="1.6.2" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="ant" name="ant-nodeps" rev="1.6.2" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="ant" name="ant-trax" rev="1.6.2" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="commons-httpclient" name="commons-httpclient" rev="3.0" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="oro" name="oro" rev="2.0.8" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="commons-vfs" name="commons-vfs" rev="1.0" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="com.jcraft" name="jsch" rev="0.1.31" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="org.bouncycastle" name="bcpg-jdk14" rev="1.45" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="org.bouncycastle" name="bcprov-jdk14" rev="1.45" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="junit" name="junit" rev="3.8.2" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="commons-lang" name="commons-lang" rev="2.5" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.apache.ant" name="ant-testutil" rev="1.7.0" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="ant" name="ant-launcher" rev="1.6.2" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="xerces" name="xercesImpl" rev="2.6.2" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="xerces" name="xmlParserAPIs" rev="2.6.2" force="true" conf="test->runtime(*),master(*)"/>
+	</dependencies>
+</ivy-module>

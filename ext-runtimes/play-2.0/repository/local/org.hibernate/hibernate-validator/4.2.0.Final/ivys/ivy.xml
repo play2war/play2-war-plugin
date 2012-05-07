@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="org.hibernate"
+		module="hibernate-validator"
+		revision="4.2.0.Final"
+		status="release"
+		publication="20120229222247"
+	>
+		<description homepage="">
+		Hibernate&apos;s Bean Validation (JSR-303) reference implementation.
+		</description>
+		<m:dependency.management__org.jsoup__jsoup__version>1.5.2</m:dependency.management__org.jsoup__jsoup__version>
+		<m:properties__jdbc.driver>org.h2.Driver</m:properties__jdbc.driver>
+		<m:properties__jdbc.url>jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</m:properties__jdbc.url>
+		<m:dependency.management__com.googlecode.jtype__jtype__version>0.1.1</m:dependency.management__com.googlecode.jtype__jtype__version>
+		<m:dependency.management__org.hibernate__hibernate-entitymanager__version>3.6.0.Final</m:dependency.management__org.hibernate__hibernate-entitymanager__version>
+		<m:dependency.management__com.h2database__h2__version>1.2.124</m:dependency.management__com.h2database__h2__version>
+		<m:dependency.management__javax.xml.bind__jaxb-api__version>2.2</m:dependency.management__javax.xml.bind__jaxb-api__version>
+		<m:properties__jsr303.tck.version>1.0.5.GA</m:properties__jsr303.tck.version>
+		<m:dependency.management__org.slf4j__slf4j-api__version>1.6.1</m:dependency.management__org.slf4j__slf4j-api__version>
+		<m:properties__jdbc.user>sa</m:properties__jdbc.user>
+		<m:properties__jdocbook.ignoreTranslations>false</m:properties__jdocbook.ignoreTranslations>
+		<m:dependency.management__org.easymock__easymock__version>3.0</m:dependency.management__org.easymock__easymock__version>
+		<m:maven.plugins>org.apache.maven.plugins__maven-enforcer-plugin__1.0-beta-1|org.apache.maven.plugins__maven-release-plugin__2.0|org.apache.maven.plugins__maven-enforcer-plugin__1.0-beta-1|org.apache.maven.plugins__maven-release-plugin__2.0|null__maven-source-plugin__null|org.codehaus.mojo__jaxb2-maven-plugin__null|null__maven-jar-plugin__null|org.apache.felix__maven-bundle-plugin__null|null__maven-surefire-plugin__null|null__maven-surefire-report-plugin__null|null__maven-shade-plugin__null|null__maven-javadoc-plugin__null|org.jboss.maven.plugins__maven-jdocbook-plugin__null|org.jboss.maven.plugins__maven-jdocbook-style-plugin__null|null__maven-release-plugin__null|org.jboss.maven.plugins__maven-injection-plugin__null</m:maven.plugins>
+		<m:dependency.management__joda-time__joda-time__version>1.6</m:dependency.management__joda-time__joda-time__version>
+		<m:properties__db.dialect>org.hibernate.dialect.H2Dialect</m:properties__db.dialect>
+		<m:dependency.management__org.hibernate.jsr303.tck__jsr303-tck__version>1.0.5.GA</m:dependency.management__org.hibernate.jsr303.tck__jsr303-tck__version>
+		<m:dependency.management__javax.validation__validation-api__version>1.0.0.GA</m:dependency.management__javax.validation__validation-api__version>
+		<m:dependency.management__org.testng__testng__version>5.14.2</m:dependency.management__org.testng__testng__version>
+		<m:dependency.management__org.hibernate__hibernate-validator-annotation-processor__version>4.2.0.Final</m:dependency.management__org.hibernate__hibernate-validator-annotation-processor__version>
+		<m:dependency.management__org.hibernate__hibernate-validator__version>4.2.0.Final</m:dependency.management__org.hibernate__hibernate-validator__version>
+		<m:dependency.management__org.jboss.jbossas.as7-cdi-tck__jbossas-container__version>1.0.0.Alpha1</m:dependency.management__org.jboss.jbossas.as7-cdi-tck__jbossas-container__version>
+		<m:dependency.management__org.slf4j__slf4j-simple__version>1.6.1</m:dependency.management__org.slf4j__slf4j-simple__version>
+		<m:dependency.management__org.hibernate.javax.persistence__hibernate-jpa-2.0-api__version>1.0.1.Final</m:dependency.management__org.hibernate.javax.persistence__hibernate-jpa-2.0-api__version>
+		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>
+		<m:properties__slf4jVersion>1.6.1</m:properties__slf4jVersion>
+		<m:dependency.management__org.slf4j__slf4j-log4j12__version>1.6.1</m:dependency.management__org.slf4j__slf4j-log4j12__version>
+		<m:dependency.management__org.jboss.as__jboss-as-arquillian-container-managed__version>7.0.0.Beta2</m:dependency.management__org.jboss.as__jboss-as-arquillian-container-managed__version>
+		<m:dependency.management__com.sun.xml.bind__jaxb-impl__version>2.1.12</m:dependency.management__com.sun.xml.bind__jaxb-impl__version>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+		<artifact name="hibernate-validator" type="jar" ext="jar" conf="master"/>
+	</publications>
+	<dependencies>
+		<dependency org="javax.validation" name="validation-api" rev="1.0.0.GA" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.6.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="org.jsoup" name="jsoup" rev="1.5.2" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="javax.xml.bind" name="jaxb-api" rev="2.2" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)">
+			<exclude org="javax.xml.stream" module="stax-api" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="javax.activation" module="activation" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="com.sun.xml.bind" name="jaxb-impl" rev="2.1.12" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="joda-time" name="joda-time" rev="1.6" force="true" conf="optional->compile(*),master(*)"/>
+		<dependency org="org.testng" name="testng" rev="5.14.2" force="true" conf="test->runtime(*),master(*)">
+			<exclude org="junit" module="junit" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="org.beanshell" module="bsh" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="com.google.inject" module="guice" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="com.beust" module="jcommander" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="org.easymock" name="easymock" rev="3.0" force="true" conf="test->runtime(*),master(*)">
+			<exclude org="cglib" module="cglib-nodep" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="org.objenesis" module="objenesis" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="org.hibernate" name="hibernate-entitymanager" rev="3.6.0.Final" force="true" conf="test->runtime(*),master(*)">
+			<exclude org="org.hibernate" module="hibernate-core" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="cglib" module="cglib" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="javassist" module="javassist" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="com.h2database" name="h2" rev="1.2.124" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.1" force="true" conf="test->runtime(*),master(*)">
+			<exclude org="log4j" module="log4j" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<override org="joda-time" module="joda-time" matcher="exact" rev="1.6"/>
+		<override org="org.jsoup" module="jsoup" matcher="exact" rev="1.5.2"/>
+		<override org="org.hibernate.jsr303.tck" module="jsr303-tck" matcher="exact" rev="1.0.5.GA"/>
+		<override org="org.testng" module="testng" matcher="exact" rev="5.14.2"/>
+		<override org="javax.validation" module="validation-api" matcher="exact" rev="1.0.0.GA"/>
+		<override org="org.hibernate" module="hibernate-validator-annotation-processor" matcher="exact" rev="4.2.0.Final"/>
+		<override org="org.jboss.jbossas.as7-cdi-tck" module="jbossas-container" matcher="exact" rev="1.0.0.Alpha1"/>
+		<override org="org.hibernate" module="hibernate-validator" matcher="exact" rev="4.2.0.Final"/>
+		<override org="com.googlecode.jtype" module="jtype" matcher="exact" rev="0.1.1"/>
+		<override org="org.slf4j" module="slf4j-simple" matcher="exact" rev="1.6.1"/>
+		<override org="org.hibernate" module="hibernate-entitymanager" matcher="exact" rev="3.6.0.Final"/>
+		<override org="org.hibernate.javax.persistence" module="hibernate-jpa-2.0-api" matcher="exact" rev="1.0.1.Final"/>
+		<override org="com.h2database" module="h2" matcher="exact" rev="1.2.124"/>
+		<override org="javax.xml.bind" module="jaxb-api" matcher="exact" rev="2.2"/>
+		<override org="org.slf4j" module="slf4j-api" matcher="exact" rev="1.6.1"/>
+		<override org="org.slf4j" module="slf4j-log4j12" matcher="exact" rev="1.6.1"/>
+		<override org="org.easymock" module="easymock" matcher="exact" rev="3.0"/>
+		<override org="org.jboss.as" module="jboss-as-arquillian-container-managed" matcher="exact" rev="7.0.0.Beta2"/>
+		<override org="com.sun.xml.bind" module="jaxb-impl" matcher="exact" rev="2.1.12"/>
+	</dependencies>
+</ivy-module>
