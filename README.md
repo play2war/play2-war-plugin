@@ -25,6 +25,12 @@ Live demos :
 	<th>2.4/2.5</th>
   </tr>
   <tr>
+	<td colspan="2">Available ?</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+    <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+    <td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
+  </tr>
+  <tr>
 	<td rowspan="4">HTTP</td>
     <td>Asynchronous request<br/>processing</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
