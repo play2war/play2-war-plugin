@@ -126,6 +126,8 @@ Live demos :
   </tr>
 </table>
 
+The plugin may work on others containers, such as Weblogic or Websphere (not tested yet).
+
 ## Usage
 
 In the next descriptions, APP_HOME is the root of your Play 2.0 application you want to package as a WAR file.
