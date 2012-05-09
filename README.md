@@ -13,7 +13,6 @@ Live demos :
 - Tomcat7@Jelastic : http://play2war.jelastic.dogado.eu/
 - JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
 
-<a name="features">
 ## Features
 <table>
   <tr>
@@ -76,7 +75,6 @@ Live demos :
   </tr>
 </table>
 
-<a name="compatibility">
 ## Server compatibility
 <table>
   <tr>
@@ -202,7 +200,7 @@ Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_version.war
 
 ## Upload or deploy your WAR file
 
-Upload or deploy your WAR file to your favorite Application Server if compatible (see <a href="#compatibility">Compatibility matrix above</a>).
+Upload or deploy your WAR file to your favorite Application Server if compatible (see <a href="#server-compatibility">Compatibility matrix above</a>).
 
 ## FAQ
 
