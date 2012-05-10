@@ -4,7 +4,7 @@
 		module="commons-parent"
 		revision="9"
 		status="release"
-		publication="20120229222348"
+		publication="20120330020928"
 	>
 		<description homepage="http://commons.apache.org/" />
 		<m:properties__commons.binary.suffix>-bin</m:properties__commons.binary.suffix>

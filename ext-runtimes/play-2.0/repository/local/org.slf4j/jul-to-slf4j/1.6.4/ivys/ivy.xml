@@ -4,7 +4,7 @@
 		module="jul-to-slf4j"
 		revision="1.6.4"
 		status="release"
-		publication="20120229222234"
+		publication="20120330020147"
 	>
 		<description homepage="http://www.slf4j.org">
 		JUL to SLF4J bridge

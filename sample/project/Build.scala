@@ -9,7 +9,7 @@ object ApplicationBuild extends Build {
 
     val appDependencies = Seq(
       // Add your project dependencies here,
-	  "com.github.play2war" %% "play2-war-core" % "0.4-SNAPSHOT"
+	  "com.github.play2war" %% "play2-war-core" % "0.3.1"
     )
 	
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(

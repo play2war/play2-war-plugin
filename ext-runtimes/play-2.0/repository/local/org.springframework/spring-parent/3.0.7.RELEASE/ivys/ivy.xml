@@ -4,7 +4,7 @@
 		module="spring-parent"
 		revision="3.0.7.RELEASE"
 		status="release"
-		publication="20120229222249"
+		publication="20120330020239"
 	>
 		<description homepage="">
 		Spring Framework Parent

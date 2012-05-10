@@ -4,7 +4,7 @@
 		module="apache"
 		revision="4"
 		status="release"
-		publication="20120229222343"
+		publication="20120330021702"
 	>
 		<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt" />
 		<description homepage="http://www.apache.org/">

@@ -4,7 +4,7 @@
 		module="selenium-iphone-driver"
 		revision="2.16.1"
 		status="release"
-		publication="20120304040346"
+		publication="20120330020940"
 	>
 		<description homepage="" />
 		<m:dependency.management__com.opera__operadriver__version>0.8.1</m:dependency.management__com.opera__operadriver__version>

@@ -4,6 +4,8 @@ import java.io.File
 
 object Build extends Build {
 
+  val play2Version = "2.0.1"
+
   val cloudbees = "https://repository-play-war.forge.cloudbees.com/"
   val local = Path.userHome.absolutePath + "/.ivy2/publish/"
   val curDir = new File(".")
@@ -19,7 +21,7 @@ object Build extends Build {
     base = file("core"),
     settings = commonSettings ++ Seq(
       sbtPlugin := false,
-      libraryDependencies ++= Seq("play" %% "play" % "2.0")))
+      libraryDependencies ++= Seq("play" %% "play" % play2Version)))
 
   lazy val play2WarPlugin = Project(id = "play2-war-plugin",
     base = file("plugin"),
@@ -27,7 +29,7 @@ object Build extends Build {
       sbtPlugin := true,
       libraryDependencies <++= (scalaVersion, sbtVersion) { (scalaVersion, sbtVersion) =>
         Seq(
-          "play" % "sbt-plugin" % "2.0" extra ("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion))
+          "play" % "sbt-plugin" % play2Version extra ("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion))
       }))
 
   lazy val play2WarIntegrationTests = Project(id = "integration-tests",

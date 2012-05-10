@@ -4,7 +4,7 @@
 		module="parboiled-java"
 		revision="1.0.2"
 		status="release"
-		publication="20120229222113"
+		publication="20120330020337"
 	>
 		<license name="Apache 2" url="http://www.apache.org/licenses/LICENSE-2.0.txt" />
 		<description homepage="http://parboiled.org/" />

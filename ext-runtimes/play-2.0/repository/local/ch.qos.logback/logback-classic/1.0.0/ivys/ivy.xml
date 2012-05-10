@@ -4,7 +4,7 @@
 		module="logback-classic"
 		revision="1.0.0"
 		status="release"
-		publication="20120229222236"
+		publication="20120330020154"
 	>
 		<license name="Eclipse Public License - v 1.0" url="http://www.eclipse.org/legal/epl-v10.html" />
 		<license name="GNU Lesser General Public License" url="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html" />

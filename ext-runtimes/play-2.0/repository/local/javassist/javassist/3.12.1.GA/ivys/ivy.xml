@@ -4,7 +4,7 @@
 		module="javassist"
 		revision="3.12.1.GA"
 		status="release"
-		publication="20120229222252"
+		publication="20120330020248"
 	>
 		<license name="MPL 1.1" url="http://www.mozilla.org/MPL/MPL-1.1.html" />
 		<license name="LGPL 2.1" url="http://www.gnu.org/licenses/lgpl-2.1.html" />
