@@ -4,7 +4,7 @@
 		module="bonecp-parent"
 		revision="0.7.1.RELEASE"
 		status="release"
-		publication="20120229222245"
+		publication="20120330020216"
 	>
 		<license name="Apache v2" url="http://www.apache.org/licenses/LICENSE-2.0.html" />
 		<description homepage="http://jolbox.com">

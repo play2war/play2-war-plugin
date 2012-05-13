@@ -4,7 +4,7 @@
 		module="serializer"
 		revision="2.7.1"
 		status="release"
-		publication="20120229222347"
+		publication="20120330020924"
 	>
 		<description homepage="http://xml.apache.org/xalan-j/">
 		Serializer to write out XML, HTML etc. as a stream of characters from an input DOM or from input

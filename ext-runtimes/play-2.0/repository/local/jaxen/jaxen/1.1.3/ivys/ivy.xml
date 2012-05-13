@@ -4,7 +4,7 @@
 		module="jaxen"
 		revision="1.1.3"
 		status="release"
-		publication="20120229222305"
+		publication="20120330020323"
 	>
 		<license name="The Werken Company License" url="http://jaxen.codehaus.org/license.html" />
 		<description homepage="http://jaxen.codehaus.org/">

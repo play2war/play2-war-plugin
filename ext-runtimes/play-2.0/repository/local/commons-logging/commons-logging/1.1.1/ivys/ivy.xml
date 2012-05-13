@@ -4,7 +4,7 @@
 		module="commons-logging"
 		revision="1.1.1"
 		status="release"
-		publication="20120229222342"
+		publication="20120330013654"
 	>
 		<description homepage="http://commons.apache.org/logging">
 		Commons Logging is a thin adapter allowing configurable bridging to other,

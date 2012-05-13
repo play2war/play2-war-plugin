@@ -4,7 +4,7 @@
 		module="netty"
 		revision="3.3.0.Final"
 		status="release"
-		publication="20120229222228"
+		publication="20120330020139"
 	>
 		<license name="Apache License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0" />
 		<description homepage="http://netty.io/">

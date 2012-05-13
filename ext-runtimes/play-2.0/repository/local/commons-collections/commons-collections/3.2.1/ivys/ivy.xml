@@ -4,7 +4,7 @@
 		module="commons-collections"
 		revision="3.2.1"
 		status="release"
-		publication="20120229222348"
+		publication="20120330020927"
 	>
 		<description homepage="http://commons.apache.org/collections/">
 		Types that extend and augment the Java Collections Framework.

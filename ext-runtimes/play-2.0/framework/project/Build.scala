@@ -34,7 +34,7 @@ object PlayBuild extends Build {
             scalacOptions ++= Seq("-encoding", "utf8"),
             javacOptions ++= Seq("-encoding", "utf8"),
             publishArtifact in (Compile, packageDoc) := false,
-            publishArtifact in (Compile, packageSrc) := false
+            publishArtifact in (Compile, packageSrc) := true
         )
     ).settings(com.typesafe.sbtscalariform.ScalariformPlugin.defaultScalariformSettings: _*)
 
@@ -48,7 +48,7 @@ object PlayBuild extends Build {
             scalacOptions ++= Seq("-Xlint","-deprecation", "-unchecked","-encoding", "utf8"),
             javacOptions ++= Seq("-encoding", "utf8"),
             publishArtifact in (Compile, packageDoc) := false,
-            publishArtifact in (Compile, packageSrc) := false,
+            publishArtifact in (Compile, packageSrc) := true,
             resolvers += typesafe,
             sourceGenerators in Compile <+= (dependencyClasspath in TemplatesProject in Runtime, packageBin in TemplatesProject in Compile, scalaSource in Compile, sourceManaged in Compile, streams) map ScalaTemplates,
             compile in (Compile) <<= PostCompile
@@ -64,7 +64,7 @@ object PlayBuild extends Build {
         scalacOptions ++= Seq("-deprecation","-Xcheckinit", "-encoding", "utf8"),
         javacOptions ++= Seq("-encoding", "utf8"),
         publishArtifact in (Compile, packageDoc) := false,
-        publishArtifact in (Compile, packageSrc) := false,
+        publishArtifact in (Compile, packageSrc) := true,
         resolvers += typesafe
       )
     ).settings(com.typesafe.sbtscalariform.ScalariformPlugin.defaultScalariformSettings: _*).dependsOn(PlayProject)
@@ -98,7 +98,7 @@ object PlayBuild extends Build {
         scalacOptions ++= Seq("-deprecation","-Xcheckinit", "-encoding", "utf8"),
         javacOptions ++= Seq("-encoding", "utf8"),
         publishArtifact in (Compile, packageDoc) := false,
-        publishArtifact in (Compile, packageSrc) := false,
+        publishArtifact in (Compile, packageSrc) := true,
         resolvers += typesafe
       )
     ).settings(com.typesafe.sbtscalariform.ScalariformPlugin.defaultScalariformSettings: _*)
@@ -180,8 +180,8 @@ object PlayBuild extends Build {
             "ch.qos.logback"                    %    "logback-core"             %   "1.0.0",
             "ch.qos.logback"                    %    "logback-classic"          %   "1.0.0",
             "com.github.scala-incubator.io"     %%   "scala-io-file"            %   "0.2.0",
-            "com.typesafe.akka"                 %    "akka-actor"               %   "2.0",
-            "com.typesafe.akka"                 %    "akka-slf4j"               %   "2.0",
+            "com.typesafe.akka"                 %    "akka-actor"               %   "2.0.1",
+            "com.typesafe.akka"                 %    "akka-slf4j"               %   "2.0.1",
             "com.google.guava"                  %    "guava"                    %   "10.0.1",
             
             ("org.avaje"                        %    "ebean"                    %   "2.7.3" notTransitive())
@@ -260,7 +260,7 @@ object PlayBuild extends Build {
             "com.typesafe.config"               %    "config"                   %   "0.2.1",
             "rhino"                             %    "js"                       %   "1.7R2",
             
-            ("com.google.javascript"            %    "closure-compiler"         %   "r1741" notTransitive())
+            ("com.google.javascript"            %    "closure-compiler"         %   "r1810" notTransitive())
               .exclude("args4j", "args4j")
               .exclude("com.google.guava", "guava")
               .exclude("org.json", "json")

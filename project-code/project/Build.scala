@@ -4,6 +4,8 @@ import java.io.File
 
 object Build extends Build {
 
+  val play2Version = "2.0.1"
+
   val cloudbees = "https://repository-play-war.forge.cloudbees.com/"
   val local = Path.userHome.absolutePath + "/.ivy2/publish/"
   val curDir = new File(".")
@@ -19,7 +21,7 @@ object Build extends Build {
     base = file("core"),
     settings = commonSettings ++ Seq(
       sbtPlugin := false,
-      libraryDependencies ++= Seq("play" %% "play" % "2.0")))
+      libraryDependencies ++= Seq("play" %% "play" % play2Version)))
 
   lazy val play2WarPlugin = Project(id = "play2-war-plugin",
     base = file("plugin"),
@@ -27,7 +29,7 @@ object Build extends Build {
       sbtPlugin := true,
       libraryDependencies <++= (scalaVersion, sbtVersion) { (scalaVersion, sbtVersion) =>
         Seq(
-          "play" % "sbt-plugin" % "2.0" extra ("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion))
+          "play" % "sbt-plugin" % play2Version extra ("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion))
       }))
 
   lazy val play2WarIntegrationTests = Project(id = "integration-tests",
@@ -52,11 +54,12 @@ object Build extends Build {
       // version is defined in version.sbt in order to support sbt-release
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
-	  publishTo <<= (version) {
-		version: String =>
-		  if (version.trim.endsWith("SNAPSHOT")) Some("snapshot" at cloudbees + "snapshot/")
-		  else                                   Some("release"  at cloudbees + "release/")
-	  },
+      publishTo := Some(Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish")) ),
+//    publishTo <<= (version) {
+//		version: String =>
+//		  if (version.trim.endsWith("SNAPSHOT")) Some("snapshot" at cloudbees + "snapshot/")
+//		  else                                   Some("release"  at cloudbees + "release/")
+//	  },
 //      credentials += Credentials(file("/private/play-war/.credentials")),
 //      credentials += Credentials(file(Path.userHome.absolutePath + "/.ivy2/.credentials")),
       publishMavenStyle := true,

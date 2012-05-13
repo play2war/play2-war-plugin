@@ -4,7 +4,7 @@
 		module="js"
 		revision="1.7R2"
 		status="release"
-		publication="20120229222108"
+		publication="20120330020332"
 	>
 		<license name="Mozilla Public License" url="http://www.mozilla.org/MPL/MPL-1.1.html" />
 		<description homepage="http://www.mozilla.org/rhino/">

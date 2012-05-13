@@ -4,7 +4,7 @@
 		module="oauth-signpost"
 		revision="1.2.1.1"
 		status="release"
-		publication="20120229222255"
+		publication="20120330020256"
 	>
 		<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt" />
 		<description homepage="http://code.google.com/p/oauth-signpost/">

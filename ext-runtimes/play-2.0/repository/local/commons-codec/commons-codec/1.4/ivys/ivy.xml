@@ -4,7 +4,7 @@
 		module="commons-codec"
 		revision="1.4"
 		status="release"
-		publication="20120229222058"
+		publication="20120330013655"
 	>
 		<description homepage="http://commons.apache.org/codec/">
 		The codec package contains simple encoder and decoders for
