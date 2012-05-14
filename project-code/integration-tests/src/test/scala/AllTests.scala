@@ -351,6 +351,8 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
             scenario("container sends big files (" + expectedSize + " bytes expected with " + header + " header") {
 
+              // TODO : Should extract scenario content as a specific method
+              
               val page = givenWhenGet("a page which sends " + name, url, parameters = Map("maxRange" -> maxRange.toString))
 
               then("response page should be downloaded")
