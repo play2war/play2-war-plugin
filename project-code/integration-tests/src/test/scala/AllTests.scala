@@ -360,24 +360,27 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
       }
     }
 
-//    scenario("container sends big files with chunked Transfer-Encoding") {
-//
-//      val page = givenWhenGet("a page which sends big content", "/chunkedBigContent")
-//
-//      then("response page should be downloaded")
-//      
-//      page.map { p =>
-//        p.getWebResponse.getStatusCode should be(200)
-//
-//        and("have a specified the Transfer-Encoding header")
-//        p.getWebResponse.getResponseHeaderValue("Transfer-Encoding") should be("chunked")
-//        
-//        and("have a specified size")
-//        p.getWebResponse.getContentAsStream.available should be(10485760)
-//      }.getOrElse {
-//        fail("Page not found")
-//      }
-//    }
+    scenario("container sends big files with chunked Transfer-Encoding") {
+
+      val page = givenWhenGet("a page which sends big content", "/chunkedBigContent", parameters = Map("maxRange" -> "300000"))
+
+      then("response page should be downloaded")
+      
+      page.map { p =>
+        val expectedSize = 1988890
+        
+        p.getWebResponse.getStatusCode should be(200)
+
+        and("have a specified the Transfer-Encoding header")
+        info("Detected Transfer-Encoding: " + p.getWebResponse.getResponseHeaderValue("Transfer-Encoding"))
+        p.getWebResponse.getResponseHeaderValue("Transfer-Encoding") should be("chunked")
+        
+        and("have a specified size")
+        p.getWebResponse.getContentAsStream.available should be(expectedSize)
+      }.getOrElse {
+        fail("Page not found")
+      }
+    }
   }
 }
 

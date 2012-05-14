@@ -81,7 +81,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
 
               case r @ SimpleResult(ResponseHeader(status, headers), body) => {
                 Logger("play").trace("Sending simple result: " + r)
-                
+
                 httpResponse.setStatus(status)
 
                 // Set response headers
@@ -131,21 +131,48 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                     }
                 }
               }
-              
+
               case r @ ChunkedResult(ResponseHeader(status, headers), chunks) => {
                 Logger("play").trace("Sending chunked result: " + r)
-                Logger("play").error("Unhandle chunked result (TODO): " + chunks)
-                
-                // TODO : handle Play chunked result
-                // httpResponse.setStatus(status)
 
-                handle(Results.NotImplemented)
+                httpResponse.setStatus(status)
+
+                // Copy headers to netty response
+                headers.foreach {
+
+                  case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
+                    getServletCookies(value).map {
+                      c => httpResponse.addCookie(c)
+                    }
+                  }
+
+                  case (name, value) => httpResponse.setHeader(name, value)
+                }
+
+                val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
+                  Promise.pure(
+                    {
+                      aSyncContext.getResponse.getOutputStream.write(r.writeable.transform(x))
+                      aSyncContext.getResponse.getOutputStream.flush
+                    }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
+                }
+
+                val chunksIteratee = {
+                  val writeIteratee = Iteratee.fold1(
+                    Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
+
+                  writeIteratee.mapDone { _ =>
+                    aSyncContext.complete()
+                  }
+                }
+
+                chunks(chunksIteratee)
               }
 
               case defaultResponse @ _ =>
                 Logger("play").trace("Default response: " + defaultResponse)
                 Logger("play").error("Unhandle default response: " + defaultResponse)
-                
+
                 httpResponse.setContentLength(0);
                 httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
                 aSyncContext.complete()
@@ -242,7 +269,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
         Logger("play").error("Impossible to serve Web Socket request:" + ws)
         response.handle(Results.InternalServerError)
       }
-      
+
       case unexpected => {
         Logger("play").error("Oops, unexpected message received in Play server (please report this problem): " + unexpected)
         response.handle(Results.InternalServerError)
