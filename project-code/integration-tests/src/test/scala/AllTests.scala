@@ -92,17 +92,17 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   import AbstractPlay2WarTests._
 
   var webClient: WebClient = null
-  
+
   var container: InstalledLocalContainer = null
 
   def getContainer = container
-  
+
   def setContainer(container: InstalledLocalContainer) = this.container = container
 
   def containerUrl = ""
-  
+
   def containerName = ""
-  
+
   before {
     webClient = new WebClient
     webClient.setJavaScriptEnabled(false)
@@ -329,59 +329,58 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
    ******************
    */
 
+  val mapOfMaxRangeExpectedSize: Map[Int, Int] = Map(
+    100000 -> 588890 //
+    , 300000 -> 1988890 //
+    //, 500000 -> 3388890 // Ca craque avec content-length, mais ca a l'air de passer avec Transfert-encoding
+    //, 900000 -> 
+    )
+
+  val seqTupleBigContent = Seq(
+    // (page name, page url, expected header)
+    ("big content", "/bigContent", "Content-length", ""),
+    ("big chunked content", "/chunkedBigContent", "Transfer-Encoding", "chunked"))
+
   feature("The container must handle GET requests of big content") {
 
-    scenario("container sends big files with Content-length header") {
+    seqTupleBigContent.foreach {
+      case (name, url, header, expectedHeaderValue) => {
 
-      
-      //100 000 => 588890
-      //300 000 => 1988890
-      //500 000 => 3388890
-      //700 000 => 4788890
-      //900 000 => Ca craque
-      val page = givenWhenGet("a page which sends big content", "/bigContent", parameters = Map("maxRange" -> "300000"))
+        mapOfMaxRangeExpectedSize.foreach {
+          case (maxRange, expectedSize) => {
 
-      then("response page should be downloaded")
-      
-      page.map { p =>
-        val expectedSize = 1988890
-        
-        p.getWebResponse.getStatusCode should be(200)
+            scenario("container sends big files (" + expectedSize + " bytes expected with " + header + " header") {
 
-        and("have a specified Content-length")
-        info("Detected Content-length: " + p.getWebResponse.getResponseHeaderValue("Content-length"))
-        p.getWebResponse.getResponseHeaderValue("Content-length") should be(expectedSize.toString)
-        
-        and("have a specified size")
-        p.getWebResponse.getContentAsStream.available should be(expectedSize)
-        
-      }.getOrElse {
-        fail("Page not found")
-      }
-    }
+              val page = givenWhenGet("a page which sends " + name, url, parameters = Map("maxRange" -> maxRange.toString))
 
-    scenario("container sends big files with chunked Transfer-Encoding") {
+              then("response page should be downloaded")
 
-      val page = givenWhenGet("a page which sends big content", "/chunkedBigContent", parameters = Map("maxRange" -> "300000"))
+              page.map { p =>
 
-      then("response page should be downloaded")
-      
-      page.map { p =>
-        val expectedSize = 1988890
-        
-        p.getWebResponse.getStatusCode should be(200)
+                p.getWebResponse.getStatusCode should be(200)
 
-        and("have a specified the Transfer-Encoding header")
-        info("Detected Transfer-Encoding: " + p.getWebResponse.getResponseHeaderValue("Transfer-Encoding"))
-        p.getWebResponse.getResponseHeaderValue("Transfer-Encoding") should be("chunked")
-        
-        and("have a specified size")
-        p.getWebResponse.getContentAsStream.available should be(expectedSize)
-      }.getOrElse {
-        fail("Page not found")
+                and("have a specified " + header)
+                info("Detected " + header + ": " + p.getWebResponse.getResponseHeaderValue(header))
+                if (expectedHeaderValue.isEmpty) {
+                  p.getWebResponse.getResponseHeaderValue(header) should be(expectedSize.toString)
+                } else {
+                  p.getWebResponse.getResponseHeaderValue(header) should be(expectedHeaderValue)
+                }
+
+                and("have a specified size")
+                p.getWebResponse.getContentAsStream.available should be(expectedSize)
+
+              }.getOrElse {
+                fail("Page not found")
+              }
+            }
+          }
+        }
       }
     }
   }
+  
+  // TODO : download many files, several times, in parallel, ...
 }
 
 @RunWith(classOf[JUnitRunner])
