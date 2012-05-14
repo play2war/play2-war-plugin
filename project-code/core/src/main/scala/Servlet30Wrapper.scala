@@ -100,6 +100,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                 headers.get(CONTENT_LENGTH).map { contentLength =>
                   Logger("play").trace("Result with Content-length: " + contentLength)
 
+                  // TODO: should be coded with a Promise
                   val writer: Function2[AsyncContext, r.BODY_CONTENT, Unit] = (a, x) => {
                     a.getResponse.getOutputStream.write(r.writeable.transform(x))
                     aSyncContext.getResponse.getOutputStream.flush
