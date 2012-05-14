@@ -4,7 +4,7 @@
 		module="logback-parent"
 		revision="1.0.0"
 		status="release"
-		publication="20120229222235"
+		publication="20120330020151"
 	>
 		<description homepage="http://logback.qos.ch" />
 		<m:dependency.management__org.codehaus.groovy__groovy-all__version>1.7.6</m:dependency.management__org.codehaus.groovy__groovy-all__version>

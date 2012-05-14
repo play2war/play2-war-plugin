@@ -4,7 +4,7 @@
 		module="reflections"
 		revision="0.9.6"
 		status="release"
-		publication="20120229222300"
+		publication="20120330020306"
 	>
 		<description homepage="http://code.google.com/p/reflections/">
 		Reflections - a Java runtime metadata analysis

@@ -4,7 +4,7 @@
 		module="commons-parent"
 		revision="15"
 		status="release"
-		publication="20120229222352"
+		publication="20120330020936"
 	>
 		<description homepage="http://commons.apache.org/" />
 		<m:properties__commons.compiler.fork>false</m:properties__commons.compiler.fork>

@@ -4,7 +4,7 @@
 		module="joda-convert"
 		revision="1.1"
 		status="release"
-		publication="20120229222252"
+		publication="20120330020247"
 	>
 		<license name="Apache 2" url="http://www.apache.org/licenses/LICENSE-2.0.txt" />
 		<description homepage="http://joda-convert.sourceforge.net">

@@ -1,17 +1,18 @@
 # WAR Plugin for Play framework 2.0
 
-    Current version: 0.3
+    Current version: 0.3.1
 
     Project-status: ALPHA
 
 This project is a module for Play framework 2 to package your apps into standard WAR packages.
+
+As of version 0.3.1, it is only compatible with Play2 **2.0.1**.
 
 Live demos :
 
 - Tomcat7@Jelastic : http://play2war.jelastic.dogado.eu/
 - JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
 
-<a name="features">
 ## Features
 <table>
   <tr>
@@ -22,6 +23,12 @@ Live demos :
   <tr>
 	<th>3.0</th>
 	<th>2.4/2.5</th>
+  </tr>
+  <tr>
+	<td colspan="2">Available ?</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+    <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+    <td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
   </tr>
   <tr>
 	<td rowspan="4">HTTP</td>
@@ -57,14 +64,17 @@ Live demos :
   <tr>
     <td>Root context path
     <br/>Eg: http://local/</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20" title="Always deployed at root context"></td>
-	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.pngg" title="WAR package must be deployed at root context" height="20"></td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" title="WAR package must be deployed at root context" height="20"></td>
   </tr>
   <tr>
     <td>Non root context path
     <br/>Eg: http://local/myAppContext</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context"></td>
-	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD ?</td>
+	<td>
+        2.0.x : <img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context">
+        <br/>2.1.x (alpha) : <img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
+    </td>
+	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD for Play 2.1</td>
   </tr>
   <tr>
     <td>WAR customization<br/>(web.xml, ...)</td>
@@ -74,7 +84,6 @@ Live demos :
   </tr>
 </table>
 
-<a name="compatibility">
 ## Server compatibility
 <table>
   <tr>
@@ -122,6 +131,8 @@ Live demos :
   </tr>
 </table>
 
+The plugin may work on others containers, such as Weblogic or Websphere (not tested yet).
+
 ## Usage
 
 In the next descriptions, APP_HOME is the root of your Play 2.0 application you want to package as a WAR file.
@@ -133,7 +144,7 @@ In ``APP_HOME/project/plugins.sbt``, add:
 ```scala
 resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.3")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.3.1")
 ```
 
 ### Add play2war runtime
@@ -143,7 +154,7 @@ In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` val
 ```scala
 val appDependencies = Seq(
   ...
-  "com.github.play2war" %% "play2-war-core" % "0.3"
+  "com.github.play2war" %% "play2-war-core" % "0.3.1"
   ...
 )
 
@@ -200,7 +211,7 @@ Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_version.war
 
 ## Upload or deploy your WAR file
 
-Upload or deploy your WAR file to your favorite Application Server if compatible (see <a href="#compatibility">Compatibility matrix above</a>).
+Upload or deploy your WAR file to your favorite Application Server if compatible (see <a href="#server-compatibility">Compatibility matrix above</a>).
 
 ## FAQ
 

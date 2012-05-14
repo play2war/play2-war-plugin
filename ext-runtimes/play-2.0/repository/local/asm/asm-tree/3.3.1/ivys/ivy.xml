@@ -4,7 +4,7 @@
 		module="asm-tree"
 		revision="3.3.1"
 		status="release"
-		publication="20120229222118"
+		publication="20120330020343"
 	>
 		<description homepage="" />
 		<m:dependency.management__asm__asm-xml__version>3.3.1</m:dependency.management__asm__asm-xml__version>

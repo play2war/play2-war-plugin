@@ -4,7 +4,7 @@
 		module="hibernate-jpa-2.0-api"
 		revision="1.0.1.Final"
 		status="release"
-		publication="20120229222242"
+		publication="20120330020210"
 	>
 		<license name="Unknown License" url="license.txt" />
 		<description homepage="http://hibernate.org">
