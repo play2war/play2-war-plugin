@@ -114,7 +114,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     webClient.closeAllWindows
   }
 
-  def sendRequest(pageUrl: String, method: String = "GET", parameters: Map[String, String] = Map.empty): Option[Page] = {
+  def sendRequest(pageUrl: String, method: String = "GET", parameters: Map[String, String] = Map.empty, howManyTimes: Int = 1): Option[Page] = {
 
     val strictMethod = HttpMethod.valueOf(method)
     val requestSettings = new WebRequest(new URL(pageUrl), strictMethod)
@@ -126,18 +126,27 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
     requestSettings.setRequestParameters(listParam)
 
-    Some(webClient.getPage(requestSettings))
+    info("Page to load many times: " + howManyTimes)
+
+    info("Load page: " + pageUrl)
+    val result = Some(webClient.getPage(requestSettings))
+
+//    for (i <- 1 until howManyTimes) {
+//      info("Load page: " + pageUrl)
+//      webClient.getPage(requestSettings)
+//    }
+
+    result
   }
 
-  def givenWhenGet(given: String, path: String, when: String = "page is loaded with %s method", root: String = ROOT_URL, method: String = "GET", parameters: Map[String, String] = Map.empty): Option[Page] = {
+  def givenWhenGet(given: String, path: String, when: String = "page is loaded with %s method", root: String = ROOT_URL, method: String = "GET", parameters: Map[String, String] = Map.empty, howManyTimes: Int = 1): Option[Page] = {
 
     this.given(given)
     val pageUrl = root + path
 
     this.when(when.format(method))
-    info("Load page " + pageUrl)
 
-    sendRequest(pageUrl, method, parameters)
+    sendRequest(pageUrl, method, parameters, howManyTimes)
   }
 
   def thenCheckStatusCode(p: Option[Page], s: Int) {
@@ -329,6 +338,31 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
    ******************
    */
 
+  def downloadBigContent(name: String, url: String, maxRange: Int, header: String, expectedHeaderValue: String, expectedSize: Int, howManyTimes: Int = 1) = {
+    val page = givenWhenGet("a page which sends " + name, url, parameters = Map("maxRange" -> maxRange.toString), howManyTimes = howManyTimes)
+
+    then("response page should be downloaded")
+
+    page.map { p =>
+
+      p.getWebResponse.getStatusCode should be(200)
+
+      and("have a specified " + header)
+      info("Detected " + header + ": " + p.getWebResponse.getResponseHeaderValue(header))
+      if (expectedHeaderValue.isEmpty) {
+        p.getWebResponse.getResponseHeaderValue(header) should be(expectedSize.toString)
+      } else {
+        p.getWebResponse.getResponseHeaderValue(header) should be(expectedHeaderValue)
+      }
+
+      and("have a specified size")
+      p.getWebResponse.getContentAsStream.available should be(expectedSize)
+
+    }.getOrElse {
+      fail("Page not found")
+    }
+  }
+
   val mapOfMaxRangeExpectedSize: Map[Int, Int] = Map(
     100000 -> 588890 //
     , 300000 -> 1988890 //
@@ -351,38 +385,32 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
             scenario("container sends big files (" + expectedSize + " bytes expected with " + header + " header") {
 
-              // TODO : Should extract scenario content as a specific method
-              
-              val page = givenWhenGet("a page which sends " + name, url, parameters = Map("maxRange" -> maxRange.toString))
+              downloadBigContent(name, url, maxRange, header, expectedHeaderValue, expectedSize)
 
-              then("response page should be downloaded")
-
-              page.map { p =>
-
-                p.getWebResponse.getStatusCode should be(200)
-
-                and("have a specified " + header)
-                info("Detected " + header + ": " + p.getWebResponse.getResponseHeaderValue(header))
-                if (expectedHeaderValue.isEmpty) {
-                  p.getWebResponse.getResponseHeaderValue(header) should be(expectedSize.toString)
-                } else {
-                  p.getWebResponse.getResponseHeaderValue(header) should be(expectedHeaderValue)
-                }
-
-                and("have a specified size")
-                p.getWebResponse.getContentAsStream.available should be(expectedSize)
-
-              }.getOrElse {
-                fail("Page not found")
-              }
             }
           }
         }
       }
     }
   }
+
+  val howManyTimes = 10
   
-  // TODO : download many files, several times, in parallel, ...
+  feature("The container must handle GET requests of big content many times") {
+
+    seqTupleBigContent.foreach {
+      case (name, url, header, expectedHeaderValue) => {
+
+        val (maxRange, expectedSize) = mapOfMaxRangeExpectedSize.head
+
+        scenario("container sends big files (" + expectedSize + " bytes expected with " + header + " header") {
+
+          downloadBigContent(name, url, maxRange, header, expectedHeaderValue, expectedSize, howManyTimes)
+
+        }
+      }
+    }
+  }
 }
 
 @RunWith(classOf[JUnitRunner])
