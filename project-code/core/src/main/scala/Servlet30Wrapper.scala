@@ -100,18 +100,24 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                 headers.get(CONTENT_LENGTH).map { contentLength =>
                   Logger("play").trace("Result with Content-length: " + contentLength)
 
-                  // TODO: should be coded with a Promise
-                  val writer: Function2[AsyncContext, r.BODY_CONTENT, Unit] = (a, x) => {
-                    a.getResponse.getOutputStream.write(r.writeable.transform(x))
-                    aSyncContext.getResponse.getOutputStream.flush
+                  val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
+                    Promise.pure(
+                      {
+                        aSyncContext.getResponse.getOutputStream.write(r.writeable.transform(x))
+                        aSyncContext.getResponse.getOutputStream.flush
+                      }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
                   }
-                  val bodyIteratee = Iteratee.fold(aSyncContext)((a, e: r.BODY_CONTENT) => { writer(a, e); a })
-                  val p = body |>> bodyIteratee
 
-                  p.flatMap(i => i.run)
-                    .onRedeem { buffer =>
+                  val bodyIteratee = {
+                    val writeIteratee = Iteratee.fold1(
+                      Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
+
+                    writeIteratee.mapDone { _ =>
                       aSyncContext.complete()
                     }
+                  }
+
+                  body(bodyIteratee)
                 }.getOrElse {
                   Logger("play").trace("Result without Content-length")
 
