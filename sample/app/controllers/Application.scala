@@ -6,7 +6,7 @@ import play.api.mvc._
 object Application extends Controller {
 
   def index = Action {
-    Ok(views.html.index("Your new application is ready."))
+    Ok(views.html.index("This is a Play 2.0 application, running in a Servlet v3.0 Container :)"))
   }
 
   def setCookies = Action {
@@ -51,6 +51,21 @@ object Application extends Controller {
   }
 
   def echo = Action { request =>
-      Ok(views.html.echo(request.queryString))
+    Ok(views.html.echo(request.queryString))
+  }
+  
+  def uploadForm = Action { 
+    Ok(views.html.uploadForm())
+  }
+
+  def upload = Action(parse.multipartFormData) { request =>
+    request.body.file("uploadedFile").map { uploadedFile =>
+      import java.io.File
+      val filename = uploadedFile.filename
+      val contentType = uploadedFile.contentType
+      Ok(views.html.index("File uploaded: " + filename))
+    }.getOrElse {
+      Ok(views.html.index("Error when uploading"))
+    }
   }
 }
