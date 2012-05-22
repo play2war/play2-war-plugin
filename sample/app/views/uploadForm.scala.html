@@ -1,0 +1,27 @@
+@import helper._
+
+@main("Upload test") {
+
+<div class="container">
+
+  <header class="jumbotron subhead" id="overview">
+	<h1>Upload test</h1>
+  </header>
+
+	<section id="global">
+	  <div class="page-header">
+		<h1>Upload form</h1>
+	  </div>
+	  <div class="row">
+		<div class="span8">
+			@form(action = routes.Application.upload, 'enctype -> "multipart/form-data") {
+				<input type="file" name="uploadedFile" />
+				<input type="submit" value="Upload" />
+			}
+		</div><!-- /.span -->
+	  </div><!-- /.row -->
+	</section>
+ 
+</div><!-- /container -->
+ 
+}
