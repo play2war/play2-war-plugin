@@ -9,12 +9,12 @@ object ApplicationBuild extends Build {
 
     val appDependencies = Seq(
       // Add your project dependencies here,
-	  "com.github.play2war" %% "play2-war-core" % "0.3.1"
+	  "com.github.play2war" %% "play2-war-core" % "0.3.2"
     )
 	
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
       resolvers += (Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath+"/.ivy2/local"))(Resolver.ivyStylePatterns)),
-      resolvers += "Play2war plugins snapshot" at "http://repository-play-war.forge.cloudbees.com/snapshot/"
+      resolvers += "Play2war plugins" at "http://repository-play-war.forge.cloudbees.com/release/"
     )
 
 }
