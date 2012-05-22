@@ -39,7 +39,7 @@ object Build extends Build {
       libraryDependencies ++= Seq(
           "org.scalatest" %% "scalatest" % "1.7.2" % "test",
           "junit" % "junit" % "4.10" % "test",
-          "org.codehaus.cargo" % "cargo-core-uberjar" % "1.2.1" % "test",
+          "org.codehaus.cargo" % "cargo-core-uberjar" % "1.2.2" % "test",
           "net.sourceforge.htmlunit" % "htmlunit" % "2.9" % "test"
       ),
       parallelExecution in Test := false,

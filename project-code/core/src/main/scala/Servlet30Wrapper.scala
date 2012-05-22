@@ -290,7 +290,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
 
     Logger.configure(Map.empty, Map.empty, Mode.Prod)
 
-    val classLoader = e.getServletContext.getClassLoader;
+    val classLoader = getClass.getClassLoader;
 
     Servlet30Wrapper.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod))
   }
