@@ -217,15 +217,15 @@ Deployment in a sub-context is a known limitation which is fixed for Play 2.1 (s
 The best way to deploy at root context is to include a configuration file into the WAR file to indicate to your application server where to deploy the application.
 But Play2War doesn't support file inclusion yet (see [#4](/dlecan/play2-war-plugin/issues/4)).
 
-### How to deploy at root context in Tomcat
+### How to deploy at root context in Tomcat 7
 
 Rename the generated war *ROOT.war* before deployment.
 
-### How to deploy at root context in Jetty
+### How to deploy at root context in Jetty 8
 
 Rename the generated war *ROOT.war* before deployment.
 
-### How to deploy at root context in JBoss
+### How to deploy at root context in JBoss 7
 
 First, disable default welcome page in ``standalone/configuration/standalone.xml`` by changing ``enable-welcome-root="true"`` to ``enable-welcome-root="false"``:
 
@@ -236,7 +236,8 @@ First, disable default welcome page in ``standalone/configuration/standalone.xml
     <alias name="localhost" />
     <alias name="example.com" />
   </virtual-server>
-</subsystem>```
+</subsystem>
+```
 
 Rename the generated war *ROOT.war* before deployment.
 
