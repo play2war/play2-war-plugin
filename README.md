@@ -239,7 +239,7 @@ First, disable default welcome page in ``standalone/configuration/standalone.xml
 </subsystem>
 ```
 
-Rename the generated war *ROOT.war* before deployment.
+Then rename the generated war *ROOT.war* before deployment.
 
 ## Upload or deploy your WAR file
 
