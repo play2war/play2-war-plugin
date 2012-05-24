@@ -209,6 +209,37 @@ If Play runtime is available, run
 
 Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_version.war``
 
+## How to deploy in your favortie application server
+
+**Play framework 2.0.x applications must be deployed at root context.**
+Deployment in a sub-context is a known limitation which is fixed for Play 2.1 (still in development).
+
+The best way to deploy at root context is to include a configuration file into the WAR file to indicate to your application server where to deploy the application.
+But Play2War doesn't support file inclusion yet (see [#4](/dlecan/play2-war-plugin/issues/4)).
+
+### How to deploy at root context in Tomcat
+
+Rename the generated war *ROOT.war* before deployment.
+
+### How to deploy at root context in Jetty
+
+Rename the generated war *ROOT.war* before deployment.
+
+### How to deploy at root context in JBoss
+
+First, disable default welcome page in ``standalone/configuration/standalone.xml`` by changing ``enable-welcome-root="true"`` to ``enable-welcome-root="false"``:
+
+```xml
+<subsystem xmlns="urn:jboss:domain:web:1.0" default-virtual-server="default-host">
+  <connector name="http" scheme="http" protocol="HTTP/1.1" socket-binding="http"/>
+  <virtual-server name="default-host" enable-welcome-root="true">
+    <alias name="localhost" />
+    <alias name="example.com" />
+  </virtual-server>
+</subsystem>```
+
+Rename the generated war *ROOT.war* before deployment.
+
 ## Upload or deploy your WAR file
 
 Upload or deploy your WAR file to your favorite Application Server if compatible (see <a href="#server-compatibility">Compatibility matrix above</a>).
