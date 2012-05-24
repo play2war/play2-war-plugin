@@ -225,7 +225,13 @@ Rename the generated war *ROOT.war* before deployment.
 
 Rename the generated war *ROOT.war* before deployment.
 
-### How to deploy at root context in JBoss 7
+### How to deploy at root context in JBoss 7.0.x
+
+In ``standalone/configuration/standalone.xml``, remove the bean named ``urn:jboss:bean-deployer:2.0``.
+
+Then follow explanations for JBoss 7.1.X below.
+
+### How to deploy at root context in JBoss 7.1.x
 
 First, disable default welcome page in ``standalone/configuration/standalone.xml`` by changing ``enable-welcome-root="true"`` to ``enable-welcome-root="false"``:
 
