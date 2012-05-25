@@ -8,10 +8,10 @@ This project is a module for Play framework 2 to package your apps into standard
 
 As of version 0.3.1, it is only compatible with Play2 **2.0.1**.
 
-Live demos :
+Live demo: JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
 
-- Tomcat7@Jelastic : http://play2war.jelastic.dogado.eu/
-- JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
+Other references built with Play 2 and Play2War:
+ - [Factile](http://factile.net/) (Survey plateform)
 
 ## Features
 <table>
