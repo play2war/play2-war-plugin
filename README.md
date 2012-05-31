@@ -1,17 +1,27 @@
 # WAR Plugin for Play framework 2.0
 
-    Current version: 0.3.2
+    Current version: 0.4
 
-    Project-status: ALPHA
+    Project-status: BETA
 
 This project is a module for Play framework 2 to package your apps into standard WAR packages.
 
 As of version 0.3.1, it is only compatible with Play2 **2.0.1**.
 
+**Play2War is only compatible with Java 6 JRE**.
+
 Live demo: JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
 
 Other references built with Play 2 and Play2War:
  - [Factile](http://factile.net/) (Survey plateform)
+
+## What's new ?
+
+* v0.4
+    * Play ChunkedResult are now handled. See [demo](http://servlet30.play-war.cloudbees.net/)
+    * Improvements with Play SimpleResult
+    * Integration tests are now running on Tomcat 7 and Jetty 8
+
 
 ## Features
 <table>
@@ -46,7 +56,7 @@ Other references built with Play 2 and Play2War:
   <tr>
     <td>Chunked response</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td>TBD</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td>TBD</td>
   </tr>
   <tr>
@@ -144,7 +154,7 @@ In ``APP_HOME/project/plugins.sbt``, add:
 ```scala
 resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.3.2")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.4")
 ```
 
 ### Add play2war runtime
@@ -154,7 +164,7 @@ In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` val
 ```scala
 val appDependencies = Seq(
   ...
-  "com.github.play2war" %% "play2-war-core" % "0.3.2"
+  "com.github.play2war" %% "play2-war-core" % "0.4"
   ...
 )
 
@@ -209,7 +219,7 @@ If Play runtime is available, run
 
 Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_version.war``
 
-## How to deploy in your favortie application server
+## How to deploy in your favorite application server ?
 
 **Play framework 2.0.x applications must be deployed at root context.**
 Deployment in a sub-context is a known limitation which is fixed for Play 2.1 (still in development).
@@ -227,9 +237,9 @@ Rename the generated war *ROOT.war* before deployment.
 
 ### How to deploy at root context in JBoss 7.0.x
 
-In ``standalone/configuration/standalone.xml``, remove the bean named ``urn:jboss:bean-deployer:2.0``.
+In ``standalone/configuration/standalone.xml``, comment the ``subsystem`` named ``urn:jboss:domain:pojo:1.0``.
 
-Then follow explanations for JBoss 7.1.X below.
+Then follow explanations for JBoss 7.1.x below.
 
 ### How to deploy at root context in JBoss 7.1.x
 
