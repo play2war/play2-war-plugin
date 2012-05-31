@@ -54,7 +54,7 @@ Other references built with Play 2 and Play2War:
 	<td>TBD</td>
   </tr>
   <tr>
-    <td>Chunked response</td>
+    <td>Chunked response<br/>For long-polling</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td>TBD</td>
