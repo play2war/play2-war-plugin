@@ -13,7 +13,7 @@ As of version 0.3.1, it is only compatible with Play **2.0.1**.
 Live demo: JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
 
 Other references built with Play 2 and Play2War:
- - [Factile](http://factile.net/) (Survey plateform)
+ - [Factile](http://factile.net/) (Survey platform)
 
 ## What's new ?
 
