@@ -38,7 +38,7 @@ Other references built with Play 2 and Play2War:
 	<td colspan="2">Available ?</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
     <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-    <td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
+    <td>TBD</td>
   </tr>
   <tr>
 	<td rowspan="4">HTTP</td>
