@@ -6,7 +6,7 @@
 
 This project is a module for Play framework 2 to package your apps into standard WAR packages.
 
-As of version 0.3.1, it is only compatible with Play2 **2.0.1**.
+As of version 0.3.1, it is only compatible with Play **2.0.1**.
 
 **Play2War is only compatible with Java 6 JRE**.
 
