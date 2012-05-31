@@ -20,6 +20,23 @@
 		  <p>Find it here: <a href="https://github.com/dlecan/play2-war-plugin">https://github.com/dlecan/play2-war-plugin</a>.</p>
 		</div><!-- /.span -->
 	  </div><!-- /.row -->
+	  <div class="row">
+		<div class="span8">
+		    <h1 id="clock"></h1>
+		    <p>
+		        Clock events are pushed from the Server using a Comet connection.
+		    </p>
+		    
+		    <script type="text/javascript" charset="utf-8">
+		        // Called for each Comet message
+		        var clockChanged = function(time) {
+		            $('#clock').html(time.replace(/(\d)/g, '<span>$1</span>'))
+		        }
+		    </script>
+		    
+		    <iframe id="comet" src="@routes.Application.liveClock.unique"></iframe>
+		</div><!-- /.span -->
+	  </div><!-- /.row -->
 	</section>
  
 </div><!-- /container -->
