@@ -31,8 +31,9 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
     Logger("play").trace("Http request received: " + servletRequest)
 
     val aSyncContext = servletRequest.startAsync
-    val aSyncCtxListener = new ASyncCtxListener
-    aSyncContext.addListener(aSyncCtxListener)
+    
+    // Disable timeout for long-polling
+    aSyncContext.setTimeout(-1)
 
     val server = Servlet30Wrapper.playServer
 
@@ -81,7 +82,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
 
               case r @ SimpleResult(ResponseHeader(status, headers), body) => {
                 Logger("play").trace("Sending simple result: " + r)
-                
+
                 httpResponse.setStatus(status)
 
                 // Set response headers
@@ -100,17 +101,24 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                 headers.get(CONTENT_LENGTH).map { contentLength =>
                   Logger("play").trace("Result with Content-length: " + contentLength)
 
-                  val writer: Function2[AsyncContext, r.BODY_CONTENT, Unit] = (a, x) => {
-                    a.getResponse.getOutputStream.write(r.writeable.transform(x))
-                    aSyncContext.getResponse.getOutputStream.flush
+                  val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
+                    Promise.pure(
+                      {
+                        aSyncContext.getResponse.getOutputStream.write(r.writeable.transform(x))
+                        aSyncContext.getResponse.getOutputStream.flush
+                      }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
                   }
-                  val bodyIteratee = Iteratee.fold(aSyncContext)((a, e: r.BODY_CONTENT) => { writer(a, e); a })
-                  val p = body |>> bodyIteratee
 
-                  p.flatMap(i => i.run)
-                    .onRedeem { buffer =>
+                  val bodyIteratee = {
+                    val writeIteratee = Iteratee.fold1(
+                      Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
+
+                    writeIteratee.mapDone { _ =>
                       aSyncContext.complete()
                     }
+                  }
+
+                  body(bodyIteratee)
                 }.getOrElse {
                   Logger("play").trace("Result without Content-length")
 
@@ -126,26 +134,52 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                       aSyncContext.getResponse.setContentLength(buffer.size)
                       aSyncContext.getResponse.getOutputStream.flush
                       buffer.writeTo(aSyncContext.getResponse.getOutputStream)
-                      aSyncContext.getResponse.getOutputStream.flush
                       aSyncContext.complete()
                     }
                 }
               }
-              
+
               case r @ ChunkedResult(ResponseHeader(status, headers), chunks) => {
                 Logger("play").trace("Sending chunked result: " + r)
-                Logger("play").error("Unhandle chunked result (TODO): " + chunks)
-                
-                // TODO : handle Play chunked result
-                // httpResponse.setStatus(status)
 
-                handle(Results.NotImplemented)
+                httpResponse.setStatus(status)
+
+                // Copy headers to netty response
+                headers.foreach {
+
+                  case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
+                    getServletCookies(value).map {
+                      c => httpResponse.addCookie(c)
+                    }
+                  }
+
+                  case (name, value) => httpResponse.setHeader(name, value)
+                }
+
+                val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
+                  Promise.pure(
+                    {
+                      aSyncContext.getResponse.getOutputStream.write(r.writeable.transform(x))
+                      aSyncContext.getResponse.getOutputStream.flush
+                    }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
+                }
+
+                val chunksIteratee = {
+                  val writeIteratee = Iteratee.fold1(
+                    Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
+
+                  writeIteratee.mapDone { _ =>
+                    aSyncContext.complete()
+                  }
+                }
+
+                chunks(chunksIteratee)
               }
 
               case defaultResponse @ _ =>
                 Logger("play").trace("Default response: " + defaultResponse)
                 Logger("play").error("Unhandle default response: " + defaultResponse)
-                
+
                 httpResponse.setContentLength(0);
                 httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
                 aSyncContext.complete()
@@ -242,7 +276,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
         Logger("play").error("Impossible to serve Web Socket request:" + ws)
         response.handle(Results.InternalServerError)
       }
-      
+
       case unexpected => {
         Logger("play").error("Oops, unexpected message received in Play server (please report this problem): " + unexpected)
         response.handle(Results.InternalServerError)
@@ -256,7 +290,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
 
     Logger.configure(Map.empty, Map.empty, Mode.Prod)
 
-    val classLoader = e.getServletContext.getClassLoader;
+    val classLoader = getClass.getClassLoader;
 
     Servlet30Wrapper.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod))
   }
@@ -281,25 +315,4 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
         sc.log("Play server stopped")
     } // if playServer is null, nothing to do
   }
-}
-
-class ASyncCtxListener extends AsyncListener {
-
-  var eventReceived: Boolean = false
-
-  override def onComplete(event: AsyncEvent) = {
-    eventReceived = true;
-  }
-
-  override def onTimeout(event: AsyncEvent) = {
-    eventReceived = true;
-  }
-
-  override def onError(event: AsyncEvent) = {
-    eventReceived = true;
-  }
-
-  override def onStartAsync(event: AsyncEvent) = {
-  }
-
 }

@@ -91,26 +91,31 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
   import AbstractPlay2WarTests._
 
-  var container: InstalledLocalContainer = null
-
   var webClient: WebClient = null
 
-  override def getContainer = container
+  var container: InstalledLocalContainer = null
 
-  override def setContainer(container: InstalledLocalContainer) = this.container = container
+  def getContainer = container
+
+  def setContainer(container: InstalledLocalContainer) = this.container = container
+
+  def containerUrl = ""
+
+  def containerName = ""
 
   before {
     webClient = new WebClient
     webClient.setJavaScriptEnabled(false)
     webClient.setThrowExceptionOnFailingStatusCode(false)
     webClient.getCookieManager.setCookiesEnabled(true)
+    new SkipClockiFrameWrapper(webClient)
   }
 
   after {
     webClient.closeAllWindows
   }
 
-  def sendRequest(pageUrl: String, method: String = "GET", parameters: Map[String, String] = Map.empty): Option[Page] = {
+  def sendRequest(pageUrl: String, method: String = "GET", parameters: Map[String, String] = Map.empty, howManyTimes: Int = 1): Option[Page] = {
 
     val strictMethod = HttpMethod.valueOf(method)
     val requestSettings = new WebRequest(new URL(pageUrl), strictMethod)
@@ -122,18 +127,27 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
     requestSettings.setRequestParameters(listParam)
 
-    Some(webClient.getPage(requestSettings))
+    info("Page to load many times: " + howManyTimes)
+
+    info("Load page: " + pageUrl)
+    val result = Some(webClient.getPage(requestSettings))
+
+//    for (i <- 1 until howManyTimes) {
+//      info("Load page: " + pageUrl)
+//      webClient.getPage(requestSettings)
+//    }
+
+    result
   }
 
-  def givenWhenGet(given: String, path: String, when: String = "page is loaded with %s method", root: String = ROOT_URL, method: String = "GET", parameters: Map[String, String] = Map.empty): Option[Page] = {
+  def givenWhenGet(given: String, path: String, when: String = "page is loaded with %s method", root: String = ROOT_URL, method: String = "GET", parameters: Map[String, String] = Map.empty, howManyTimes: Int = 1): Option[Page] = {
 
     this.given(given)
     val pageUrl = root + path
 
     this.when(when.format(method))
-    info("Load page " + pageUrl)
 
-    sendRequest(pageUrl, method, parameters)
+    sendRequest(pageUrl, method, parameters, howManyTimes)
   }
 
   def thenCheckStatusCode(p: Option[Page], s: Int) {
@@ -325,6 +339,85 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
    ******************
    */
 
+  def downloadBigContent(name: String, url: String, maxRange: Int, header: String, expectedHeaderValue: String, expectedSize: Int, howManyTimes: Int = 1) = {
+    val page = givenWhenGet("a page which sends " + name, url, parameters = Map("maxRange" -> maxRange.toString), howManyTimes = howManyTimes)
+
+    then("response page should be downloaded")
+
+    page.map { p =>
+
+      p.getWebResponse.getStatusCode should be(200)
+
+      and("have a specified " + header)
+      info("Detected " + header + ": " + p.getWebResponse.getResponseHeaderValue(header))
+      if (expectedHeaderValue.isEmpty) {
+        p.getWebResponse.getResponseHeaderValue(header) should be(expectedSize.toString)
+      } else {
+        p.getWebResponse.getResponseHeaderValue(header) should be(expectedHeaderValue)
+      }
+
+      and("have a specified size")
+      p.getWebResponse.getContentAsStream.available should be(expectedSize)
+
+    }.getOrElse {
+      fail("Page not found")
+    }
+  }
+
+  val mapOfMaxRangeExpectedSize: Map[Int, Int] = Map(
+    100000 -> 588890 //
+    , 300000 -> 1988890 //
+    //, 500000 -> 3388890 // Ca craque avec content-length, mais ca a l'air de passer avec Transfert-encoding
+    //, 900000 -> 
+    )
+
+  val seqTupleBigContent = Seq(
+    // (page name, page url, expected header)
+    ("big content", "/bigContent", "Content-length", ""),
+    ("big chunked content", "/chunkedBigContent", "Transfer-Encoding", "chunked"))
+
+  feature("The container must handle GET requests of big content") {
+
+    seqTupleBigContent.foreach {
+      case (name, url, header, expectedHeaderValue) => {
+
+        mapOfMaxRangeExpectedSize.foreach {
+          case (maxRange, expectedSize) => {
+
+            scenario("container sends big files (" + expectedSize + " bytes expected with " + header + " header") {
+
+              downloadBigContent(name, url, maxRange, header, expectedHeaderValue, expectedSize)
+
+            }
+          }
+        }
+      }
+    }
+  }
+
+  val howManyTimes = 10
+  
+  feature("The container must handle GET requests of big content many times") {
+
+    seqTupleBigContent.foreach {
+      case (name, url, header, expectedHeaderValue) => {
+
+        val (maxRange, expectedSize) = mapOfMaxRangeExpectedSize.head
+
+        scenario("container sends big files (" + expectedSize + " bytes expected with " + header + " header") {
+
+          downloadBigContent(name, url, maxRange, header, expectedHeaderValue, expectedSize, howManyTimes)
+
+        }
+      }
+    }
+  }
+  
+  /*
+   ******************
+   ******************
+   */
+
   feature("The container must handle POST requests with 'multipart/form-data' enctype") {
 
     scenario("container sends an image") {
@@ -358,7 +451,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
         fail("Page not found")
       }
     }
-  }
+  }  
 }
 
 @RunWith(classOf[JUnitRunner])
@@ -367,11 +460,11 @@ class Tomcat7xTests extends AbstractPlay2WarTests {
   override def containerName = "tomcat7x"
 }
 
-//@RunWith(classOf[JUnitRunner])
-//class Jetty8xTests extends AbstractPlay2WarTests {
-//  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
-//  override def containerName = "jetty8x"
-//}
+@RunWith(classOf[JUnitRunner])
+class Jetty8xTests extends AbstractPlay2WarTests {
+  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
+  override def containerName = "jetty8x"
+}
 
 // Doesn't work yet : deployment of sample war fails : Command deploy requires an operand of type class java.io.File
 //@RunWith(classOf[JUnitRunner])

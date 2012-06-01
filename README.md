@@ -1,17 +1,23 @@
 # WAR Plugin for Play framework 2.0
 
-    Current version: 0.3.2
+    Current version: 0.4
 
-    Project-status: ALPHA
+    Project-status: BETA
 
 This project is a module for Play framework 2 to package your apps into standard WAR packages.
 
-As of version 0.3.1, it is only compatible with Play2 **2.0.1**.
+As of version 0.3.1, it is only compatible with Play **2.0.1**.
 
-Live demos :
+**Play2War is only compatible with Java 6 JRE**.
 
-- Tomcat7@Jelastic : http://play2war.jelastic.dogado.eu/
-- JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
+Live demo: JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
+
+Other references built with Play 2 and Play2War:
+ - [Factile](http://factile.net/) (Survey platform)
+
+## What's new ?
+
+See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 
 ## Features
 <table>
@@ -28,7 +34,7 @@ Live demos :
 	<td colspan="2">Available ?</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
     <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-    <td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
+    <td>TBD</td>
   </tr>
   <tr>
 	<td rowspan="4">HTTP</td>
@@ -44,9 +50,9 @@ Live demos :
 	<td>TBD</td>
   </tr>
   <tr>
-    <td>Chunked response</td>
+    <td>Chunked response<br/>For long-polling</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td>TBD</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td>TBD</td>
   </tr>
   <tr>
@@ -64,14 +70,17 @@ Live demos :
   <tr>
     <td>Root context path
     <br/>Eg: http://local/</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20" title="Always deployed at root context"></td>
-	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.pngg" title="WAR package must be deployed at root context" height="20"></td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" title="WAR package must be deployed at root context" height="20"></td>
   </tr>
   <tr>
     <td>Non root context path
     <br/>Eg: http://local/myAppContext</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context"></td>
-	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD ?</td>
+	<td>
+        2.0.x : <img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context">
+        <br/>2.1.x (alpha) : <img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
+    </td>
+	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD for Play 2.1</td>
   </tr>
   <tr>
     <td>WAR customization<br/>(web.xml, ...)</td>
@@ -141,7 +150,7 @@ In ``APP_HOME/project/plugins.sbt``, add:
 ```scala
 resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.3.2")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.4")
 ```
 
 ### Add play2war runtime
@@ -151,7 +160,7 @@ In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` val
 ```scala
 val appDependencies = Seq(
   ...
-  "com.github.play2war" %% "play2-war-core" % "0.3.2"
+  "com.github.play2war" %% "play2-war-core" % "0.4"
   ...
 )
 
@@ -206,6 +215,44 @@ If Play runtime is available, run
 
 Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_version.war``
 
+## How to deploy in my favorite application server ?
+
+**Play framework 2.0.x applications must be deployed at root context.**
+Deployment in a sub-context is a known limitation which is fixed for Play 2.1 (still in development).
+
+The best way to deploy at root context is to include a configuration file into the WAR file to indicate to your application server where to deploy the application.
+But Play2War doesn't support file inclusion yet (see [#4](/dlecan/play2-war-plugin/issues/4)).
+
+### How to deploy at root context in Tomcat 7
+
+Rename the generated war *ROOT.war* before deployment.
+
+### How to deploy at root context in Jetty 8
+
+Rename the generated war *ROOT.war* before deployment.
+
+### How to deploy at root context in JBoss 7.0.x
+
+In ``standalone/configuration/standalone.xml``, comment the ``subsystem`` named ``urn:jboss:domain:pojo:1.0``.
+
+Then follow explanations for JBoss 7.1.x below.
+
+### How to deploy at root context in JBoss 7.1.x
+
+First, disable default welcome page in ``standalone/configuration/standalone.xml`` by changing ``enable-welcome-root="true"`` to ``enable-welcome-root="false"``:
+
+```xml
+<subsystem xmlns="urn:jboss:domain:web:1.0" default-virtual-server="default-host">
+  <connector name="http" scheme="http" protocol="HTTP/1.1" socket-binding="http"/>
+  <virtual-server name="default-host" enable-welcome-root="true">
+    <alias name="localhost" />
+    <alias name="example.com" />
+  </virtual-server>
+</subsystem>
+```
+
+Then rename the generated war *ROOT.war* before deployment.
+
 ## Upload or deploy your WAR file
 
 Upload or deploy your WAR file to your favorite Application Server if compatible (see <a href="#server-compatibility">Compatibility matrix above</a>).
@@ -243,3 +290,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+## Built by CloudBees
+<img src="http://web-static-cloudfront.s3.amazonaws.com/images/badges/BuiltOnDEV.png"/>

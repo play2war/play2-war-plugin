@@ -1,7 +1,14 @@
 package controllers
 
+import java.io._
+
 import play.api._
 import play.api.mvc._
+import play.api.libs.{ Comet }
+import play.api.libs.iteratee._
+import play.api.libs.concurrent._
+
+import akka.util.duration._
 
 object Application extends Controller {
 
@@ -50,6 +57,69 @@ object Application extends Controller {
     throw new RuntimeException("This a desired exception in order to test exception interception")
   }
 
+  // All in memory
+  def bigContent = Action { request =>
+
+    val sb = new StringBuilder;
+
+    request.queryString.get("maxRange").map {
+      maxRange =>
+
+        for (i <- 0 until maxRange.head.toInt) {
+          sb.append(i)
+          sb.append("\n")
+        }
+    }.getOrElse {
+      sb.append("Max range not found\n")
+    }
+
+    val data = sb.toString.getBytes
+    val dataContent: Enumerator[Array[Byte]] = Enumerator.fromStream(new ByteArrayInputStream(data))
+
+    SimpleResult(
+      header = ResponseHeader(200, Map(CONTENT_LENGTH -> data.length.toString)),
+      body = dataContent)
+  }
+
+  // Streaming of big content
+  def chunkedBigContent = Action { request =>
+
+    val dataContent: Enumerator[String] =
+      request.queryString.get("maxRange").map {
+        maxRange =>
+          val iMaxRange = maxRange.head.toInt
+          var counter = 0
+
+          Enumerator.fromCallback(() => {
+
+            if (counter >= iMaxRange) {
+              Promise.pure(None)
+            } else {
+
+              val tempCounter = counter + 50000
+
+              import scala.math._
+              val minCounter = min(tempCounter, iMaxRange)
+
+              val sb = new StringBuilder
+
+              for (i <- counter until minCounter) {
+                sb.append(i)
+                sb.append("\n")
+              }
+
+              counter = tempCounter
+
+              Promise.pure(Some(sb.toString))
+            }
+          })
+      }.getOrElse {
+        Enumerator("Max range not found\n")
+      }
+
+    Ok.stream(dataContent >>> Enumerator.eof)
+  }
+
   def echo = Action { request =>
     Ok(views.html.echo(request.queryString))
   }
@@ -67,5 +137,25 @@ object Application extends Controller {
     }.getOrElse {
       Ok(views.html.index("Error when uploading"))
     }
+  }
+
+  /** 
+   * A String Enumerator producing a formatted Time message every 100 millis.
+   * A callback enumerator is pure an can be applied on several Iteratee.
+   */
+  lazy val clock: Enumerator[String] = {
+    
+    import java.util._
+    import java.text._
+    
+    val dateFormat = new SimpleDateFormat("HH mm ss")
+    
+    Enumerator.fromCallback { () =>
+      Promise.timeout(Some(dateFormat.format(new Date)), 100 milliseconds)
+    }
+  }
+  
+  def liveClock = Action {
+    Ok.stream(clock &> Comet(callback = "parent.clockChanged"))
   }
 }
