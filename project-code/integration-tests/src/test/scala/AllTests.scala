@@ -108,6 +108,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     webClient.setJavaScriptEnabled(false)
     webClient.setThrowExceptionOnFailingStatusCode(false)
     webClient.getCookieManager.setCookiesEnabled(true)
+    new SkipClockiFrameWrapper(webClient)
   }
 
   after {

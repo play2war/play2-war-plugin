@@ -31,8 +31,9 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
     Logger("play").trace("Http request received: " + servletRequest)
 
     val aSyncContext = servletRequest.startAsync
-    val aSyncCtxListener = new ASyncCtxListener
-    aSyncContext.addListener(aSyncCtxListener)
+    
+    // Disable timeout for long-polling
+    aSyncContext.setTimeout(-1)
 
     val server = Servlet30Wrapper.playServer
 
@@ -133,7 +134,6 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                       aSyncContext.getResponse.setContentLength(buffer.size)
                       aSyncContext.getResponse.getOutputStream.flush
                       buffer.writeTo(aSyncContext.getResponse.getOutputStream)
-                      aSyncContext.getResponse.getOutputStream.flush
                       aSyncContext.complete()
                     }
                 }
@@ -315,25 +315,4 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
         sc.log("Play server stopped")
     } // if playServer is null, nothing to do
   }
-}
-
-class ASyncCtxListener extends AsyncListener {
-
-  var eventReceived: Boolean = false
-
-  override def onComplete(event: AsyncEvent) = {
-    eventReceived = true;
-  }
-
-  override def onTimeout(event: AsyncEvent) = {
-    eventReceived = true;
-  }
-
-  override def onError(event: AsyncEvent) = {
-    eventReceived = true;
-  }
-
-  override def onStartAsync(event: AsyncEvent) = {
-  }
-
 }
