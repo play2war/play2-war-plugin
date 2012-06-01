@@ -17,11 +17,7 @@ Other references built with Play 2 and Play2War:
 
 ## What's new ?
 
-* v0.4
-    * Play ChunkedResult are now handled. See [demo](http://servlet30.play-war.cloudbees.net/)
-    * Improvements with Play SimpleResult
-    * Integration tests are now running on Tomcat 7 and Jetty 8
-
+See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 
 ## Features
 <table>
@@ -219,7 +215,7 @@ If Play runtime is available, run
 
 Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_version.war``
 
-## How to deploy in your favorite application server ?
+## How to deploy in my favorite application server ?
 
 **Play framework 2.0.x applications must be deployed at root context.**
 Deployment in a sub-context is a known limitation which is fixed for Play 2.1 (still in development).
