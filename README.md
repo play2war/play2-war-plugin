@@ -14,7 +14,7 @@ Other references built with Play 2 and Play2War:
 ## Known limitations
 * **Play2War is only compatible with Servlet 3.0 containers** (Tomcat 7, Jetty 8, JBoss 7, ...)
 * **Play2War is only compatible with Java 6 JRE** (most of the application servers aren't compatible with too)
-* **Your WAR must be deployed at root context** (it will be possible with Play 2.1)
+* **Your WAR must be deployed at root context** (sub-context deployment will be available with Play 2.1)
 * As of version 0.3.1, it is only compatible with Play **2.0.1** (use Play2War 0.3 if you need Play 2.0 compatibility)
  
 ## What's new ?
