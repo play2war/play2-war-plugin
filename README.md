@@ -29,8 +29,12 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 	<th colspan="2">Servlet engine</th>
   </tr>
   <tr>
-	<th>3.0</th>
-	<th>2.4/2.5</th>
+	<th>3.0
+        <br/>
+        <span style="font-size: x-small;">Tomcat 7, Jetty 8, JBoss 7, ...</span></th>
+	<th>2.4/2.5
+        <br/>
+        <span style="font-size: x-small;">Tomcat 6, Jetty 7, JBoss 5/6, ...</span></th>
   </tr>
   <tr>
 	<td colspan="2">Available ?</td>
