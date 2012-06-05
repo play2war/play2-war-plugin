@@ -12,7 +12,7 @@ Other references built with Play 2 and Play2War:
  - [Factile](http://factile.net/) (Survey platform)
 
 ## Known limitations
-* **Play2War is only compatible with [Servlet 3.0 containers][servlet3containers]**
+* **Play2War is only compatible with Servlet 3.0 containers** (Tomcat 7, Jetty 8, JBoss 7, ...)
 * **Play2War is only compatible with Java 6 JRE** (most of the application servers aren't compatible with too)
 * **Your WAR must be deployed at root context** (sub-context deployment will be available with Play 2.1)
 * As of version 0.3.1, it is only compatible with Play **2.0.1** (use Play2War 0.3 if you need Play 2.0 compatibility)
@@ -29,7 +29,7 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 	<th colspan="2">Servlet engine</th>
   </tr>
   <tr>
-	<th>[3.0][servlet3containers]</th>
+	<th>3.0</th>
 	<th>2.4/2.5</th>
   </tr>
   <tr>
@@ -295,7 +295,3 @@ limitations under the License.
 
 ## Built by CloudBees
 <img src="http://web-static-cloudfront.s3.amazonaws.com/images/badges/BuiltOnDEV.png"/>
-
-## Footnotes
-
-[servlet3containers]: Tomcat 7, Jetty 8, JBoss 7, ...
