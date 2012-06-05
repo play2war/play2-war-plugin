@@ -104,9 +104,7 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 	<td rowspan="4">Servlet 3.0</td>
 	<td>Tomcat 7</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"> 
-		<a href="http://play2war.jelastic.dogado.eu/" title="Play 2 WAR demo hosted at Jelastic PaaS provider">Demo</a> @Jelastic
-	</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
   <tr>
 	<td>JBoss 7.0</td>
@@ -124,7 +122,7 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <tr>
 	<td>Glassfish 3</td>
 	<td>TBD</td>
-	<td>TBD<br/>(Jelastic)</td>
+	<td>TBD</td>
   </tr>
   <tr>
 	<td rowspan="2">Servlet 2.4/2.5</td>
@@ -135,7 +133,7 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <tr>
 	<td>Jetty 6</td>
 	<td>TBD</td>
-	<td>TBD<br/>(Jelastic)</td>
+	<td>TBD</td>
   </tr>
 </table>
 
