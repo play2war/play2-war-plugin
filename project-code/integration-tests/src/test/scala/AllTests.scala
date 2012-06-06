@@ -419,36 +419,42 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
    */
 
   feature("The container must handle POST requests with 'multipart/form-data' enctype") {
+    
+    // 2 routes to test
+    List("/upload", "/upload2").foreach {
+      case (route) => {
 
-    scenario("container sends an image") {
+        scenario("container sends an image to " + route) {
 
-      this.given("a form which sends a image")
-      val pageUrl = ROOT_URL + "/upload"
+          this.given("a form which sends a image to " + route)
+          val pageUrl = ROOT_URL + route
 
-      this.when("image is uploaded")
-      info("Load page " + pageUrl)
+          this.when("image is uploaded")
+          info("Load page " + pageUrl)
 
-      val strictMethod = HttpMethod.valueOf("POST")
-      val requestSettings = new WebRequest(new URL(pageUrl), strictMethod)
-      requestSettings.setEncodingType(FormEncodingType.MULTIPART);
+          val strictMethod = HttpMethod.valueOf("POST")
+          val requestSettings = new WebRequest(new URL(pageUrl), strictMethod)
+          requestSettings.setEncodingType(FormEncodingType.MULTIPART);
 
-      import java.io._
+          import java.io._
 
-      val imageName = "play-logo.png"
-      val image = new File(getClass.getResource("/" + imageName).toURI)
+          val imageName = "play-logo.png"
+          val image = new File(getClass.getResource("/" + imageName).toURI)
 
-      val listParam: List[NameValuePair] = List(new KeyDataPair("uploadedFile", image, "image/png", "utf-8"))
+          val listParam: List[NameValuePair] = List(new KeyDataPair("uploadedFile", image, "image/png", "utf-8"))
 
-      requestSettings.setRequestParameters(listParam.asJava)
+          requestSettings.setRequestParameters(listParam.asJava)
 
-      val page: Some[Page] = Some(webClient.getPage(requestSettings))
+          val page: Some[Page] = Some(webClient.getPage(requestSettings))
 
-      then("response page should contains image name")
+          then("response page should contains image name")
 
-      page.map { p =>
-        p.getWebResponse.getContentAsString should include(imageName)
-      }.getOrElse {
-        fail("Page not found")
+          page.map { p =>
+            p.getWebResponse.getContentAsString should include(imageName)
+          }.getOrElse {
+            fail("Page not found")
+          }
+        }
       }
     }
   }

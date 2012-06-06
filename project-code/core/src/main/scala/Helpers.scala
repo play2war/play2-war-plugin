@@ -18,18 +18,22 @@ private[servlet] trait Helpers {
 
   def getPlayHeaders(request: HttpServletRequest): Headers = {
 
+    import java.util.Collections
+
     val headers = request.getHeaderNames.asScala.map {
       key =>
         key.toUpperCase ->
-          request.getHeaders(key).asScala
+          // /!\ It very important to COPY headers from request enumeration
+          Collections.list(request.getHeaders(key)).asScala
     }.toMap
 
     new Headers {
+
       def getAll(key: String) = headers.get(key.toUpperCase).flatten.toSeq
       def keys = headers.keySet
       override def toString = headers.map {
         case (k, v) => {
-          k + " => " + v.mkString(", ")
+          k + ": " + v.mkString(", ")
         }
       }.mkString("\n  ")
     }
