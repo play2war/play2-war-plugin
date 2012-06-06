@@ -18,7 +18,7 @@ import com.gargoylesoftware.htmlunit.util._
 import org.codehaus.cargo.container.deployable.WAR
 import org.codehaus.cargo.container.property._
 import org.codehaus.cargo.util.log._
-import scala.collection.immutable.{Page => _, _}
+import scala.collection.immutable.{ Page => _, _ }
 import scala.collection.JavaConverters._
 
 trait CargoContainerManager extends BeforeAndAfterAll {
@@ -132,10 +132,10 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     info("Load page: " + pageUrl)
     val result = Some(webClient.getPage(requestSettings))
 
-//    for (i <- 1 until howManyTimes) {
-//      info("Load page: " + pageUrl)
-//      webClient.getPage(requestSettings)
-//    }
+    //    for (i <- 1 until howManyTimes) {
+    //      info("Load page: " + pageUrl)
+    //      webClient.getPage(requestSettings)
+    //    }
 
     result
   }
@@ -396,7 +396,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   }
 
   val howManyTimes = 10
-  
+
   feature("The container must handle GET requests of big content many times") {
 
     seqTupleBigContent.foreach {
@@ -412,7 +412,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
       }
     }
   }
-  
+
   /*
    ******************
    ******************
@@ -451,7 +451,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
         fail("Page not found")
       }
     }
-  }  
+  }
 }
 
 @RunWith(classOf[JUnitRunner])
