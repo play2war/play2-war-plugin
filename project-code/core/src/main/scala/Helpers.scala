@@ -27,7 +27,11 @@ private[servlet] trait Helpers {
     new Headers {
       def getAll(key: String) = headers.get(key.toUpperCase).flatten.toSeq
       def keys = headers.keySet
-      override def toString = headers.toString
+      override def toString = headers.map {
+        case (k, v) => {
+            k + " => " + v.mkString(", ")
+        }
+      }.mkString("\n  ")
     }
 
   }

@@ -28,7 +28,7 @@ object Servlet30Wrapper {
 class Servlet30Wrapper extends HttpServlet with ServletContextListener with Helpers {
 
   protected override def service(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
-    Logger("play").trace("Http request received: " + servletRequest)
+    Logger("play").trace("HTTP request received: " + servletRequest)
 
     val aSyncContext = servletRequest.startAsync
     
@@ -55,10 +55,10 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
       def username = None
 
       override def toString = {
-        super.toString + "\n" + path + "\n" + queryString + "\n" + headers + "\n" + rCookies
+        super.toString + "\nPath: " + path + "\nParameters: " + queryString + "\nHeaders: " + headers + "\nCookies: " + rCookies
       }
     }
-    Logger("play").trace("requestHeader: " + requestHeader)
+    Logger("play").trace("HTTP request content: " + requestHeader)
 
     // converting servlet response to play's
     val response = new Response {
