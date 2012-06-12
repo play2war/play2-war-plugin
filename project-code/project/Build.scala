@@ -20,7 +20,7 @@ object Build extends Build {
     base = file("core"),
     settings = commonSettings ++ Seq(
       sbtPlugin := false,
-      libraryDependencies ++= Seq("play" %% "play" % play2Version)))
+      libraryDependencies ++= Seq("play" %% "play" % play2Version % "provided->default")))
 
   lazy val play2WarPlugin = Project(id = "play2-war-plugin",
     base = file("plugin"),
