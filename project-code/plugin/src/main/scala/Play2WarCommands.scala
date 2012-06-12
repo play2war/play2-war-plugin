@@ -30,10 +30,16 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
     IO.createDirectory(warDir)
 
     val libs = {
-      dependencies.filterNot(_.data.name.contains("servlet")).filter(_.data.ext == "jar").filterNot(_.data.name.contains("-sources")).map { dependency =>
-        dependency.data -> ("WEB-INF/lib/" + (dependency.metadata.get(AttributeKey[ModuleID]("module-id")).map { module =>
-          module.organization + "." + module.name + "-" + module.revision + ".jar"
-        }.getOrElse(dependency.data.getName)))
+      dependencies.filterNot(_.data.name.contains("servlet")).filter(_.data.ext == "jar").map { dependency =>
+        val filename = for {
+          module <- dependency.metadata.get(AttributeKey[ModuleID]("module-id"))
+          artifact <- dependency.metadata.get(AttributeKey[Artifact]("artifact"))
+        } yield {
+          // groupId.artifactId-version[-classifier].extension
+          module.organization + "." + module.name + "-" + module.revision + artifact.classifier.map("-" + _).getOrElse("") + "." + artifact.extension
+        }
+        val path = ("WEB-INF/lib/" + filename.getOrElse(dependency.data.getName))
+        dependency.data -> path
       } ++ packaged.map(jar => jar -> ("WEB-INF/lib/" + jar.getName))
     }
 
