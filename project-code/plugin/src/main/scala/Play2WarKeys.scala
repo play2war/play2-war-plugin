@@ -1,5 +1,7 @@
 package com.github.play2.warplugin
 
+import sbt._
+
 trait Play2WarKeys {
 
   val servletVersion: SettingKey[String] =

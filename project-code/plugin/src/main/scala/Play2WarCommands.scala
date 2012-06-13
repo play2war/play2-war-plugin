@@ -1,20 +1,21 @@
 package com.github.play2.warplugin
 
-import Keys._
-import CommandSupport.{ ClearOnFailure, FailureWall }
-import complete.Parser
+import sbt._
+import sbt.Keys._
+import sbt.CommandSupport.{ ClearOnFailure, FailureWall }
+import sbt.complete.Parser
 import Parser._
-import Cache.seqFormat
+import sbt.Cache.seqFormat
 import sbinary.DefaultProtocol.StringFormat
 import play.api._
 import play.core._
 import play.utils.Colors
-import PlayKeys._
+import sbt.PlayKeys._
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import java.lang.{ ProcessBuilder => JProcessBuilder }
 import java.util.jar.Manifest
-import java.io._
+import java.io.{ File, ByteArrayInputStream }
 
 trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
 
