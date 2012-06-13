@@ -19,7 +19,6 @@ import java.io.{ File, ByteArrayInputStream }
 
 trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
 
-  val war = TaskKey[File]("war", "Build the standalone application package as a WAR file")
   val warTask = (baseDirectory, playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version) map { (root, packaged, dependencies, target, id, version) =>
 
     import sbt.NameFilter._
