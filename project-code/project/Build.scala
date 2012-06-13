@@ -52,6 +52,8 @@ object Build extends Build {
       organization := "com.github.play2war",
       // version is defined in version.sbt in order to support sbt-release
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
+      publishArtifact in (Compile, packageDoc) := false,
+      publishArtifact in (Compile, packageSrc) := false,
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
 //      publishTo := Some(Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish")) ),
 //      publishTo <<= (version) {
