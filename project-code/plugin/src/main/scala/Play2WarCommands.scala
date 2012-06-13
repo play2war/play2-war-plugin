@@ -1,4 +1,4 @@
-package sbt
+package com.github.play2.warplugin
 
 import Keys._
 import CommandSupport.{ ClearOnFailure, FailureWall }

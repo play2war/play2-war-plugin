@@ -1,4 +1,4 @@
-package sbt
+package com.github.play2.warplugin
 
 import sbt.{ `package` => _, _ }
 import PlayKeys._
