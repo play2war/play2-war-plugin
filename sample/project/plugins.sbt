@@ -1,6 +1,8 @@
 // Comment to get more information during initialization
 logLevel := Level.Warn
 
+//resolvers += "Local Repository" at "http://localhost:8090/publish"
+
 resolvers += (Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath+"/.ivy2/local"))(Resolver.ivyStylePatterns))
 
 resolvers += "Play2war plugins snapshot" at "http://repository-play-war.forge.cloudbees.com/snapshot/"
@@ -10,4 +12,4 @@ addSbtPlugin("play" % "sbt-plugin" % "2.0.1")
 
 addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.0.0")
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.4")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.5")

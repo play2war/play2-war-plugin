@@ -20,7 +20,7 @@ object Build extends Build {
     base = file("core"),
     settings = commonSettings ++ Seq(
       sbtPlugin := false,
-      libraryDependencies ++= Seq("play" %% "play" % play2Version)))
+      libraryDependencies ++= Seq("play" %% "play" % play2Version % "provided->default")))
 
   lazy val play2WarPlugin = Project(id = "play2-war-plugin",
     base = file("plugin"),
@@ -52,7 +52,12 @@ object Build extends Build {
       organization := "com.github.play2war",
       // version is defined in version.sbt in order to support sbt-release
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
+
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
+      
+      publishArtifact in (Compile, packageDoc) := false,
+      publishArtifact in Test := false,
+
 //      publishTo := Some(Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish")) ),
 //      publishTo <<= (version) {
 //		version: String =>
@@ -61,7 +66,6 @@ object Build extends Build {
 //	  },
 //      credentials += Credentials(file("/private/play-war/.credentials")),
 //      credentials += Credentials(file(Path.userHome.absolutePath + "/.ivy2/.credentials")),
-      publishMavenStyle := true,
-      publishArtifact in Test := false
+      publishMavenStyle := true
     )
 }

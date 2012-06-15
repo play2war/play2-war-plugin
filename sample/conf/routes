@@ -24,6 +24,7 @@ POST	/echo						controllers.Application.echo
 
 GET		/uploadForm					controllers.Application.uploadForm
 POST	/upload						controllers.Application.upload
+POST	/upload2					controllers.Application.upload2
 
 GET     /clock                      controllers.Application.liveClock
 

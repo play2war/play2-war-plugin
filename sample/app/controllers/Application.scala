@@ -128,14 +128,29 @@ object Application extends Controller {
     Ok(views.html.uploadForm())
   }
 
+  def upload2 = Action { request =>
+    request.body.asMultipartFormData.map { b =>
+        b.file("uploadedFile").map { uploadedFile =>
+          import java.io.File
+          val filename = uploadedFile.filename
+          val contentType = uploadedFile.contentType
+          Ok("File uploaded: " + filename)
+        }.getOrElse {
+          Ok("Error when uploading")
+        }
+    }.getOrElse {
+       Ok("Error when uploading")
+    }
+  }
+  
   def upload = Action(parse.multipartFormData) { request =>
     request.body.file("uploadedFile").map { uploadedFile =>
       import java.io.File
       val filename = uploadedFile.filename
       val contentType = uploadedFile.contentType
-      Ok(views.html.index("File uploaded: " + filename))
+      Ok("File uploaded: " + filename)
     }.getOrElse {
-      Ok(views.html.index("Error when uploading"))
+      Ok("Error when uploading")
     }
   }
 

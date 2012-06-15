@@ -1,25 +1,25 @@
-package sbt
+package com.github.play2.warplugin
 
-import Keys._
-import CommandSupport.{ ClearOnFailure, FailureWall }
-import complete.Parser
+import sbt._
+import sbt.Keys._
+import sbt.CommandSupport.{ ClearOnFailure, FailureWall }
+import sbt.complete.Parser
 import Parser._
-import Cache.seqFormat
+import sbt.Cache.seqFormat
 import sbinary.DefaultProtocol.StringFormat
 import play.api._
 import play.core._
 import play.utils.Colors
-import PlayKeys._
+import sbt.PlayKeys._
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import java.lang.{ ProcessBuilder => JProcessBuilder }
 import java.util.jar.Manifest
-import java.io._
+import java.io.{ File, ByteArrayInputStream }
 
 trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
 
-  val war = TaskKey[File]("war", "Build the standalone application package as a WAR file")
-  val warTask = (baseDirectory, playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version) map { (root, packaged, dependencies, target, id, version) =>
+  val warTask = (baseDirectory, playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version, streams) map { (root, packaged, dependencies, target, id, version, s) =>
 
     import sbt.NameFilter._
 
@@ -27,13 +27,21 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
     val packageName = id + "-" + version
     val war = warDir / (packageName + ".war")
 
+    s.log.info("Packaging " + war.getCanonicalPath + " ...")
+
     IO.createDirectory(warDir)
 
     val libs = {
-      dependencies.filterNot(_.data.name.contains("servlet")).filter(_.data.ext == "jar").filterNot(_.data.name.contains("-sources")).map { dependency =>
-        dependency.data -> ("WEB-INF/lib/" + (dependency.metadata.get(AttributeKey[ModuleID]("module-id")).map { module =>
-          module.organization + "." + module.name + "-" + module.revision + ".jar"
-        }.getOrElse(dependency.data.getName)))
+      dependencies.filterNot(_.data.name.contains("servlet")).filter(_.data.ext == "jar").map { dependency =>
+        val filename = for {
+          module <- dependency.metadata.get(AttributeKey[ModuleID]("module-id"))
+          artifact <- dependency.metadata.get(AttributeKey[Artifact]("artifact"))
+        } yield {
+          // groupId.artifactId-version[-classifier].extension
+          module.organization + "." + module.name + "-" + module.revision + artifact.classifier.map("-" + _).getOrElse("") + "." + artifact.extension
+        }
+        val path = ("WEB-INF/lib/" + filename.getOrElse(dependency.data.getName))
+        dependency.data -> path
       } ++ packaged.map(jar => jar -> ("WEB-INF/lib/" + jar.getName))
     }
 
@@ -74,26 +82,13 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
     //
     //    val webxmlFile = Seq(webxml -> ("WEB-INF/web.xml"))
 
-    val config = Option(System.getProperty("config.file"))
-
-    val productionConfig = target / "application.conf"
-
-    val prodApplicationConf = config.map { location =>
-
-      IO.copyFile(new File(location), productionConfig)
-      Seq(productionConfig -> ("WEB-INF/classes/application.conf"))
-    }.getOrElse(Nil)
-
     val manifest = new Manifest(
       new ByteArrayInputStream((
         "Manifest-Version: 1.0\n").getBytes))
 
-    IO.jar(libs ++ prodApplicationConf /*++ webxmlFile*/ , war, manifest)
-    IO.delete(productionConfig)
+    IO.jar(libs /*++ webxmlFile*/ , war, manifest)
 
-    println()
-    println("Your application is ready in " + war.getCanonicalPath)
-    println()
+    s.log.info("Done packaging.")
 
     war
   }

@@ -3,7 +3,7 @@ package play.core.server.servlet
 import java.util.Arrays
 import java.util.concurrent._
 
-import javax.servlet.http.{Cookie => ServletCookie, _}
+import javax.servlet.http.{ Cookie => ServletCookie, _ }
 
 import play.core._
 import play.api._
@@ -18,16 +18,24 @@ private[servlet] trait Helpers {
 
   def getPlayHeaders(request: HttpServletRequest): Headers = {
 
+    import java.util.Collections
+
     val headers = request.getHeaderNames.asScala.map {
       key =>
         key.toUpperCase ->
-          request.getHeaders(key).asScala
+          // /!\ It very important to COPY headers from request enumeration
+          Collections.list(request.getHeaders(key)).asScala
     }.toMap
 
     new Headers {
+
       def getAll(key: String) = headers.get(key.toUpperCase).flatten.toSeq
       def keys = headers.keySet
-      override def toString = headers.toString
+      override def toString = headers.map {
+        case (k, v) => {
+          k + ": " + v.mkString(", ")
+        }
+      }.mkString("\n  ")
     }
 
   }
@@ -51,13 +59,13 @@ private[servlet] trait Helpers {
   def getServletCookies(flatCookie: String): Seq[ServletCookie] = {
     Cookies.decode(flatCookie).map {
       pCookie =>
-        	val sc = new ServletCookie(pCookie.name, pCookie.value)
-        	pCookie.domain.map(sc.setDomain(_))
-        	sc.setHttpOnly(pCookie.httpOnly)
-        	sc.setMaxAge(pCookie.maxAge)
-        	sc.setPath(pCookie.path)
-        	sc.setSecure(pCookie.secure)
-        	sc
+        val sc = new ServletCookie(pCookie.name, pCookie.value)
+        pCookie.domain.map(sc.setDomain(_))
+        sc.setHttpOnly(pCookie.httpOnly)
+        sc.setMaxAge(pCookie.maxAge)
+        sc.setPath(pCookie.path)
+        sc.setSecure(pCookie.secure)
+        sc
     }
   }
 }

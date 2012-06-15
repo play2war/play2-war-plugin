@@ -1,20 +1,22 @@
 # WAR Plugin for Play framework 2.0
 
-    Current version: 0.4
+    Current version: 0.5
 
     Project-status: BETA
 
 This project is a module for Play framework 2 to package your apps into standard WAR packages.
-
-As of version 0.3.1, it is only compatible with Play **2.0.1**.
-
-**Play2War is only compatible with Java 6 JRE**.
 
 Live demo: JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
 
 Other references built with Play 2 and Play2War:
  - [Factile](http://factile.net/) (Survey platform)
 
+## Known limitations
+* **Play2War is only compatible with Servlet 3.0 containers** (Tomcat 7, Jetty 8, JBoss 7, ...)
+* **Play2War is only compatible with Java 6 JRE** (most of the application servers aren't compatible with too)
+* **Your WAR must be deployed at root context** (sub-context deployment will be available with Play 2.1)
+* As of version 0.3.1, it is only compatible with Play **2.0.1** (use Play2War 0.3 if you need Play 2.0 compatibility)
+ 
 ## What's new ?
 
 See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
@@ -102,9 +104,7 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 	<td rowspan="4">Servlet 3.0</td>
 	<td>Tomcat 7</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"> 
-		<a href="http://play2war.jelastic.dogado.eu/" title="Play 2 WAR demo hosted at Jelastic PaaS provider">Demo</a> @Jelastic
-	</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
   <tr>
 	<td>JBoss 7.0</td>
@@ -116,13 +116,13 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   </tr>
   <tr>
 	<td>JBoss 7.1</td>
-	<td>TBD</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td>TBD<br/>(Openshift)</td>
   </tr>
   <tr>
 	<td>Glassfish 3</td>
 	<td>TBD</td>
-	<td>TBD<br/>(Jelastic)</td>
+	<td>TBD</td>
   </tr>
   <tr>
 	<td rowspan="2">Servlet 2.4/2.5</td>
@@ -133,7 +133,7 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <tr>
 	<td>Jetty 6</td>
 	<td>TBD</td>
-	<td>TBD<br/>(Jelastic)</td>
+	<td>TBD</td>
   </tr>
 </table>
 
@@ -150,7 +150,7 @@ In ``APP_HOME/project/plugins.sbt``, add:
 ```scala
 resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.4")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.5")
 ```
 
 ### Add play2war runtime
@@ -160,7 +160,7 @@ In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` val
 ```scala
 val appDependencies = Seq(
   ...
-  "com.github.play2war" %% "play2-war-core" % "0.4"
+  "com.github.play2war" %% "play2-war-core" % "0.5"
   ...
 )
 
@@ -211,9 +211,9 @@ Create a file ``APP_HOME/conf/logger.xml`` with the following content :
 
 If Play runtime is available, run
 
-    play war
+    play package
 
-Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_version.war``
+Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_<YOUR_VERSION>.war``
 
 ## How to deploy in my favorite application server ?
 
@@ -256,6 +256,10 @@ Then rename the generated war *ROOT.war* before deployment.
 ## Upload or deploy your WAR file
 
 Upload or deploy your WAR file to your favorite Application Server if compatible (see <a href="#server-compatibility">Compatibility matrix above</a>).
+
+## WAR publishing (Artifactory, Nexus, ...)
+
+Play2war follows SBT rules, so built WAR can be published in a standard way (see [SBT Publish](https://github.com/harrah/xsbt/wiki/Publishing)).
 
 ## FAQ
 
