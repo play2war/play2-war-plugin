@@ -205,7 +205,7 @@ Create a file ``APP_HOME/conf/logger.xml`` with the following content :
   </root>
 ```
 
-``Warning: there is a known issue with JBoss and Play logger`` (see [#54](/dlecan/play2-war-plugin/issues/54)).
+**Warning: there is a known issue with JBoss and Play logger** (see [#54](/dlecan/play2-war-plugin/issues/54)).
 
 </configuration>
 
