@@ -12,4 +12,4 @@ addSbtPlugin("play" % "sbt-plugin" % "2.0.1")
 
 addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.0.0")
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.5")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % 0.6-SNAPSHOT)
