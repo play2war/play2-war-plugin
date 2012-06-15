@@ -211,9 +211,9 @@ Create a file ``APP_HOME/conf/logger.xml`` with the following content :
 
 If Play runtime is available, run
 
-    play war
+    play package
 
-Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_version.war``
+Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_<YOUR_VERSION>.war``
 
 ## How to deploy in my favorite application server ?
 

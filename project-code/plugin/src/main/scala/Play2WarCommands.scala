@@ -26,7 +26,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
     val warDir = target
     val packageName = id + "-" + version
     val war = warDir / (packageName + ".war")
-    
+
     s.log.info("Packaging " + war.getCanonicalPath + " ...")
 
     IO.createDirectory(warDir)
@@ -82,22 +82,11 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
     //
     //    val webxmlFile = Seq(webxml -> ("WEB-INF/web.xml"))
 
-    val config = Option(System.getProperty("config.file"))
-
-    val productionConfig = target / "application.conf"
-
-    val prodApplicationConf = config.map { location =>
-
-      IO.copyFile(new File(location), productionConfig)
-      Seq(productionConfig -> ("WEB-INF/classes/application.conf"))
-    }.getOrElse(Nil)
-
     val manifest = new Manifest(
       new ByteArrayInputStream((
         "Manifest-Version: 1.0\n").getBytes))
 
-    IO.jar(libs ++ prodApplicationConf /*++ webxmlFile*/ , war, manifest)
-    IO.delete(productionConfig)
+    IO.jar(libs /*++ webxmlFile*/ , war, manifest)
 
     s.log.info("Done packaging.")
 
