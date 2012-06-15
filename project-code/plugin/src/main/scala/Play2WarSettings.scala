@@ -10,11 +10,17 @@ trait Play2WarSettings {
 
   lazy val defaultSettings = Seq[Setting[_]](
     //    defaultServletVersion <<= "3.x",
-    //    artifact in war <<= moduleName(n => Artifact(n, "war", "war")),
-    //    addArtifact(artifact in (Compile, war), warTask),
+
+    // War attifact
+    artifact in war <<= moduleName(n => Artifact(n, "war", "war")),
+
+    // Bind war building to "war" task
     war <<= warTask,
+
+    // Bind war task to "package" task (phase)
     `package` <<= war //
-    // Add new tasks here
-    )
+    ) ++
+    // Attach war artifact. War file is published on "publish-local" and "publish"
+    Seq(addArtifact(artifact in (Compile, war), war).settings: _*)
 
 }
