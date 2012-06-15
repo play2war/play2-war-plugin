@@ -1,6 +1,6 @@
 # WAR Plugin for Play framework 2.0
 
-    Current version: 0.4
+    Current version: 0.5
 
     Project-status: BETA
 
@@ -150,7 +150,7 @@ In ``APP_HOME/project/plugins.sbt``, add:
 ```scala
 resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.4")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.5")
 ```
 
 ### Add play2war runtime
@@ -160,7 +160,7 @@ In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` val
 ```scala
 val appDependencies = Seq(
   ...
-  "com.github.play2war" %% "play2-war-core" % "0.4"
+  "com.github.play2war" %% "play2-war-core" % "0.5"
   ...
 )
 
@@ -256,6 +256,10 @@ Then rename the generated war *ROOT.war* before deployment.
 ## Upload or deploy your WAR file
 
 Upload or deploy your WAR file to your favorite Application Server if compatible (see <a href="#server-compatibility">Compatibility matrix above</a>).
+
+## WAR publishing (Artifactory, Nexus, ...)
+
+Play2war follows SBT rules, so built WAR can be published in a standard way (see [SBT Publish](https://github.com/harrah/xsbt/wiki/Publishing)).
 
 ## FAQ
 
