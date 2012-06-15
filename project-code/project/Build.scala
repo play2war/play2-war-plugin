@@ -67,6 +67,6 @@ object Build extends Build {
 //	  },
 //      credentials += Credentials(file("/private/play-war/.credentials")),
 //      credentials += Credentials(file(Path.userHome.absolutePath + "/.ivy2/.credentials")),
-      publishMavenStyle := true,
+      publishMavenStyle := true
     )
 }
