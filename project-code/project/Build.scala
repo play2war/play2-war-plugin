@@ -52,9 +52,13 @@ object Build extends Build {
       organization := "com.github.play2war",
       // version is defined in version.sbt in order to support sbt-release
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
+
+      resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
+      
       publishArtifact in (Compile, packageDoc) := false,
       publishArtifact in (Compile, packageSrc) := false,
-      resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
+      publishArtifact in Test := false
+
 //      publishTo := Some(Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish")) ),
 //      publishTo <<= (version) {
 //		version: String =>
@@ -64,6 +68,5 @@ object Build extends Build {
 //      credentials += Credentials(file("/private/play-war/.credentials")),
 //      credentials += Credentials(file(Path.userHome.absolutePath + "/.ivy2/.credentials")),
       publishMavenStyle := true,
-      publishArtifact in Test := false
     )
 }
