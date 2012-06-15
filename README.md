@@ -173,7 +173,7 @@ val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).s
 
 ### Configure logging
 
-You probably need to override default Play 2.0 logging configuration because :
+You probably need to override default Play 2.0 logging configuration because:
 
 - An external file will be written in ``$USER_HOME/logs/...``
 
@@ -204,7 +204,9 @@ Create a file ``APP_HOME/conf/logger.xml`` with the following content :
     <appender-ref ref="STDOUT" />
   </root>
 ```
-  
+
+``Warning: there is a known issue with JBoss and Play logger`` (see [#54](/dlecan/play2-war-plugin/issues/54)).
+
 </configuration>
 
 ## Packaging
