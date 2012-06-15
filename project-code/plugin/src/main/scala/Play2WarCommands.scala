@@ -19,13 +19,15 @@ import java.io.{ File, ByteArrayInputStream }
 
 trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
 
-  val warTask = (baseDirectory, playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version) map { (root, packaged, dependencies, target, id, version) =>
+  val warTask = (baseDirectory, playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version, streams) map { (root, packaged, dependencies, target, id, version, s) =>
 
     import sbt.NameFilter._
 
     val warDir = target
     val packageName = id + "-" + version
     val war = warDir / (packageName + ".war")
+    
+    s.log.info("Packaging " + war.getCanonicalPath + " ...")
 
     IO.createDirectory(warDir)
 
@@ -97,9 +99,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
     IO.jar(libs ++ prodApplicationConf /*++ webxmlFile*/ , war, manifest)
     IO.delete(productionConfig)
 
-    println()
-    println("Your application is ready in " + war.getCanonicalPath)
-    println()
+    s.log.info("Done packaging.")
 
     war
   }
