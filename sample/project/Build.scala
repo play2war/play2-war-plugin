@@ -21,6 +21,8 @@ object ApplicationBuild extends Build {
     publishArtifact in (Compile, packageSrc) := false,
 
     publishTo := Some(Resolver.file("file", file(Path.userHome.absolutePath + "/.ivy2/publish"))),
-    publishMavenStyle := true)
+    publishMavenStyle := true)/* dependsOn(core)
+
+    lazy val core = Project("core", file("core"))*/
 
 }
