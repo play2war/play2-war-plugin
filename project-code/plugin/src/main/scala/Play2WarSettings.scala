@@ -10,6 +10,8 @@ trait Play2WarSettings {
 
   lazy val defaultSettings = Seq[Setting[_]](
     //    defaultServletVersion <<= "3.x",
+      
+    webappResource <<= baseDirectory / "war",
 
     // War attifact
     artifact in war <<= moduleName(n => Artifact(n, "war", "war")),

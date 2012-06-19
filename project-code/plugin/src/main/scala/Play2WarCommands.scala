@@ -16,11 +16,12 @@ import scala.collection.JavaConverters._
 import java.lang.{ ProcessBuilder => JProcessBuilder }
 import java.util.jar.Manifest
 import java.io.{ File, ByteArrayInputStream }
+import com.github.play2.warplugin.Play2WarKeys._
 
 trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
 
-  val warTask = (baseDirectory, playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version, streams) map {
-    (root, packaged, dependencies, target, id, version, s) =>
+  val warTask = (baseDirectory, playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version, webappResource, streams) map {
+    (root, packaged, dependencies, target, id, version, webappResource, s) =>
 
       import sbt.NameFilter._
 
@@ -45,6 +46,25 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
           dependency.data -> path
         } ++ packaged.map(jar => jar -> ("WEB-INF/lib/" + jar.getName))
       }
+      
+      libs.foreach { l => 
+        s.log.debug("Embedding dependency " + l._1 + " -> " + l._2)
+      }
+      
+//      s.log.info(webappResource.getAbsolutePath)
+//      
+//      webappResource.getPaths.foreach { r => 
+//        s.log.info(r.toString)
+//      }
+      
+//      val additionnalResources = webappResource.get.map { r =>
+//        r -> Path.relativizeFile(webappResource, r).get.getPath
+//      }
+//      
+//      additionnalResources.foreach { r => 
+//        s.log.info("Embedding " + r._1 + " -> " + r._2)
+//      }
+
 
       val webxml = warDir / "web.xml"
 
@@ -87,7 +107,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
         new ByteArrayInputStream((
           "Manifest-Version: 1.0\n").getBytes))
 
-      IO.jar(libs /*++ webxmlFile*/ , war, manifest)
+      IO.jar(libs /*++ additionnalResources ++ webxmlFile*/ , war, manifest)
 
       s.log.info("Done packaging.")
 
