@@ -40,7 +40,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
     //    val keepAlive -> non-sens
     //    val websocketableRequest -> non-sens
     val version = servletRequest.getProtocol.substring("HTTP/".length, servletRequest.getProtocol.length)
-    val servletUri = servletRequest.getServletPath
+    val servletUri = servletRequest.getRequestURI
     val parameters = Map.empty[String, Seq[String]] ++ servletRequest.getParameterMap.asScala.mapValues(Arrays.asList(_: _*).asScala)
     val rHeaders = getPlayHeaders(servletRequest)
     val rCookies = getPlayCookies(servletRequest)
