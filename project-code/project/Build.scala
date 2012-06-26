@@ -14,13 +14,32 @@ object Build extends Build {
   lazy val root = Project(id = "play2-war",
     base = file("."),
     settings = commonSettings ++ Seq(
-      publishArtifact := false)) aggregate (play2WarCore, play2WarPlugin, play2WarIntegrationTests)
+      publishArtifact := false)
+  ) aggregate (play2WarCoreCommon, play2WarCoreServlet3x, play2WarCoreServlet2x, play2WarPlugin, play2WarIntegrationTests)
 
-  lazy val play2WarCore = Project(id = "play2-war-core",
-    base = file("core"),
+  lazy val play2WarCoreCommon = Project(id = "play2-war-core-common",
+    base = file("core/common"),
     settings = commonSettings ++ Seq(
-      sbtPlugin := false,
-      libraryDependencies ++= Seq("play" %% "play" % play2Version % "provided->default")))
+      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude("javax.servlet", "servlet-api") exclude("javax.servlet", "javax.servlet-api"),
+      libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default" 
+    )
+  )
+
+  lazy val play2WarCoreServlet3x = Project(id = "play2-war-core-servlet3x",
+    base = file("core/servlet3x"),
+    settings = commonSettings ++ Seq(
+      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude("javax.servlet", "servlet-api") exclude("javax.servlet", "javax.servlet-api"),
+      libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "provided->default"
+    )
+  ) dependsOn(play2WarCoreCommon)
+
+  lazy val play2WarCoreServlet2x = Project(id = "play2-war-core-servlet2x",
+    base = file("core/servlet2x"),
+    settings = commonSettings ++ Seq(
+      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude("javax.servlet", "servlet-api") exclude("javax.servlet", "javax.servlet-api"),
+      libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default"
+    )
+  ) dependsOn(play2WarCoreCommon)
 
   lazy val play2WarPlugin = Project(id = "play2-war-plugin",
     base = file("plugin"),
@@ -36,12 +55,12 @@ object Build extends Build {
     settings = commonSettings ++ Seq(
       sbtPlugin := false,
       publishArtifact := false,
-      libraryDependencies ++= Seq(
-          "org.scalatest" %% "scalatest" % "1.7.2" % "test",
-          "junit" % "junit" % "4.10" % "test",
-          "org.codehaus.cargo" % "cargo-core-uberjar" % "1.2.2" % "test",
-          "net.sourceforge.htmlunit" % "htmlunit" % "2.9" % "test"
-      ),
+
+      libraryDependencies += "org.scalatest" %% "scalatest" % "1.7.2" % "test",
+      libraryDependencies += "junit" % "junit" % "4.10" % "test",
+      libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.2.2" % "test",
+      libraryDependencies += "net.sourceforge.htmlunit" % "htmlunit" % "2.9" % "test",
+
       parallelExecution in Test := false,
       testOptions in Test += Tests.Argument("-oD"),
       testOptions in Test += Tests.Argument("-Dwar=" + sampleWarPath)
