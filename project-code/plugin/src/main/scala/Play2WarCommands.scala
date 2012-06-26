@@ -17,8 +17,17 @@ import java.lang.{ ProcessBuilder => JProcessBuilder }
 import java.util.jar.Manifest
 import java.io.{ File, ByteArrayInputStream }
 import com.github.play2.warplugin.Play2WarKeys._
+import scala.collection.JavaConversions._ 
 
 trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
+
+    def getFiles(root: File, skipHidden: Boolean = true): Stream[File] =  
+      if (!root.exists || (skipHidden && root.isHidden)) Stream.empty  
+      else root #:: ( 
+        root.listFiles match { 
+          case null => Stream.empty 
+          case files => files.toStream.flatMap(getFiles(_, skipHidden)) 
+      })
 
   val warTask = (baseDirectory, playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version, webappResource, streams) map {
     (root, packaged, dependencies, target, id, version, webappResource, s) =>
@@ -51,22 +60,19 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
         s.log.debug("Embedding dependency " + l._1 + " -> " + l._2)
       }
       
-//      s.log.info(webappResource.getAbsolutePath)
-//      
-//      webappResource.getPaths.foreach { r => 
-//        s.log.info(r.toString)
-//      }
+      s.log.debug("Webapp resources directory: " + webappResource.getAbsolutePath)
       
-//      val additionnalResources = webappResource.get.map { r =>
-//        r -> Path.relativizeFile(webappResource, r).get.getPath
-//      }
-//      
-//      additionnalResources.foreach { r => 
-//        s.log.info("Embedding " + r._1 + " -> " + r._2)
-//      }
+      val filesToInclude = getFiles(webappResource).filter(f => f.isFile)
+      
+      val additionnalResources = filesToInclude.map { f =>
+        f -> Path.relativizeFile(webappResource, f).get.getPath
+      }
+      
+      additionnalResources.foreach { r => 
+        s.log.debug("Embedding " + r._1 + " -> /" + r._2)
+      }
 
-
-      val webxml = warDir / "web.xml"
+      //    val webxml = warDir / "web.xml"
 
       //    if (!webxml.exists) {
       //      IO.write(webxml,
@@ -107,7 +113,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
         new ByteArrayInputStream((
           "Manifest-Version: 1.0\n").getBytes))
 
-      IO.jar(libs /*++ additionnalResources ++ webxmlFile*/ , war, manifest)
+      IO.jar(libs ++ additionnalResources /*++ webxmlFile*/ , war, manifest)
 
       s.log.info("Done packaging.")
 
