@@ -24,7 +24,7 @@ object Build extends Build {
       libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default" 
     )
   )
-      
+
   lazy val play2WarCoreServlet3x = Project(id = "play2-war-core-servlet3x",
     base = file("core/servlet3x"),
     settings = commonSettings ++ Seq(
@@ -40,7 +40,7 @@ object Build extends Build {
       libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default"
     )
   ) dependsOn(play2WarCoreCommon)
-      
+
   lazy val play2WarPlugin = Project(id = "play2-war-plugin",
     base = file("plugin"),
     settings = commonSettings ++ Seq(
@@ -55,12 +55,12 @@ object Build extends Build {
     settings = commonSettings ++ Seq(
       sbtPlugin := false,
       publishArtifact := false,
-      libraryDependencies ++= Seq(
-          "org.scalatest" %% "scalatest" % "1.7.2" % "test",
-          "junit" % "junit" % "4.10" % "test",
-          "org.codehaus.cargo" % "cargo-core-uberjar" % "1.2.2" % "test",
-          "net.sourceforge.htmlunit" % "htmlunit" % "2.9" % "test"
-      ),
+
+      libraryDependencies += "org.scalatest" %% "scalatest" % "1.7.2" % "test",
+      libraryDependencies += "junit" % "junit" % "4.10" % "test",
+      libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.2.2" % "test",
+      libraryDependencies += "net.sourceforge.htmlunit" % "htmlunit" % "2.9" % "test",
+
       parallelExecution in Test := false,
       testOptions in Test += Tests.Argument("-oD"),
       testOptions in Test += Tests.Argument("-Dwar=" + sampleWarPath)
