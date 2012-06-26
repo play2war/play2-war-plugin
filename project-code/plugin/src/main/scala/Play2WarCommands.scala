@@ -43,7 +43,8 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
       IO.createDirectory(warDir)
 
       val libs = {
-        dependencies.filterNot(_.data.name.contains("servlet")).filter(_.data.ext == "jar").map { dependency =>
+        // Much better: filter by scope (exclude 'provided')
+        dependencies.filterNot(_.data.name.contains("servlet-api")).filter(_.data.ext == "jar").map { dependency =>
           val filename = for {
             module <- dependency.metadata.get(AttributeKey[ModuleID]("module-id"))
             artifact <- dependency.metadata.get(AttributeKey[Artifact]("artifact"))
