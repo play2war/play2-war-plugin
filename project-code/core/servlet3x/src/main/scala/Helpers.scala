@@ -20,7 +20,7 @@ private[servlet] trait Helpers {
 
     import java.util.Collections
 
-    val headers = request.getHeaderNames.asScala.map {
+    val headers: Map[String, Seq[String]] = request.getHeaderNames.asScala.map {
       key =>
         key.toUpperCase ->
           // /!\ It very important to COPY headers from request enumeration
