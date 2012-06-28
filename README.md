@@ -3,6 +3,8 @@
     Current version: 0.5
 
     Project-status: BETA
+    
+[![Build Status](https://play-war.ci.cloudbees.com/job/Play_2_War_-_on_push_-_with_integration_tests_-_on_develop_branch/badge/icon)](https://play-war.ci.cloudbees.com/job/Play_2_War_-_on_push_-_with_integration_tests_-_on_develop_branch/)
 
 This project is a module for Play framework 2 to package your apps into standard WAR packages.
 
