@@ -9,7 +9,7 @@ object ApplicationBuild extends Build {
 
   val appDependencies = Seq(
     // Add your project dependencies here,
-    "com.github.play2war" %% "play2-war-core" % "0.6-SNAPSHOT")
+    "com.github.play2war" %% "play2-war-core" % "0.6")
 
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
     //      resolvers += "Local Repository" at "http://localhost:8090/publish",
