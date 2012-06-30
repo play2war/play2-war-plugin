@@ -45,6 +45,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
     val rHeaders = getPlayHeaders(servletRequest)
     val rCookies = getPlayCookies(servletRequest)
     val httpMethod = servletRequest.getMethod
+    val rRemoteAddress = servletRequest.getRemoteAddr
 
     val requestHeader = new RequestHeader {
       def uri = servletUri
@@ -53,6 +54,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
       def queryString = parameters
       def headers = rHeaders
       def username = None
+      def remoteAddress = rRemoteAddress
 
       override def toString = {
         super.toString + "\nPath: " + path + "\nParameters: " + queryString + "\nHeaders: " + headers + "\nCookies: " + rCookies
@@ -250,6 +252,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                   def queryString = parameters
                   def headers = rHeaders
                   def username = None
+                  def remoteAddress = rRemoteAddress
                   val body = b
                 })
             }

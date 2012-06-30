@@ -8,7 +8,7 @@ resolvers += (Resolver.file("Local Ivy Repository", file(Path.userHome.absoluteP
 resolvers += "Play2war plugins snapshot" at "http://repository-play-war.forge.cloudbees.com/snapshot/"
 
 // Use the Play sbt plugin for Play projects
-addSbtPlugin("play" % "sbt-plugin" % "2.0.1")
+addSbtPlugin("play" % "sbt-plugin" % "2.0.2")
 
 addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.0.0")
 
