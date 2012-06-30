@@ -4,7 +4,7 @@ import java.io.File
 
 object Build extends Build {
 
-  val play2Version = "2.0.1"
+  val play2Version = "2.0.2"
 
   val cloudbees = "https://repository-play-war.forge.cloudbees.com/"
   val curDir = new File(".")
