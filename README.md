@@ -1,8 +1,10 @@
 # WAR Plugin for Play framework 2.0
 
-    Current version: 0.5
+    Current version: 0.6
 
     Project-status: BETA
+    
+[![Build Status](https://play-war.ci.cloudbees.com/job/Play_2_War_-_on_push_-_with_integration_tests_-_on_develop_branch/badge/icon)](https://play-war.ci.cloudbees.com/job/Play_2_War_-_on_push_-_with_integration_tests_-_on_develop_branch/)
 
 This project is a module for Play framework 2 to package your apps into standard WAR packages.
 
@@ -15,7 +17,7 @@ Other references built with Play 2 and Play2War:
 * **Play2War is only compatible with Servlet 3.0 containers** (Tomcat 7, Jetty 8, JBoss 7, ...)
 * **Play2War is only compatible with Java 6 JRE** (most of the application servers aren't compatible with too)
 * **Your WAR must be deployed at root context** (sub-context deployment will be available with Play 2.1)
-* As of version 0.3.1, it is only compatible with Play **2.0.1** (use Play2War 0.3 if you need Play 2.0 compatibility)
+* As of version 0.6, it is only compatible with Play **2.0.2** (use Play2War v0.3 for Play 2.0 and v0.5 for Play 2.0.1)
  
 ## What's new ?
 
@@ -150,7 +152,7 @@ In ``APP_HOME/project/plugins.sbt``, add:
 ```scala
 resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.5")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.6")
 ```
 
 ### Add play2war runtime
@@ -160,7 +162,7 @@ In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` val
 ```scala
 val appDependencies = Seq(
   ...
-  "com.github.play2war" %% "play2-war-core" % "0.5"
+  "com.github.play2war" %% "play2-war-core" % "0.6"
   ...
 )
 

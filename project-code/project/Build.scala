@@ -4,7 +4,7 @@ import java.io.File
 
 object Build extends Build {
 
-  val play2Version = "2.0.1"
+  val play2Version = "2.0.2"
 
   val cloudbees = "https://repository-play-war.forge.cloudbees.com/"
   val curDir = new File(".")
@@ -15,7 +15,7 @@ object Build extends Build {
     base = file("."),
     settings = commonSettings ++ Seq(
       publishArtifact := false)
-  ) aggregate (play2WarCoreCommon, play2WarCoreServlet3x, play2WarCoreServlet2x, play2WarPlugin, play2WarIntegrationTests)
+  ) aggregate (play2WarCoreCommon, play2WarCoreservlet30, play2WarCoreservlet25, play2WarPlugin, play2WarIntegrationTests)
 
   lazy val play2WarCoreCommon = Project(id = "play2-war-core-common",
     base = file("core/common"),
@@ -25,16 +25,16 @@ object Build extends Build {
     )
   )
 
-  lazy val play2WarCoreServlet3x = Project(id = "play2-war-core-servlet3x",
-    base = file("core/servlet3x"),
+  lazy val play2WarCoreservlet30 = Project(id = "play2-war-core-servlet30",
+    base = file("core/servlet30"),
     settings = commonSettings ++ Seq(
       libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude("javax.servlet", "servlet-api") exclude("javax.servlet", "javax.servlet-api"),
       libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "provided->default"
     )
   ) dependsOn(play2WarCoreCommon)
 
-  lazy val play2WarCoreServlet2x = Project(id = "play2-war-core-servlet2x",
-    base = file("core/servlet2x"),
+  lazy val play2WarCoreservlet25 = Project(id = "play2-war-core-servlet25",
+    base = file("core/servlet25"),
     settings = commonSettings ++ Seq(
       libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude("javax.servlet", "servlet-api") exclude("javax.servlet", "javax.servlet-api"),
       libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default"

@@ -1,4 +1,4 @@
-//package play.core.server.servlet
+//package play.core.server.servlet25
 //
 //import javax.servlet._
 //import javax.servlet.http._
@@ -18,16 +18,16 @@
 //
 //import scala.collection.JavaConverters._
 //
-//object Servlet25Wrapper {
+//object Play2Servlet {
 //  var playServer: Play2WarServer = null
 //}
 //
-//class Servlet25Wrapper extends HttpServlet with ServletContextListener with Helpers {
+//class Play2Servlet extends HttpServlet with ServletContextListener with Helpers {
 //
 //  protected override def service(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
 //    Logger("play").trace("HTTP request received: " + servletRequest)
 //
-//    val server = Servlet25Wrapper.playServer
+//    val server = Play2Servlet.playServer
 //
 //    //    val keepAlive -> non-sens
 //    //    val websocketableRequest -> non-sens
@@ -298,7 +298,7 @@
 //
 //    val classLoader = getClass.getClassLoader;
 //
-//    Servlet25Wrapper.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod))
+//    Play2Servlet.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod))
 //  }
 //
 //  override def contextDestroyed(e: ServletContextEvent) = {
@@ -314,10 +314,10 @@
 //  }
 //
 //  private def stopPlayServer(sc: ServletContext) = {
-//    Option(Servlet25Wrapper.playServer).map {
+//    Option(Play2Servlet.playServer).map {
 //      s =>
 //        s.stop()
-//        Servlet25Wrapper.playServer = null
+//        Play2Servlet.playServer = null
 //        sc.log("Play server stopped")
 //    } // if playServer is null, nothing to do
 //  }
