@@ -19,13 +19,13 @@ import server.Server
 
 import scala.collection.JavaConverters._
 
-object Play2WrapperServlet30 {
+object Play2Servlet {
   var playServer: Play2WarServer = null
 }
 
 @WebServlet(name = "Play", urlPatterns = Array { "/" }, asyncSupported = true)
 @WebListener
-class Play2WrapperServlet30 extends HttpServlet with ServletContextListener with Helpers {
+class Play2Servlet extends HttpServlet with ServletContextListener with Helpers {
 
   protected override def service(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
     Logger("play").trace("HTTP request received: " + servletRequest)
@@ -35,7 +35,7 @@ class Play2WrapperServlet30 extends HttpServlet with ServletContextListener with
     // Disable timeout for long-polling
     aSyncContext.setTimeout(-1)
 
-    val server = Play2WrapperServlet30.playServer
+    val server = Play2Servlet.playServer
 
     //    val keepAlive -> non-sens
     //    val websocketableRequest -> non-sens
@@ -295,7 +295,7 @@ class Play2WrapperServlet30 extends HttpServlet with ServletContextListener with
 
     val classLoader = getClass.getClassLoader;
 
-    Play2WrapperServlet30.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod))
+    Play2Servlet.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod))
   }
 
   override def contextDestroyed(e: ServletContextEvent) = {
@@ -311,10 +311,10 @@ class Play2WrapperServlet30 extends HttpServlet with ServletContextListener with
   }
 
   private def stopPlayServer(sc: ServletContext) = {
-    Option(Play2WrapperServlet30.playServer).map {
+    Option(Play2Servlet.playServer).map {
       s =>
         s.stop()
-        Play2WrapperServlet30.playServer = null
+        Play2Servlet.playServer = null
         sc.log("Play server stopped")
     } // if playServer is null, nothing to do
   }
