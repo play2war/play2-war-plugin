@@ -1,4 +1,4 @@
-package play.core.server.servlet.common
+package play.core.server.servlet
 
 import java.io._
 
