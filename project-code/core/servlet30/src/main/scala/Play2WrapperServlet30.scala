@@ -1,4 +1,4 @@
-package play.core.server.servlet
+package play.core.server.servlet30
 
 import javax.servlet._
 import javax.servlet.annotation._
@@ -19,13 +19,13 @@ import server.Server
 
 import scala.collection.JavaConverters._
 
-object Servlet30Wrapper {
+object Play2WrapperServlet30 {
   var playServer: Play2WarServer = null
 }
 
 @WebServlet(name = "Play", urlPatterns = Array { "/" }, asyncSupported = true)
 @WebListener
-class Servlet30Wrapper extends HttpServlet with ServletContextListener with Helpers {
+class Play2WrapperServlet30 extends HttpServlet with ServletContextListener with Helpers {
 
   protected override def service(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
     Logger("play").trace("HTTP request received: " + servletRequest)
@@ -35,7 +35,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
     // Disable timeout for long-polling
     aSyncContext.setTimeout(-1)
 
-    val server = Servlet30Wrapper.playServer
+    val server = Play2WrapperServlet30.playServer
 
     //    val keepAlive -> non-sens
     //    val websocketableRequest -> non-sens
@@ -295,7 +295,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
 
     val classLoader = getClass.getClassLoader;
 
-    Servlet30Wrapper.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod))
+    Play2WrapperServlet30.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod))
   }
 
   override def contextDestroyed(e: ServletContextEvent) = {
@@ -311,10 +311,10 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
   }
 
   private def stopPlayServer(sc: ServletContext) = {
-    Option(Servlet30Wrapper.playServer).map {
+    Option(Play2WrapperServlet30.playServer).map {
       s =>
         s.stop()
-        Servlet30Wrapper.playServer = null
+        Play2WrapperServlet30.playServer = null
         sc.log("Play server stopped")
     } // if playServer is null, nothing to do
   }

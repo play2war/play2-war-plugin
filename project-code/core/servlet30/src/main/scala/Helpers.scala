@@ -1,4 +1,4 @@
-package play.core.server.servlet
+package play.core.server.servlet30
 
 import java.util.Arrays
 import java.util.concurrent._
@@ -14,7 +14,7 @@ import play.api.libs.concurrent._
 
 import scala.collection.JavaConverters._
 
-private[servlet] trait Helpers {
+private[servlet30] trait Helpers {
 
   def getPlayHeaders(request: HttpServletRequest): Headers = {
 
