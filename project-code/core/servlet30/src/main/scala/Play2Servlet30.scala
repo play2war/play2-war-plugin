@@ -23,5 +23,26 @@ import scala.collection.JavaConverters._
 @WebListener
 class Play2Servlet extends play.core.server.servlet.Play2Servlet with Helpers {
 
+  var aSyncContext: AsyncContext = null
+
+  protected override def onBeginService(request: HttpServletRequest) = {
+     aSyncContext = request.startAsync
+  }
+
+  protected override def onFinishService() = {
+    // Nothing to do
+  }
+  
+  protected override def onHttpResponseComplete() = {
+	aSyncContext.complete
+  }
+  
+  protected override def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
+	Map.empty[String, Seq[String]] ++ request.getParameterMap.asScala.mapValues(Arrays.asList(_: _*).asScala)
+  }
+  
+  protected override def getHttpRequest(): HttpServletRequest = aSyncContext.getRequest.asInstanceOf[HttpServletRequest]
+  
+  protected override def getHttpResponse(): HttpServletResponse = aSyncContext.getResponse.asInstanceOf[HttpServletResponse]
 
 }

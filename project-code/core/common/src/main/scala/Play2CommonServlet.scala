@@ -35,7 +35,7 @@ abstract class Play2Servlet extends HttpServlet with ServletContextListener {
   
   protected def getServletCookies(flatCookie: String): Seq[ServletCookie]
   
-  protected def onBeginService(): Unit
+  protected def onBeginService(request: HttpServletRequest): Unit
   
   protected def onFinishService(): Unit
   
@@ -44,7 +44,7 @@ abstract class Play2Servlet extends HttpServlet with ServletContextListener {
   protected override def service(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
     Logger("play").trace("HTTP request received: " + servletRequest)
 
-    onBeginService
+    onBeginService(servletRequest)
     
     val server = Play2Servlet.playServer
 
