@@ -20,6 +20,9 @@ import org.codehaus.cargo.container.property._
 import org.codehaus.cargo.util.log._
 import scala.collection.immutable.{ Page => _, _ }
 import scala.collection.JavaConverters._
+import org.apache.commons.io.FileUtils
+import java.io.File
+import java.lang.Thread
 
 trait CargoContainerManager extends BeforeAndAfterAll {
   self: Suite =>
@@ -78,7 +81,6 @@ trait CargoContainerManager extends BeforeAndAfterAll {
       _.stop
     }
   }
-
 }
 
 object AbstractPlay2WarTests {
@@ -460,16 +462,26 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   }
 }
 
-@RunWith(classOf[JUnitRunner])
-class Tomcat7xTests extends AbstractPlay2WarTests {
-  override def containerUrl = "http://apache.cict.fr/tomcat/tomcat-7/v7.0.27/bin/apache-tomcat-7.0.27.zip"
+abstract class AbstractTomcat7x extends AbstractPlay2WarTests {
+  def tomcatVersion() = "Version to override"
+  override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-7/v" + tomcatVersion + "/bin/apache-tomcat-"+ tomcatVersion + ".zip"
   override def containerName = "tomcat7x"
+}
+
+@RunWith(classOf[JUnitRunner])
+class Tomcat7027Tests extends AbstractTomcat7x {
+  override def tomcatVersion = "7.0.27"
 }
 
 @RunWith(classOf[JUnitRunner])
 class Jetty8xTests extends AbstractPlay2WarTests {
   override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
   override def containerName = "jetty8x"
+}
+
+@RunWith(classOf[JUnitRunner])
+class Tomcat7029Tests extends AbstractTomcat7x {
+  override def tomcatVersion = "7.0.29"
 }
 
 // Doesn't work yet : deployment of sample war fails : Command deploy requires an operand of type class java.io.File
