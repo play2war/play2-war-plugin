@@ -56,7 +56,7 @@ object Build extends Build {
       sbtPlugin := false,
       publishArtifact := false,
 
-      libraryDependencies += "org.scalatest" %% "scalatest" % "1.7.2" % "test",
+      libraryDependencies += "org.scalatest" %% "scalatest" % "1.8" % "test",
       libraryDependencies += "junit" % "junit" % "4.10" % "test",
       libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.2.2" % "test",
       libraryDependencies += "net.sourceforge.htmlunit" % "htmlunit" % "2.9" % "test",
