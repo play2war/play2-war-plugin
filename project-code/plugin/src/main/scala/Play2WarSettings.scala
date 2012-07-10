@@ -9,7 +9,7 @@ trait Play2WarSettings {
   this: Play2WarCommands =>
 
   lazy val defaultSettings = Seq[Setting[_]](
-    //    defaultServletVersion <<= "3.x",
+    servletVersion := "3.0",
       
     webappResource <<= baseDirectory / "war",
 

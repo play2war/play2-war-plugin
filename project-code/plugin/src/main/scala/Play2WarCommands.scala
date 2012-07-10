@@ -29,9 +29,11 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
           case files => files.toStream.flatMap(getFiles(_, skipHidden)) 
       })
 
-  val warTask = (baseDirectory, playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version, webappResource, streams) map {
-    (root, packaged, dependencies, target, id, version, webappResource, s) =>
+  val warTask = (baseDirectory, playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version, webappResource, streams, servletVersion) map {
+    (root, packaged, dependencies, target, id, version, webappResource, s, servletVersion) =>
 
+      s.log.info("Build WAR package for servlet container: " + servletVersion)
+    
       import sbt.NameFilter._
 
       val warDir = target
@@ -61,6 +63,53 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
         s.log.debug("Embedding dependency " + l._1 + " -> " + l._2)
       }
       
+      // Web.xml generation
+      servletVersion match {
+        case "2.5" => {
+          val webxmlFolder = webappResource / "WEB-INF"
+          val webxml = webxmlFolder / "web.xml"
+            
+            if (webxml.exists) {
+              s.log.info("web.xml found.")
+            } else {
+              s.log.info("web.xml not found, generate it in " + webxmlFolder)
+              IO.write(webxml,
+                """<?xml version="1.0" ?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+        version="3.0">
+  
+  <display-name>Play! """ + id + """</display-name>
+  
+  <listener>
+      <listener-class>play.core.server.servlet25.Play2Servlet</listener-class>
+  </listener>
+  
+  <servlet>
+    <servlet-name>play</servlet-name>
+    <servlet-class>play.core.server.servlet25.Play2Servlet</servlet-class>	
+  </servlet>
+    	    
+  <servlet-mapping>
+    <servlet-name>play</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+</web-app>
+""" /* */ )
+            }
+            
+        }
+        
+        case "3.0" =>
+        
+        case unknown => {
+            s.log.warn("Unknown servlet container version: " + unknown + ". Force default 3.0 version")
+        }
+      }
+
+      // Webapp resources
       s.log.debug("Webapp resources directory: " + webappResource.getAbsolutePath)
       
       val filesToInclude = getFiles(webappResource).filter(f => f.isFile)
@@ -73,50 +122,16 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
         s.log.debug("Embedding " + r._1 + " -> /" + r._2)
       }
 
-      //    val webxml = warDir / "web.xml"
-
-      //    if (!webxml.exists) {
-      //      IO.write(webxml,
-      //        """<?xml version="1.0" ?>
-      //<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
-      //        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      //        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-      //        version="3.0">
-      //  
-      //  <display-name>Play! (%APPLICATION_NAME%)</display-name>
-      //  
-      //  <!--context-param>
-      //    <param-name>play.id</param-name>
-      //    <param-value>%PLAY_ID%</param-value>
-      //  </context-param>
-      //  
-      //  <listener>
-      //      <listener-class>play.core.server.servlet.PlayServletWrapper</listener-class>
-      //  </listener>
-      //  
-      //  <servlet>
-      //    <servlet-name>play</servlet-name>
-      //    <servlet-class>play.core.server.servlet.PlayServletWrapper</servlet-class>	
-      //  </servlet>
-      //    	    
-      //  <servlet-mapping>
-      //    <servlet-name>play</servlet-name>
-      //    <url-pattern>/</url-pattern>
-      //  </servlet-mapping-->
-      //
-      //</web-app>
-      //""" /* */ )
-      //    }
-      //
-      //    val webxmlFile = Seq(webxml -> ("WEB-INF/web.xml"))
-
+      // Package final jar
+      val jarContent = libs ++ additionnalResources;
+      
       val manifest = new Manifest(
         new ByteArrayInputStream((
           "Manifest-Version: 1.0\n").getBytes))
 
-      IO.jar(libs ++ additionnalResources /*++ webxmlFile*/ , war, manifest)
+      IO.jar(jarContent, war, manifest)
 
-      s.log.info("Done packaging.")
+      s.log.info("Packaging done.")
 
       war
   }
