@@ -63,7 +63,8 @@ object Build extends Build {
 
       parallelExecution in Test := false,
       testOptions in Test += Tests.Argument("-oD"),
-      testOptions in Test += Tests.Argument("-Dwar=" + sampleWarPath)
+      testOptions in Test += Tests.Argument("-Dwar=" + sampleWarPath),
+      testListeners <<= target.map(t => Seq(new eu.henkelmann.sbt.JUnitXmlTestsListener(t.getAbsolutePath)))
   ))
 
   def commonSettings = Defaults.defaultSettings ++
