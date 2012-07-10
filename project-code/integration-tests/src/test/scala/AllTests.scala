@@ -468,10 +468,10 @@ abstract class AbstractTomcat7x extends AbstractPlay2WarTests {
   override def containerName = "tomcat7x"
 }
 
-@RunWith(classOf[JUnitRunner])
+/*@RunWith(classOf[JUnitRunner])
 class Tomcat7027Tests extends AbstractTomcat7x {
   override def tomcatVersion = "7.0.27"
-}
+}*/
 
 @RunWith(classOf[JUnitRunner])
 class Jetty8xTests extends AbstractPlay2WarTests {
