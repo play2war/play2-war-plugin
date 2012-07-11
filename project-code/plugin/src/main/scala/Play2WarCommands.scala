@@ -62,23 +62,24 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
       libs.foreach { l => 
         s.log.debug("Embedding dependency " + l._1 + " -> " + l._2)
       }
+
+      val webxmlFolder = webappResource / "WEB-INF"
+      val webxml = webxmlFolder / "web.xml"
       
       // Web.xml generation
       servletVersion match {
         case "2.5" => {
-          val webxmlFolder = webappResource / "WEB-INF"
-          val webxml = webxmlFolder / "web.xml"
-            
+          
             if (webxml.exists) {
-              s.log.info("web.xml found.")
+              s.log.info("WEB-INF/web.xml found.")
             } else {
-              s.log.info("web.xml not found, generate it in " + webxmlFolder)
+              s.log.info("WEB-INF/web.xml not found, generate it in " + webxmlFolder)
               IO.write(webxml,
                 """<?xml version="1.0" ?>
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-        version="3.0">
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+        version="2.5">
   
   <display-name>Play! """ + id + """</display-name>
   
@@ -102,10 +103,11 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
             
         }
         
-        case "3.0" =>
+        case "3.0" => handleWebXmlFileOnServlet30(webxml, s)
         
         case unknown => {
             s.log.warn("Unknown servlet container version: " + unknown + ". Force default 3.0 version")
+            handleWebXmlFileOnServlet30(webxml, s)
         }
       }
 
@@ -134,5 +136,11 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
       s.log.info("Packaging done.")
 
       war
+  }
+  
+  def handleWebXmlFileOnServlet30(webxml: File, s: TaskStreams) = {
+    if (webxml.exists) {
+      s.log.warn("WEB-INF/web.xml found! As WAR package will be built for servlet 3.0 containers, check if this web.xml file is compatible with.")
+    }
   }
 }
