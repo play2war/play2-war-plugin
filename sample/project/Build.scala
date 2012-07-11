@@ -1,6 +1,7 @@
 import sbt._
 import Keys._
 import PlayProject._
+import com.github.play2.warplugin.Play2WarKeys._
 
 object ApplicationBuild extends Build {
 
@@ -15,6 +16,8 @@ object ApplicationBuild extends Build {
     //      resolvers += "Local Repository" at "http://localhost:8090/publish",
     resolvers += (Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns)),
     resolvers += "Play2war plugins" at "http://repository-play-war.forge.cloudbees.com/release/",
+    
+    servletVersion := "3.0",
 
     publishArtifact in (Compile, packageBin) := false,
     publishArtifact in (Compile, packageDoc) := false,
