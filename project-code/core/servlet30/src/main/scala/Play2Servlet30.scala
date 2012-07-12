@@ -21,19 +21,17 @@ import scala.collection.JavaConverters._
 
 @WebServlet(name = "Play", urlPatterns = Array { "/" }, asyncSupported = true)
 @WebListener
-class Play2Servlet extends play.core.server.servlet.Play2Servlet with Helpers {
+class Play2Servlet extends play.core.server.servlet.Play2Servlet[AsyncContext] with Helpers {
 
-  var aSyncContext: AsyncContext = null
-
-  protected override def onBeginService(request: HttpServletRequest) = {
-     aSyncContext = request.startAsync
+  protected override def onBeginService(request: HttpServletRequest): AsyncContext = {
+     request.startAsync
   }
 
-  protected override def onFinishService() = {
+  protected override def onFinishService(aSyncContext: AsyncContext) = {
     // Nothing to do
   }
   
-  protected override def onHttpResponseComplete() = {
+  protected override def onHttpResponseComplete(aSyncContext: AsyncContext) = {
 	aSyncContext.complete
   }
   
@@ -41,8 +39,8 @@ class Play2Servlet extends play.core.server.servlet.Play2Servlet with Helpers {
 	Map.empty[String, Seq[String]] ++ request.getParameterMap.asScala.mapValues(Arrays.asList(_: _*).asScala)
   }
   
-  protected override def getHttpRequest(): HttpServletRequest = aSyncContext.getRequest.asInstanceOf[HttpServletRequest]
+  protected override def getHttpRequest(aSyncContext: AsyncContext): HttpServletRequest = aSyncContext.getRequest.asInstanceOf[HttpServletRequest]
   
-  protected override def getHttpResponse(): HttpServletResponse = aSyncContext.getResponse.asInstanceOf[HttpServletResponse]
+  protected override def getHttpResponse(aSyncContext: AsyncContext): HttpServletResponse = aSyncContext.getResponse.asInstanceOf[HttpServletResponse]
 
 }

@@ -24,7 +24,7 @@ object Play2Servlet {
 /**
  * Mother class for all servlet implementations for Play2.
  */
-abstract class Play2Servlet extends HttpServlet with ServletContextListener {
+abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
   
   protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]]
   
@@ -40,27 +40,27 @@ abstract class Play2Servlet extends HttpServlet with ServletContextListener {
   /**
    * Get HTTP request.
    */
-  protected def getHttpRequest(): HttpServletRequest
+  protected def getHttpRequest(executionController: T): HttpServletRequest
 
   /**
    * Get HTTP response.
    */
-  protected def getHttpResponse(): HttpServletResponse
+  protected def getHttpResponse(executionController: T): HttpServletResponse
 
   /**
    * Call just after service(...).
    */
-  protected def onBeginService(request: HttpServletRequest): Unit
+  protected def onBeginService(request: HttpServletRequest): T
 
   /**
    * Call just before end of service(...).
    */
-  protected def onFinishService(): Unit
+  protected def onFinishService(executionController: T): Unit
 
   /**
    * Call every time the HTTP response must be terminated (completed).
    */
-  protected def onHttpResponseComplete(): Unit
+  protected def onHttpResponseComplete(executionController: T): Unit
 
   /**
    * Classic "service" servlet method.
@@ -68,7 +68,7 @@ abstract class Play2Servlet extends HttpServlet with ServletContextListener {
   protected override def service(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
     Logger("play").trace("HTTP request received: " + servletRequest)
 
-    onBeginService(servletRequest)
+    val executionController: T = onBeginService(servletRequest)
     
     val server = Play2Servlet.playServer
 
@@ -102,7 +102,7 @@ abstract class Play2Servlet extends HttpServlet with ServletContextListener {
 
       def handle(result: Result) {
 
-        getHttpResponse match {
+        getHttpResponse(executionController) match {
 
           // Handle only HttpServletResponse
           case httpResponse: HttpServletResponse => {
@@ -141,8 +141,8 @@ abstract class Play2Servlet extends HttpServlet with ServletContextListener {
                   val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
                     Promise.pure(
                       {
-                        getHttpResponse.getOutputStream.write(r.writeable.transform(x))
-                        getHttpResponse.getOutputStream.flush
+                        getHttpResponse(executionController).getOutputStream.write(r.writeable.transform(x))
+                        getHttpResponse(executionController).getOutputStream.flush
                       }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
                   }
 
@@ -151,7 +151,7 @@ abstract class Play2Servlet extends HttpServlet with ServletContextListener {
                       Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
 
                     writeIteratee.mapDone { _ =>
-                      onHttpResponseComplete
+                      onHttpResponseComplete(executionController)
                     }
                   }
 
@@ -168,10 +168,10 @@ abstract class Play2Servlet extends HttpServlet with ServletContextListener {
                   p.flatMap(i => i.run)
                     .onRedeem { buffer =>
                       Logger("play").trace("Buffer size to send: " + buffer.size)
-                      getHttpResponse.setContentLength(buffer.size)
-                      getHttpResponse.getOutputStream.flush
-                      buffer.writeTo(getHttpResponse.getOutputStream)
-                      onHttpResponseComplete
+                      getHttpResponse(executionController).setContentLength(buffer.size)
+                      getHttpResponse(executionController).getOutputStream.flush
+                      buffer.writeTo(getHttpResponse(executionController).getOutputStream)
+                      onHttpResponseComplete(executionController)
                     }
                 }
               }
@@ -196,8 +196,8 @@ abstract class Play2Servlet extends HttpServlet with ServletContextListener {
                 val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
                   Promise.pure(
                     {
-                      getHttpResponse.getOutputStream.write(r.writeable.transform(x))
-                      getHttpResponse.getOutputStream.flush
+                      getHttpResponse(executionController).getOutputStream.write(r.writeable.transform(x))
+                      getHttpResponse(executionController).getOutputStream.flush
                     }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
                 }
 
@@ -206,7 +206,7 @@ abstract class Play2Servlet extends HttpServlet with ServletContextListener {
                     Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
 
                   writeIteratee.mapDone { _ =>
-                    onHttpResponseComplete
+                    onHttpResponseComplete(executionController)
                   }
                 }
 
@@ -219,7 +219,7 @@ abstract class Play2Servlet extends HttpServlet with ServletContextListener {
 
                 httpResponse.setContentLength(0);
                 httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-                onHttpResponseComplete
+                onHttpResponseComplete(executionController)
             } // end match result
 
           } // end case HttpServletResponse
@@ -263,14 +263,14 @@ abstract class Play2Servlet extends HttpServlet with ServletContextListener {
             }
 
             lazy val bodyEnumerator = {
-              val body = Stream.continually(getHttpRequest.getInputStream.read).takeWhile(-1 !=).map(_.toByte).toArray
+              val body = Stream.continually(getHttpRequest(executionController).getInputStream.read).takeWhile(-1 !=).map(_.toByte).toArray
               Enumerator(body).andThen(Enumerator.enumInput(EOF))
             }
 
             try {
               (bodyEnumerator |>> bodyParser): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
             } finally {
-              getHttpRequest.getInputStream.close
+              getHttpRequest(executionController).getInputStream.close
             }
             //                            }
           }
@@ -321,7 +321,7 @@ abstract class Play2Servlet extends HttpServlet with ServletContextListener {
       }
     }
 
-    onFinishService
+    onFinishService(executionController)
     
   }
 
