@@ -1,22 +1,22 @@
-//package play.core.server.servlet25
-//
-//import java.util.Arrays
-//import java.util.concurrent._
-//
-//import javax.servlet.http.{ Cookie => ServletCookie, _ }
-//
-//import play.core._
-//import play.api._
-//import play.api.mvc._
-//import play.api.libs.iteratee._
-//import play.api.libs.iteratee.Input._
-//import play.api.libs.concurrent._
-//
-//import scala.collection.JavaConverters._
-//
-//private[servlet25] trait Helpers {
-//
-//  def getPlayHeaders(request: HttpServletRequest): Headers = {
+package play.core.server.servlet25
+
+import java.util.Arrays
+import java.util.concurrent._
+
+import javax.servlet.http.{ Cookie => ServletCookie, _ }
+
+import play.core._
+import play.api._
+import play.api.mvc._
+import play.api.libs.iteratee._
+import play.api.libs.iteratee.Input._
+import play.api.libs.concurrent._
+
+import scala.collection.JavaConverters._
+
+private[servlet25] trait Helpers {
+
+  def getPlayHeaders(request: HttpServletRequest): Headers = {
 //
 //    import java.util.Collections
 //
@@ -42,10 +42,10 @@
 //        }
 //      }.mkString("\n  ")
 //    }
-//
-//  }
-//
-//  def getPlayCookies(request: HttpServletRequest): Cookies = {
+    null
+  }
+
+  def getPlayCookies(request: HttpServletRequest): Cookies = {
 //
 //    val cookies: Map[String, play.api.mvc.Cookie] = request.getCookies match {
 //      case null => Map.empty
@@ -59,9 +59,10 @@
 //      def get(name: String) = cookies.get(name)
 //      override def toString = cookies.toString
 //    }
-//  }
-//
-//  def getServletCookies(flatCookie: String): Seq[ServletCookie] = {
+    null
+  }
+
+  def getServletCookies(flatCookie: String): Seq[ServletCookie] = {
 //    Cookies.decode(flatCookie).map {
 //      pCookie =>
 //        val sc = new ServletCookie(pCookie.name, pCookie.value)
@@ -72,5 +73,6 @@
 //        sc.setSecure(pCookie.secure)
 //        sc
 //    }
-//  }
-//}
+    null
+  }
+}

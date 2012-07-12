@@ -23,7 +23,7 @@ import scala.collection.JavaConverters._
 @WebListener
 class Play2Servlet extends play.core.server.servlet.Play2Servlet[AsyncContext] with Helpers {
 
-  protected override def onBeginService(request: HttpServletRequest): AsyncContext = {
+  protected override def onBeginService(request: HttpServletRequest, response: HttpServletResponse): AsyncContext = {
      request.startAsync
   }
 
