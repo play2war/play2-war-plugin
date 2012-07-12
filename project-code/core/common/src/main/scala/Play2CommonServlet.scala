@@ -21,6 +21,9 @@ object Play2Servlet {
   var playServer: Play2WarServer = null
 }
 
+/**
+ * Mother class for all servlet implementations for Play2.
+ */
 abstract class Play2Servlet extends HttpServlet with ServletContextListener {
   
   protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]]
@@ -28,19 +31,40 @@ abstract class Play2Servlet extends HttpServlet with ServletContextListener {
   protected def getPlayHeaders(request: HttpServletRequest): Headers
   
   protected def getPlayCookies(request: HttpServletRequest): Cookies
-  
-  protected def getHttpRequest(): HttpServletRequest
-  
-  protected def getHttpResponse(): HttpServletResponse
-  
+
+  /**
+   * Get a list of cookies from "flat" cookie representation (one-line-string cookie).
+   */
   protected def getServletCookies(flatCookie: String): Seq[ServletCookie]
   
+  /**
+   * Get HTTP request.
+   */
+  protected def getHttpRequest(): HttpServletRequest
+
+  /**
+   * Get HTTP response.
+   */
+  protected def getHttpResponse(): HttpServletResponse
+
+  /**
+   * Call just after service(...).
+   */
   protected def onBeginService(request: HttpServletRequest): Unit
-  
+
+  /**
+   * Call just before end of service(...).
+   */
   protected def onFinishService(): Unit
-  
+
+  /**
+   * Call every time the HTTP response must be terminated (completed).
+   */
   protected def onHttpResponseComplete(): Unit
 
+  /**
+   * Classic "service" servlet method.
+   */
   protected override def service(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
     Logger("play").trace("HTTP request received: " + servletRequest)
 
