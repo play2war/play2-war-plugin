@@ -6,6 +6,7 @@ import java.util.concurrent._
 import javax.servlet.http.{ Cookie => ServletCookie, _ }
 
 import play.core._
+import play.core.server.servlet._
 import play.api._
 import play.api.mvc._
 import play.api.libs.iteratee._
@@ -14,58 +15,24 @@ import play.api.libs.concurrent._
 
 import scala.collection.JavaConverters._
 
-private[servlet30] trait Helpers {
+private[servlet30] trait Helpers extends HTTPHelpers {
 
-  def getPlayHeaders(request: HttpServletRequest): Headers = {
+  override def getPlayCookie(c: ServletCookie) = play.api.mvc.Cookie(
+    c.getName,
+    c.getValue,
+    c.getMaxAge,
+    Option(c.getPath).getOrElse("/"),
+    Option(c.getDomain),
+    c.getSecure,
+    c.isHttpOnly)
 
-    import java.util.Collections
-
-    val headers: Map[String, Seq[String]] = request.getHeaderNames.asScala.map {
-      key =>
-        key.toUpperCase ->
-          // /!\ It very important to COPY headers from request enumeration
-          Collections.list(request.getHeaders(key)).asScala
-    }.toMap
-
-    new Headers {
-
-      def getAll(key: String) = headers.get(key.toUpperCase).flatten.toSeq
-      def keys = headers.keySet
-      override def toString = headers.map {
-        case (k, v) => {
-          k + ": " + v.mkString(", ")
-        }
-      }.mkString("\n  ")
-    }
-
-  }
-
-  def getPlayCookies(request: HttpServletRequest): Cookies = {
-
-    val cookies: Map[String, play.api.mvc.Cookie] = request.getCookies match {
-      case null => Map.empty
-      case _ => Arrays.asList(request.getCookies: _*).asScala.map { c =>
-        c.getName -> play.api.mvc.Cookie(
-          c.getName, c.getValue, c.getMaxAge, Option(c.getPath).getOrElse("/"), Option(c.getDomain), c.getSecure, c.isHttpOnly)
-      }.toMap
-    }
-
-    new Cookies {
-      def get(name: String) = cookies.get(name)
-      override def toString = cookies.toString
-    }
-  }
-
-  def getServletCookies(flatCookie: String): Seq[ServletCookie] = {
-    Cookies.decode(flatCookie).map {
-      pCookie =>
-        val sc = new ServletCookie(pCookie.name, pCookie.value)
-        pCookie.domain.map(sc.setDomain(_))
-        sc.setHttpOnly(pCookie.httpOnly)
-        sc.setMaxAge(pCookie.maxAge)
-        sc.setPath(pCookie.path)
-        sc.setSecure(pCookie.secure)
-        sc
-    }
+  override def getServletCookie(pCookie: play.api.mvc.Cookie) = {
+    val sc = new ServletCookie(pCookie.name, pCookie.value)
+    pCookie.domain.map(sc.setDomain(_))
+    sc.setHttpOnly(pCookie.httpOnly)
+    sc.setMaxAge(pCookie.maxAge)
+    sc.setPath(pCookie.path)
+    sc.setSecure(pCookie.secure)
+    sc
   }
 }
