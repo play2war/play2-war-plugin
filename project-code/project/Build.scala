@@ -1,6 +1,7 @@
 import sbt._
 import Keys._
 import java.io.File
+import com.typesafe.sbteclipse.plugin.EclipsePlugin.EclipseKeys
 
 object Build extends Build {
 
@@ -72,6 +73,7 @@ object Build extends Build {
       organization := "com.github.play2war",
       // version is defined in version.sbt in order to support sbt-release
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
+      EclipseKeys.withSource := true,
 
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
       
