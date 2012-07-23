@@ -5,7 +5,8 @@ import com.typesafe.sbteclipse.plugin.EclipsePlugin.EclipseKeys
 
 object Build extends Build {
 
-  val play2Version = "2.0.2"
+  import BuildSettings._
+  import Generators._
 
   val cloudbees = "https://repository-play-war.forge.cloudbees.com/"
   val curDir = new File(".")
@@ -15,32 +16,25 @@ object Build extends Build {
   lazy val root = Project(id = "play2-war",
     base = file("."),
     settings = commonSettings ++ Seq(
-      publishArtifact := false)
-  ) aggregate (play2WarCoreCommon, play2WarCoreservlet30, play2WarCoreservlet25, play2WarPlugin, play2WarIntegrationTests)
+      publishArtifact := false)) aggregate (play2WarCoreCommon, play2WarCoreservlet30, play2WarCoreservlet25, play2WarPlugin, play2WarIntegrationTests)
 
   lazy val play2WarCoreCommon = Project(id = "play2-war-core-common",
     base = file("core/common"),
     settings = commonSettings ++ Seq(
-      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude("javax.servlet", "servlet-api") exclude("javax.servlet", "javax.servlet-api"),
-      libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default" 
-    )
-  )
+      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api") exclude ("javax.servlet", "javax.servlet-api"),
+      libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default"))
 
   lazy val play2WarCoreservlet30 = Project(id = "play2-war-core-servlet30",
     base = file("core/servlet30"),
     settings = commonSettings ++ Seq(
-      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude("javax.servlet", "servlet-api") exclude("javax.servlet", "javax.servlet-api"),
-      libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "provided->default"
-    )
-  ) dependsOn(play2WarCoreCommon)
+      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api") exclude ("javax.servlet", "javax.servlet-api"),
+      libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "provided->default")) dependsOn (play2WarCoreCommon)
 
   lazy val play2WarCoreservlet25 = Project(id = "play2-war-core-servlet25",
     base = file("core/servlet25"),
     settings = commonSettings ++ Seq(
-      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude("javax.servlet", "servlet-api") exclude("javax.servlet", "javax.servlet-api"),
-      libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default"
-    )
-  ) dependsOn(play2WarCoreCommon)
+      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api") exclude ("javax.servlet", "javax.servlet-api"),
+      libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default")) dependsOn (play2WarCoreCommon)
 
   lazy val play2WarPlugin = Project(id = "play2-war-plugin",
     base = file("plugin"),
@@ -65,29 +59,56 @@ object Build extends Build {
       parallelExecution in Test := false,
       testOptions in Test += Tests.Argument("-oD"),
       testOptions in Test += Tests.Argument("-Dwar=" + sampleWarPath),
-      testListeners <<= target.map(t => Seq(new eu.henkelmann.sbt.JUnitXmlTestsListener(t.getAbsolutePath)))
-  ))
+      testListeners <<= target.map(t => Seq(new eu.henkelmann.sbt.JUnitXmlTestsListener(t.getAbsolutePath)))))
 
-  def commonSettings = Defaults.defaultSettings ++
+  def commonSettings = buildSettings ++
     Seq(
-      organization := "com.github.play2war",
-      // version is defined in version.sbt in order to support sbt-release
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
       EclipseKeys.withSource := true,
 
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
-      
+
       publishArtifact in (Compile, packageDoc) := false,
       publishArtifact in Test := false,
 
-//      publishTo := Some(Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish")) ),
-//      publishTo <<= (version) {
-//		version: String =>
-//		  if (version.trim.endsWith("SNAPSHOT")) Some("snapshot" at cloudbees + "snapshot/")
-//		  else                                   Some("release"  at cloudbees + "release/")
-//	  },
-//      credentials += Credentials(file("/private/play-war/.credentials")),
-//      credentials += Credentials(file(Path.userHome.absolutePath + "/.ivy2/.credentials")),
-      publishMavenStyle := true
-    )
+      //      publishTo := Some(Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish")) ),
+      //      publishTo <<= (version) {
+      //		version: String =>
+      //		  if (version.trim.endsWith("SNAPSHOT")) Some("snapshot" at cloudbees + "snapshot/")
+      //		  else                                   Some("release"  at cloudbees + "release/")
+      //	  },
+      //      credentials += Credentials(file("/private/play-war/.credentials")),
+      //      credentials += Credentials(file(Path.userHome.absolutePath + "/.ivy2/.credentials")),
+      publishMavenStyle := true,
+
+      sourceGenerators in Compile <+= sourceManaged in Compile map Play2WarVersion)
+
+  object BuildSettings {
+
+    val buildOrganization = "com.github.play2war"
+    val defaultPlay2Version = "2.0.2"
+    val play2Version = Option(System.getProperty("play2.version")).filterNot(_.isEmpty).getOrElse(defaultPlay2Version)
+    val buildVersion = "0.7-SNAPSHOT"
+
+    val buildSettings = Defaults.defaultSettings ++ Seq(
+      organization := buildOrganization,
+      version := buildVersion)
+
+  }
+
+  object Generators {
+
+    val Play2WarVersion = { dir: File =>
+      val file = dir / "Play2WarVersion.scala"
+      IO.write(file,
+        """|package com.github.play2war.plugin
+                   |
+                   |object Play2WarVersion {
+                   |    val current = "%s"
+                   |}
+                """.stripMargin.format(BuildSettings.buildVersion))
+      Seq(file)
+    }
+
+  }
 }

@@ -9,6 +9,9 @@ trait Play2WarSettings {
   this: Play2WarCommands =>
 
   lazy val play2WarSettings = Seq[Setting[_]](
+      
+    libraryDependencies += "com.github.play2war" %% "play2-war-core-servlet30" % com.github.play2war.plugin.Play2WarVersion.current,
+    
 //    servletVersion := "3.0",
       
     webappResource <<= baseDirectory / "war",

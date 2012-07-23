@@ -23,8 +23,8 @@ object ApplicationBuild extends Build {
     publishMavenStyle := true) ++ Play2WarPlugin.play2WarSettings
 
   val appDependencies = Seq(
-    // Add your project dependencies here,
-    "com.github.play2war" %% "play2-war-core-servlet30" % "0.7-SNAPSHOT")
+    // Add your project dependencies here
+  )
 
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(projectSettings: _*)
   /*dependsOn (core)
