@@ -1,4 +1,4 @@
-package com.github.play2.warplugin
+package com.github.play2war.plugin
 
 import sbt._
 import sbt.Keys._
@@ -16,7 +16,7 @@ import scala.collection.JavaConverters._
 import java.lang.{ ProcessBuilder => JProcessBuilder }
 import java.util.jar.Manifest
 import java.io.{ File, ByteArrayInputStream }
-import com.github.play2.warplugin.Play2WarKeys._
+import com.github.play2war.plugin.Play2WarKeys._
 import scala.collection.JavaConversions._ 
 
 trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {

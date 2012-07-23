@@ -1,4 +1,4 @@
-package com.github.play2.warplugin
+package com.github.play2war.plugin
 
 import sbt._
 import Keys._
