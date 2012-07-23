@@ -40,6 +40,9 @@ object Build extends Build {
     base = file("plugin"),
     settings = commonSettings ++ Seq(
       sbtPlugin := true,
+
+      sourceGenerators in Compile <+= sourceManaged in Compile map Play2WarVersion,
+
       libraryDependencies <++= (scalaVersion, sbtVersion) { (scalaVersion, sbtVersion) =>
         Seq(
           "play" % "sbt-plugin" % play2Version extra ("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion))
@@ -79,9 +82,7 @@ object Build extends Build {
       //	  },
       //      credentials += Credentials(file("/private/play-war/.credentials")),
       //      credentials += Credentials(file(Path.userHome.absolutePath + "/.ivy2/.credentials")),
-      publishMavenStyle := true,
-
-      sourceGenerators in Compile <+= sourceManaged in Compile map Play2WarVersion)
+      publishMavenStyle := true)
 
   object BuildSettings {
 
