@@ -8,7 +8,7 @@ import Play2WarKeys._
 trait Play2WarSettings {
   this: Play2WarCommands =>
 
-  lazy val defaultSettings = Seq[Setting[_]](
+  lazy val play2WarSettings = Seq[Setting[_]](
 //    servletVersion := "3.0",
       
     webappResource <<= baseDirectory / "war",

@@ -5,6 +5,6 @@ import Keys._
 
 object Play2WarPlugin extends Plugin with Play2WarCommands with Play2WarSettings {
 	
-  override lazy val settings = defaultSettings
+//  override lazy val settings = play2WarSettings
   
 }
