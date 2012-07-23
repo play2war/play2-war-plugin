@@ -6,3 +6,4 @@ project/target
 .history
 .cache
 .settings
+.target
