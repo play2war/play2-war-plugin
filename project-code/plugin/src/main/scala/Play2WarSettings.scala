@@ -9,11 +9,15 @@ trait Play2WarSettings {
   this: Play2WarCommands =>
 
   lazy val play2WarSettings = Seq[Setting[_]](
-      
-    libraryDependencies += "com.github.play2war" %% "play2-war-core-servlet30" % com.github.play2war.plugin.Play2WarVersion.current,
     
-//    servletVersion := "3.0",
-      
+    libraryDependencies <++= (servletVersion) { (v) =>
+      val servletVersionString = v match {
+        case "2.5" => "25"
+        case _ => "30"
+      }
+      Seq("com.github.play2war" %% ("play2-war-core-servlet" + servletVersionString) % com.github.play2war.plugin.Play2WarVersion.current)
+    },
+
     webappResource <<= baseDirectory / "war",
 
     // War attifact
