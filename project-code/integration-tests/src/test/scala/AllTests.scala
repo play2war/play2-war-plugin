@@ -482,8 +482,14 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
 abstract class AbstractTomcat7x extends AbstractPlay2WarTests with Servlet30Container {
   def tomcatVersion() = "Version to override"
-  override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-7/v" + tomcatVersion + "/bin/apache-tomcat-"+ tomcatVersion + ".zip"
+  override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-7/v" + tomcatVersion + "/bin/apache-tomcat-"+ tomcatVersion + ".tar.gz"
   override def containerName = "tomcat7x"
+}
+
+@RunWith(classOf[JUnitRunner])
+class Tomcat6xTests extends AbstractPlay2WarTests with Servlet25Container {
+  override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-6/v6.0.35/bin/apache-tomcat-6.0.35.tar.gz"
+  override def containerName = "tomcat6x"
 }
 
 /*@RunWith(classOf[JUnitRunner])
