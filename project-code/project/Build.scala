@@ -9,9 +9,13 @@ object Build extends Build {
   import Generators._
 
   val cloudbees = "https://repository-play-war.forge.cloudbees.com/"
+
   val curDir = new File(".")
-  val sampleProjectTargetDir = new File(curDir, "../sample/target")
-  val sampleWarPath = new File(sampleProjectTargetDir, "a_warification-1.0-SNAPSHOT.war").getAbsolutePath
+  val servlet30SampleProjectTargetDir = new File(curDir, "../sample/servlet30/target")
+  val servlet30SampleWarPath = new File(servlet30SampleProjectTargetDir, "a-play2war-sample-servlet30-1.0-SNAPSHOT.war").getAbsolutePath
+
+  val servlet25SampleProjectTargetDir = new File(curDir, "../sample/servlet25/target")
+  val servlet25SampleWarPath = new File(servlet25SampleProjectTargetDir, "a-play2war-sample-servlet25-1.0-SNAPSHOT.war").getAbsolutePath
 
   lazy val root = Project(id = "play2-war",
     base = file("."),
@@ -61,7 +65,7 @@ object Build extends Build {
 
       parallelExecution in Test := false,
       testOptions in Test += Tests.Argument("-oD"),
-      testOptions in Test += Tests.Argument("-Dwar=" + sampleWarPath),
+      testOptions in Test += Tests.Argument("-Dwar.servlet30=" + servlet30SampleWarPath),
       testListeners <<= target.map(t => Seq(new eu.henkelmann.sbt.JUnitXmlTestsListener(t.getAbsolutePath)))))
 
   def commonSettings = buildSettings ++

@@ -24,10 +24,26 @@ import org.apache.commons.io.FileUtils
 import java.io.File
 import java.lang.Thread
 
+trait ServletContainer {
+
+  protected val WAR_KEY = "war.servlet"
+  
+  def keyServletContainer: String
+  
+  def keyWarPath: String = WAR_KEY + keyServletContainer
+  
+}
+
+trait Servlet30Container extends ServletContainer {
+    def keyServletContainer = "30"
+}
+
+trait Servlet25Container extends ServletContainer {
+    def keyServletContainer = "25"
+}
+
 trait CargoContainerManager extends BeforeAndAfterAll {
   self: Suite =>
-
-  private val WAR_KEY = "war"
 
   def getContainer: InstalledLocalContainer
 
@@ -38,10 +54,12 @@ trait CargoContainerManager extends BeforeAndAfterAll {
   def containerName: String
 
   def context = "/"
+  
+  def keyWarPath: String
 
   abstract override def beforeAll(configMap: Map[String, Any]) {
 
-    val warPath = configMap.get(WAR_KEY).getOrElse("/home/damien/dev/play2-war-plugin/project-code/./../sample/target/a_warification-1.0-SNAPSHOT.war")
+    val warPath = configMap.get(keyWarPath).getOrElse(Nil)
 
     println("WAR file to deploy: " + warPath)
 
@@ -462,7 +480,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   }
 }
 
-abstract class AbstractTomcat7x extends AbstractPlay2WarTests {
+abstract class AbstractTomcat7x extends AbstractPlay2WarTests with Servlet30Container {
   def tomcatVersion() = "Version to override"
   override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-7/v" + tomcatVersion + "/bin/apache-tomcat-"+ tomcatVersion + ".zip"
   override def containerName = "tomcat7x"
@@ -474,7 +492,7 @@ class Tomcat7027Tests extends AbstractTomcat7x {
 }*/
 
 @RunWith(classOf[JUnitRunner])
-class Jetty8xTests extends AbstractPlay2WarTests {
+class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container {
   override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
   override def containerName = "jetty8x"
 }
