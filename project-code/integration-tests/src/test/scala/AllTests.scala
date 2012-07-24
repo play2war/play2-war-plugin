@@ -106,7 +106,7 @@ object AbstractPlay2WarTests {
   private val ROOT_URL = "http://localhost:8080"
   
   // Milliseconds
-  private val HTTP_TIMEOUT = 5000
+  private val HTTP_TIMEOUT = 15000
 
 }
 

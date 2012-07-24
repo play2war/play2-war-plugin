@@ -22,7 +22,8 @@ import scala.collection.JavaConverters._
 object Play2Servlet {
 
   // 30 minutes in milliseconds
-  val WAIT_TIMEOUT = 30 * 60 * 1000
+  // val WAIT_TIMEOUT = 30 * 60 * 1000
+  val WAIT_TIMEOUT = 10 * 1000
 }
 
 class Play2Servlet extends play.core.server.servlet.Play2Servlet[Tuple3[HttpServletRequest, HttpServletResponse, Object]] with Helpers {
