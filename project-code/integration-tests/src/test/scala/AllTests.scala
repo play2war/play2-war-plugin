@@ -104,6 +104,9 @@ trait CargoContainerManager extends BeforeAndAfterAll {
 object AbstractPlay2WarTests {
 
   private val ROOT_URL = "http://localhost:8080"
+  
+  // Milliseconds
+  private val HTTP_TIMEOUT = 5000
 
 }
 
@@ -128,6 +131,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     webClient.setJavaScriptEnabled(false)
     webClient.setThrowExceptionOnFailingStatusCode(false)
     webClient.getCookieManager.setCookiesEnabled(true)
+	webClient.setTimeout(HTTP_TIMEOUT)
     new SkipClockiFrameWrapper(webClient)
   }
 
