@@ -502,14 +502,20 @@ class Tomcat7027Tests extends AbstractTomcat7x {
 }*/
 
 @RunWith(classOf[JUnitRunner])
-class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container {
-  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
-  override def containerName = "jetty8x"
+class Jetty7xTests extends AbstractPlay2WarTests with Servlet25Container {
+  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/7.6.5.v20120716/jetty-distribution-7.6.5.v20120716.tar.gz"
+  override def containerName = "jetty7x"
 }
 
 @RunWith(classOf[JUnitRunner])
 class Tomcat7029Tests extends AbstractTomcat7x {
   override def tomcatVersion = "7.0.29"
+}
+
+@RunWith(classOf[JUnitRunner])
+class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container {
+  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
+  override def containerName = "jetty8x"
 }
 
 // Doesn't work yet : deployment of sample war fails : Command deploy requires an operand of type class java.io.File
