@@ -160,24 +160,6 @@ resolvers += "Play2war plugins release" at "http://repository-play-war.forge.clo
 addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.7")
 ```
 
-### Add play2war runtime
-
-In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` values to add:
-
-```scala
-val appDependencies = Seq(
-  ...
-  "com.github.play2war" %% "play2-war-core" % "0.7"
-  ...
-)
-
-val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
-  ...
-  resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
-  ...
-)
-```
-
 ### Configure logging
 
 You probably need to override default Play 2.0 logging configuration because:
