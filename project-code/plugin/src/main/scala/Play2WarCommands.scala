@@ -103,7 +103,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
             
         }
         
-        case "3.0" => handleWebXmlFileOnServlet30(webxml, s)
+        case "3.0" => //handleWebXmlFileOnServlet30(webxml, s)
         
         case unknown => {
             s.log.warn("Unknown servlet container version: " + unknown + ". Force default 3.0 version")
