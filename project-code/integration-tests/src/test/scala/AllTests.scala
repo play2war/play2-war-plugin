@@ -24,10 +24,26 @@ import org.apache.commons.io.FileUtils
 import java.io.File
 import java.lang.Thread
 
+trait ServletContainer {
+
+  protected val WAR_KEY = "war.servlet"
+  
+  def keyServletContainer: String
+  
+  def keyWarPath: String = WAR_KEY + keyServletContainer
+  
+}
+
+trait Servlet30Container extends ServletContainer {
+    def keyServletContainer = "30"
+}
+
+trait Servlet25Container extends ServletContainer {
+    def keyServletContainer = "25"
+}
+
 trait CargoContainerManager extends BeforeAndAfterAll {
   self: Suite =>
-
-  private val WAR_KEY = "war"
 
   def getContainer: InstalledLocalContainer
 
@@ -38,10 +54,12 @@ trait CargoContainerManager extends BeforeAndAfterAll {
   def containerName: String
 
   def context = "/"
+  
+  def keyWarPath: String
 
   abstract override def beforeAll(configMap: Map[String, Any]) {
 
-    val warPath = configMap.get(WAR_KEY).getOrElse("/home/damien/dev/play2-war-plugin/project-code/./../sample/target/a_warification-1.0-SNAPSHOT.war")
+    val warPath = configMap.get(keyWarPath).getOrElse(Nil)
 
     println("WAR file to deploy: " + warPath)
 
@@ -86,6 +104,9 @@ trait CargoContainerManager extends BeforeAndAfterAll {
 object AbstractPlay2WarTests {
 
   private val ROOT_URL = "http://localhost:8080"
+  
+  // Milliseconds
+  private val HTTP_TIMEOUT = 15000
 
 }
 
@@ -110,6 +131,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     webClient.setJavaScriptEnabled(false)
     webClient.setThrowExceptionOnFailingStatusCode(false)
     webClient.getCookieManager.setCookiesEnabled(true)
+	webClient.setTimeout(HTTP_TIMEOUT)
     new SkipClockiFrameWrapper(webClient)
   }
 
@@ -462,9 +484,9 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   }
 }
 
-abstract class AbstractTomcat7x extends AbstractPlay2WarTests {
+abstract class AbstractTomcat7x extends AbstractPlay2WarTests with Servlet30Container {
   def tomcatVersion() = "Version to override"
-  override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-7/v" + tomcatVersion + "/bin/apache-tomcat-"+ tomcatVersion + ".zip"
+  override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-7/v" + tomcatVersion + "/bin/apache-tomcat-"+ tomcatVersion + ".tar.gz"
   override def containerName = "tomcat7x"
 }
 
@@ -474,14 +496,31 @@ class Tomcat7027Tests extends AbstractTomcat7x {
 }*/
 
 @RunWith(classOf[JUnitRunner])
-class Jetty8xTests extends AbstractPlay2WarTests {
-  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
-  override def containerName = "jetty8x"
+class Tomcat6xTests extends AbstractPlay2WarTests with Servlet25Container {
+  override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-6/v6.0.35/bin/apache-tomcat-6.0.35.tar.gz"
+  override def containerName = "tomcat6x"
+}
+
+/*@RunWith(classOf[JUnitRunner])
+class Tomcat7027Tests extends AbstractTomcat7x {
+  override def tomcatVersion = "7.0.27"
+}*/
+
+@RunWith(classOf[JUnitRunner])
+class Jetty7xTests extends AbstractPlay2WarTests with Servlet25Container {
+  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/7.6.5.v20120716/jetty-distribution-7.6.5.v20120716.tar.gz"
+  override def containerName = "jetty7x"
 }
 
 @RunWith(classOf[JUnitRunner])
 class Tomcat7029Tests extends AbstractTomcat7x {
   override def tomcatVersion = "7.0.29"
+}
+
+@RunWith(classOf[JUnitRunner])
+class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container {
+  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
+  override def containerName = "jetty8x"
 }
 
 // Doesn't work yet : deployment of sample war fails : Command deploy requires an operand of type class java.io.File

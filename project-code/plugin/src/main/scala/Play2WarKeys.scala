@@ -1,4 +1,4 @@
-package com.github.play2.warplugin
+package com.github.play2war.plugin
 
 import sbt._
 
@@ -9,7 +9,7 @@ trait Play2WarKeys {
   lazy val servletVersion: SettingKey[String] =
     SettingKey[String](
       "servletVersion",
-      "Servlet container version (2.4, 3.0)?")
+      "Servlet container version (2.5, 3.0)")
       
   lazy val webappResource = SettingKey[File]("webapp-resources")
 
