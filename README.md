@@ -1,12 +1,12 @@
 # WAR Plugin for Play framework 2.0
 
-    Current version: 0.6
+    Current version: 0.7
 
     Project-status: BETA
     
 [![Build Status](https://play-war.ci.cloudbees.com/job/Play_2_War_-_on_push_-_with_integration_tests_-_on_develop_branch/badge/icon)](https://play-war.ci.cloudbees.com/job/Play_2_War_-_on_push_-_with_integration_tests_-_on_develop_branch/)
 
-This project is a module for Play framework 2 to package your apps into standard WAR packages.
+This project is a module for Play framework 2 to package your apps into standard WAR packages. It can be used with **Servlet 3.0 and 2.5 containers** (Tomcat 6/7, Jetty 6/78, JBoss 5/6/7, ...)
 
 Live demo: JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
 
@@ -14,7 +14,6 @@ Other references built with Play 2 and Play2War:
  - [Factile](http://factile.net/) (Survey platform)
 
 ## Known limitations
-* **Play2War is only compatible with Servlet 3.0 containers** (Tomcat 7, Jetty 8, JBoss 7, ...)
 * **Play2War is only compatible with Java 6 JRE** (most of the application servers aren't compatible with too)
 * **Your WAR must be deployed at root context** (sub-context deployment will be available with Play 2.1)
 * As of version 0.6, it is only compatible with Play **2.0.2** (use Play2War v0.3 for Play 2.0 and v0.5 for Play 2.0.1)
@@ -35,10 +34,16 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 	<th>2.4/2.5</th>
   </tr>
   <tr>
-	<td colspan="2">Available ?</td>
+	<td colspan="2">Availability</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
     <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-    <td>TBD</td>
+    <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  </tr>
+  <tr>
+	<td colspan="2">Performances</td>
+	<td>++</td>
+    <td>+</td>
+    <td>-</td>
   </tr>
   <tr>
 	<td rowspan="4">HTTP</td>
@@ -51,13 +56,13 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
     <td>GET/POST<br/>HTTP 1.0/1.1</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td>TBD</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
   <tr>
     <td>Chunked response<br/>For long-polling</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td>TBD</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
   <tr>
     <td>Web Socket</td>
@@ -89,8 +94,8 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <tr>
     <td>WAR customization<br/>(web.xml, ...)</td>
 	<td>N/A</td>
-	<td>TBD</td>
-	<td>TBD</td>  
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>  
   </tr>
 </table>
 
@@ -127,14 +132,14 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 	<td>TBD</td>
   </tr>
   <tr>
-	<td rowspan="2">Servlet 2.4/2.5</td>
+	<td rowspan="2">Servlet 2.5</td>
 	<td>Tomcat 6</td>
-	<td>TBD</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td>TBD<br/>(Cloudbees)</td>
   </tr>
   <tr>
-	<td>Jetty 6</td>
-	<td>TBD</td>
+	<td>Jetty 7</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td>TBD</td>
   </tr>
 </table>
@@ -152,7 +157,7 @@ In ``APP_HOME/project/plugins.sbt``, add:
 ```scala
 resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.6")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.7")
 ```
 
 ### Add play2war runtime
@@ -162,7 +167,7 @@ In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` val
 ```scala
 val appDependencies = Seq(
   ...
-  "com.github.play2war" %% "play2-war-core" % "0.6"
+  "com.github.play2war" %% "play2-war-core" % "0.7"
   ...
 )
 
