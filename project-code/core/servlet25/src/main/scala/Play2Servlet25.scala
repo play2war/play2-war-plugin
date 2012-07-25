@@ -45,7 +45,8 @@ class Play2Servlet extends play.core.server.servlet.Play2Servlet[Tuple3[HttpServ
   }
   
   protected override def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
-	Map.empty[String, Seq[String]]// ++ request.getParameterMap.asScala.mapValues(Arrays.asList(_: _*).asScala)
+    val parameterMap = request.getParameterMap.asInstanceOf[java.util.Map[String, Array[String]]].asScala
+	Map.empty[String, Seq[String]] ++ parameterMap.mapValues(Arrays.asList(_: _*).asScala)
   }
   
   protected override def getHttpRequest(executionContext: Tuple3[HttpServletRequest, HttpServletResponse, Object]): HttpServletRequest = executionContext._1
