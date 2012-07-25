@@ -29,8 +29,8 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
           case files => files.toStream.flatMap(getFiles(_, skipHidden)) 
       })
 
-  val warTask = (baseDirectory, playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version, webappResource, streams, servletVersion) map {
-    (root, packaged, dependencies, target, id, version, webappResource, s, servletVersion) =>
+  val warTask = (playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version, webappResource, streams, servletVersion, disableWarningWhenWebxmlFileFound) map {
+    (packaged, dependencies, target, id, version, webappResource, s, servletVersion, disableWarningWhenWebxmlFileFound) =>
 
       s.log.info("Build WAR package for servlet container: " + servletVersion)
     
@@ -103,11 +103,11 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
             
         }
         
-        case "3.0" => handleWebXmlFileOnServlet30(webxml, s)
+        case "3.0" => handleWebXmlFileOnServlet30(webxml, s, disableWarningWhenWebxmlFileFound)
         
         case unknown => {
             s.log.warn("Unknown servlet container version: " + unknown + ". Force default 3.0 version")
-            handleWebXmlFileOnServlet30(webxml, s)
+            handleWebXmlFileOnServlet30(webxml, s, disableWarningWhenWebxmlFileFound)
         }
       }
 
@@ -138,8 +138,8 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
       war
   }
   
-  def handleWebXmlFileOnServlet30(webxml: File, s: TaskStreams) = {
-    if (webxml.exists) {
+  def handleWebXmlFileOnServlet30(webxml: File, s: TaskStreams, disableWarn: Boolean) = {
+    if (webxml.exists && !disableWarn) {
       s.log.warn("WEB-INF/web.xml found! As WAR package will be built for servlet 3.0 containers, check if this web.xml file is compatible with.")
     }
   }

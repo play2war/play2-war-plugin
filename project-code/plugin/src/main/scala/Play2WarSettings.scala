@@ -9,7 +9,7 @@ trait Play2WarSettings {
   this: Play2WarCommands =>
 
   lazy val play2WarSettings = Seq[Setting[_]](
-    
+      
     libraryDependencies <++= (servletVersion) { (v) =>
       val servletVersionString = v match {
         case "2.5" => "25"
