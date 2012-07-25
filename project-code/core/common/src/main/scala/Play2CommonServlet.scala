@@ -1,8 +1,7 @@
 package play.core.server.servlet
 
 import javax.servlet._
-import javax.servlet.annotation._
-import javax.servlet.http._
+import javax.servlet.http.{ Cookie => ServletCookie, _ }
 import java.io._
 import java.util.Arrays
 
@@ -14,34 +13,70 @@ import play.api.libs.iteratee._
 import play.api.libs.iteratee.Input._
 import play.api.libs.concurrent._
 import play.core._
-import play.core.server.servlet._
 import server.Server
 
 import scala.collection.JavaConverters._
 
-object Servlet30Wrapper {
+object Play2Servlet {
   var playServer: Play2WarServer = null
 }
 
-@WebServlet(name = "Play", urlPatterns = Array { "/" }, asyncSupported = true)
-@WebListener
-class Servlet30Wrapper extends HttpServlet with ServletContextListener with Helpers {
+/**
+ * Mother class for all servlet implementations for Play2.
+ */
+abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
+  
+  protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]]
+  
+  protected def getPlayHeaders(request: HttpServletRequest): Headers
+  
+  protected def getPlayCookies(request: HttpServletRequest): Cookies
 
+  /**
+   * Get a list of cookies from "flat" cookie representation (one-line-string cookie).
+   */
+  protected def getServletCookies(flatCookie: String): Seq[ServletCookie]
+  
+  /**
+   * Get HTTP request.
+   */
+  protected def getHttpRequest(execContext: T): HttpServletRequest
+
+  /**
+   * Get HTTP response.
+   */
+  protected def getHttpResponse(execContext: T): HttpServletResponse
+
+  /**
+   * Call just after service(...).
+   */
+  protected def onBeginService(request: HttpServletRequest, response: HttpServletResponse): T
+
+  /**
+   * Call just before end of service(...).
+   */
+  protected def onFinishService(execContext: T): Unit
+
+  /**
+   * Call every time the HTTP response must be terminated (completed).
+   */
+  protected def onHttpResponseComplete(execContext: T): Unit
+
+  /**
+   * Classic "service" servlet method.
+   */
   protected override def service(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
     Logger("play").trace("HTTP request received: " + servletRequest)
 
-    val aSyncContext = servletRequest.startAsync
+    val execContext: T = onBeginService(servletRequest, servletResponse)
     
-    // Disable timeout for long-polling
-    aSyncContext.setTimeout(-1)
-
-    val server = Servlet30Wrapper.playServer
+    val server = Play2Servlet.playServer
 
     //    val keepAlive -> non-sens
     //    val websocketableRequest -> non-sens
     val version = servletRequest.getProtocol.substring("HTTP/".length, servletRequest.getProtocol.length)
-    val servletUri = servletRequest.getServletPath
-    val parameters = Map.empty[String, Seq[String]] ++ servletRequest.getParameterMap.asScala.mapValues(Arrays.asList(_: _*).asScala)
+    val servletUri = servletRequest.getRequestURI
+    val parameters = getHttpParameters(servletRequest)
     val rHeaders = getPlayHeaders(servletRequest)
     val rCookies = getPlayCookies(servletRequest)
     val httpMethod = servletRequest.getMethod
@@ -67,7 +102,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
 
       def handle(result: Result) {
 
-        aSyncContext.getResponse match {
+        getHttpResponse(execContext) match {
 
           // Handle only HttpServletResponse
           case httpResponse: HttpServletResponse => {
@@ -106,8 +141,8 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                   val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
                     Promise.pure(
                       {
-                        aSyncContext.getResponse.getOutputStream.write(r.writeable.transform(x))
-                        aSyncContext.getResponse.getOutputStream.flush
+                        getHttpResponse(execContext).getOutputStream.write(r.writeable.transform(x))
+                        getHttpResponse(execContext).getOutputStream.flush
                       }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
                   }
 
@@ -116,7 +151,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                       Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
 
                     writeIteratee.mapDone { _ =>
-                      aSyncContext.complete()
+                      onHttpResponseComplete(execContext)
                     }
                   }
 
@@ -133,10 +168,10 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                   p.flatMap(i => i.run)
                     .onRedeem { buffer =>
                       Logger("play").trace("Buffer size to send: " + buffer.size)
-                      aSyncContext.getResponse.setContentLength(buffer.size)
-                      aSyncContext.getResponse.getOutputStream.flush
-                      buffer.writeTo(aSyncContext.getResponse.getOutputStream)
-                      aSyncContext.complete()
+                      getHttpResponse(execContext).setContentLength(buffer.size)
+                      getHttpResponse(execContext).getOutputStream.flush
+                      buffer.writeTo(getHttpResponse(execContext).getOutputStream)
+                      onHttpResponseComplete(execContext)
                     }
                 }
               }
@@ -161,8 +196,8 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                 val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
                   Promise.pure(
                     {
-                      aSyncContext.getResponse.getOutputStream.write(r.writeable.transform(x))
-                      aSyncContext.getResponse.getOutputStream.flush
+                      getHttpResponse(execContext).getOutputStream.write(r.writeable.transform(x))
+                      getHttpResponse(execContext).getOutputStream.flush
                     }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
                 }
 
@@ -171,7 +206,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
                     Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
 
                   writeIteratee.mapDone { _ =>
-                    aSyncContext.complete()
+                    onHttpResponseComplete(execContext)
                   }
                 }
 
@@ -184,7 +219,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
 
                 httpResponse.setContentLength(0);
                 httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-                aSyncContext.complete()
+                onHttpResponseComplete(execContext)
             } // end match result
 
           } // end case HttpServletResponse
@@ -228,14 +263,14 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
             }
 
             lazy val bodyEnumerator = {
-              val body = Stream.continually(aSyncContext.getRequest.getInputStream.read).takeWhile(-1 !=).map(_.toByte).toArray
+              val body = Stream.continually(getHttpRequest(execContext).getInputStream.read).takeWhile(-1 !=).map(_.toByte).toArray
               Enumerator(body).andThen(Enumerator.enumInput(EOF))
             }
 
             try {
               (bodyEnumerator |>> bodyParser): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
             } finally {
-              aSyncContext.getRequest.getInputStream.close
+              getHttpRequest(execContext).getInputStream.close
             }
             //                            }
           }
@@ -286,6 +321,8 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
       }
     }
 
+    onFinishService(execContext)
+    
   }
 
   override def contextInitialized(e: ServletContextEvent) = {
@@ -295,7 +332,7 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
 
     val classLoader = getClass.getClassLoader;
 
-    Servlet30Wrapper.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod))
+    Play2Servlet.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod))
   }
 
   override def contextDestroyed(e: ServletContextEvent) = {
@@ -311,10 +348,10 @@ class Servlet30Wrapper extends HttpServlet with ServletContextListener with Help
   }
 
   private def stopPlayServer(sc: ServletContext) = {
-    Option(Servlet30Wrapper.playServer).map {
+    Option(Play2Servlet.playServer).map {
       s =>
         s.stop()
-        Servlet30Wrapper.playServer = null
+        Play2Servlet.playServer = null
         sc.log("Play server stopped")
     } // if playServer is null, nothing to do
   }
