@@ -29,8 +29,8 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
           case files => files.toStream.flatMap(getFiles(_, skipHidden)) 
       })
 
-  val warTask = (baseDirectory, playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version, webappResource, streams, servletVersion) map {
-    (root, packaged, dependencies, target, id, version, webappResource, s, servletVersion) =>
+  val warTask = (playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version, webappResource, streams, servletVersion) map {
+    (packaged, dependencies, target, id, version, webappResource, s, servletVersion) =>
 
       s.log.info("Build WAR package for servlet container: " + servletVersion)
     
