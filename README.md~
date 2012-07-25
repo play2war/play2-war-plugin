@@ -88,8 +88,8 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <tr>
     <td>WAR customization<br/>(web.xml, ...)</td>
 	<td>N/A</td>
-	<td>TBD</td>
-	<td>TBD</td>  
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>  
   </tr>
 </table>
 
@@ -126,14 +126,14 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 	<td>TBD</td>
   </tr>
   <tr>
-	<td rowspan="2">Servlet 2.4/2.5</td>
+	<td rowspan="2">Servlet 2.5</td>
 	<td>Tomcat 6</td>
-	<td>TBD</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td>TBD<br/>(Cloudbees)</td>
   </tr>
   <tr>
-	<td>Jetty 6</td>
-	<td>TBD</td>
+	<td>Jetty 7</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td>TBD</td>
   </tr>
 </table>

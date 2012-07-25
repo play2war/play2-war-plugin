@@ -34,10 +34,16 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 	<th>2.4/2.5</th>
   </tr>
   <tr>
-	<td colspan="2">Available ?</td>
+	<td colspan="2">Availability</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
     <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
     <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  </tr>
+  <tr>
+	<td colspan="2">Performances</td>
+	<td>++</td>
+    <td>+</td>
+    <td>-</td>
   </tr>
   <tr>
 	<td rowspan="4">HTTP</td>
