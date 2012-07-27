@@ -88,7 +88,7 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 <table>
   <tr>
 	<th>Servlet engine</th>
-    <th>Server</th>
+        <th>Server</th>
 	<th>Standalone deployment</th>
 	<th>PaaS</th>
   </tr>
@@ -220,9 +220,13 @@ Create a file ``APP_HOME/conf/logger.xml`` with the following content :
 
 ## Packaging
 
-If Play runtime is available, run
+Package with:
 
     play package
+
+or with
+
+    sbt package
 
 Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_<YOUR_VERSION>.war``
 
