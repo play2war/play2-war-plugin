@@ -16,7 +16,7 @@ Other references built with Play 2 and Play2War:
 ## Known limitations
 * **Play2War is only compatible with Java 6 JRE** (most of the application servers aren't compatible with too)
 * **Your WAR must be deployed at root context** (sub-context deployment will be available with Play 2.1)
-* As of version 0.6, it is only compatible with Play **2.0.2** (use Play2War v0.3 for Play 2.0 and v0.5 for Play 2.0.1)
+* As of version 0.6+, it is only compatible with **Play 2.0.2** (use Play2War v0.3 for Play 2.0 and v0.5 for Play 2.0.1)
  
 ## What's new ?
 
