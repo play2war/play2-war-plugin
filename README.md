@@ -40,8 +40,8 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   </tr>
   <tr>
 	<td colspan="2">Availability</td>
-	<td>TBD</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+	<td>TBD</td>
         <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
         <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
