@@ -144,6 +144,41 @@ resolvers += "Play2war plugins release" at "http://repository-play-war.forge.clo
 
 addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.7")
 ```
+### Import Play2War SBT settings
+
+In ``APP_HOME/project/Build.scala``, add:
+
+```scala
+...
+import PlayProject._
+import com.github.play2war.plugin._
+```
+
+### Move all settings in a variable and add Play2War SBT settings to your project's settings
+
+```scala
+val appVersion      = "1.0-SNAPSHOT"
+
+val projectSettings = Play2WarPlugin.play2WarSettings ++ Seq(
+  // Your settings
+)
+
+...
+
+val main = PlayProject(
+   appName, appVersion, appDependencies, mainLang = JAVA
+).settings(projectSettings: _*)
+```
+
+### Configure servlet container version
+
+```scala
+val projectSettings = Play2WarPlugin.play2WarSettings ++ Seq(
+  Play2WarKeys.servletVersion := "3.0"
+  // Or Play2WarKeys.servletVersion := "2.5"
+)
+
+```
 
 ### Configure logging
 
