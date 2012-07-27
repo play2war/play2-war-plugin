@@ -16,8 +16,12 @@ Other references built with Play 2 and Play2War:
 ## Known limitations
 * **Play2War is only compatible with Java 6 JRE** (most of the application servers aren't compatible with too)
 * **Your WAR must be deployed at root context** (sub-context deployment will be available with Play 2.1)
-* As of version 0.6+, it is only compatible with **Play 2.0.2** (use Play2War v0.3 for Play 2.0 and v0.5 for Play 2.0.1)
- 
+
+## Compatibiity with Play2
+* Play 2.0.0 : Play2War 0.3, 0.4
+* Play 2.0.1 : Play2War 0.5
+* Play 2.0.2 : Play2War 0.6, 0.7
+
 ## What's new ?
 
 See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
@@ -25,77 +29,58 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 ## Features
 <table>
   <tr>
-	<th rowspan="2" colspan="2">Feature</th>
-    <th rowspan="2">Native Play 2</th>
-	<th colspan="2">Servlet engine</th>
+	<th rowspan="2" colspan="2">Features</th>
+        <th rowspan="2">Native Play 2</th>
+	<th colspan="3">Servlet engine</th>
   </tr>
   <tr>
+        <th>3.1</th>
 	<th>3.0</th>
 	<th>2.4/2.5</th>
   </tr>
   <tr>
 	<td colspan="2">Availability</td>
+	<td>TBD</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-    <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-    <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+        <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+        <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
   <tr>
 	<td colspan="2">Performances</td>
 	<td>++</td>
-    <td>+</td>
-    <td>-</td>
+	<td>?</td>
+        <td>+</td>
+        <td>-</td>
   </tr>
   <tr>
-	<td rowspan="4">HTTP</td>
-    <td>Asynchronous request<br/>processing</td>
+	<td rowspan="2">HTTP</td>
+        <td>Asynchronous request<br/>processing</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+        <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+        <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
   </tr>
   <tr>
-    <td>GET/POST<br/>HTTP 1.0/1.1</td>
+        <td>Web Socket</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-  </tr>
-  <tr>
-    <td>Chunked response<br/>For long-polling</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-  </tr>
-  <tr>
-    <td>Web Socket</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>  
   </tr>
   <tr>
-	<td rowspan="4">Container</td>
-    <td>Data sources</td>
+	<td rowspan="2">Container</td>
+        <td>Data sources</td>
 	<td>Built-in<br/>(<a href="http://jolbox.com/">Bone CP</a>)</td>
-	<td colspan="2">Built-in (<a href="http://jolbox.com/">Bone CP</a>)<br/>External DS support : TBD</td>
+	<td colspan="3">Built-in (<a href="http://jolbox.com/">Bone CP</a>)<br/>External DS support : TBD</td>
   </tr>
   <tr>
-    <td>Root context path
-    <br/>Eg: http://local/</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" title="WAR package must be deployed at root context" height="20"></td>
-  </tr>
-  <tr>
-    <td>Non root context path
-    <br/>Eg: http://local/myAppContext</td>
+        <td>Non root context path
+        <br/>Eg: http://local/myAppContext</td>
 	<td>
         2.0.x : <img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context">
         <br/>2.1.x (alpha) : <img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
-    </td>
-	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD for Play 2.1</td>
-  </tr>
-  <tr>
-    <td>WAR customization<br/>(web.xml, ...)</td>
-	<td>N/A</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>  
+        </td>
+	<td colspan="3"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD for Play 2.1</td>
   </tr>
 </table>
 
