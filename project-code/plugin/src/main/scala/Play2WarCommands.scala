@@ -1,28 +1,38 @@
 package com.github.play2war.plugin
 
-import sbt._
-import sbt.Keys._
-import sbt.CommandSupport.{ ClearOnFailure, FailureWall }
-import sbt.complete.Parser
-import Parser._
-import sbt.Cache.seqFormat
-import sbinary.DefaultProtocol.StringFormat
-import play.api._
-import play.core._
-import play.utils.Colors
-import sbt.PlayKeys._
-import scala.annotation.tailrec
-import scala.collection.JavaConverters._
-import java.lang.{ ProcessBuilder => JProcessBuilder }
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.io.FileInputStream
 import java.util.jar.Manifest
-import java.io.{ File, ByteArrayInputStream }
-import com.github.play2war.plugin.Play2WarKeys._
-import scala.collection.JavaConversions._ 
+
+import scala.collection.immutable.Stream.consWrapper
+
+import com.github.play2war.plugin.Play2WarKeys.servletVersion
+import com.github.play2war.plugin.Play2WarKeys.webappResource
+
+import sbt.ConfigKey.configurationToKey
+import sbt.Keys.TaskStreams
+import sbt.Keys.dependencyClasspath
+import sbt.Keys.normalizedName
+import sbt.Keys.streams
+import sbt.Keys.target
+import sbt.Keys.version
+import sbt.Scoped.t8ToTable8
+import sbt.Runtime
+import sbt.richFile
+import sbt.Artifact
+import sbt.AttributeKey
+import sbt.IO
+import sbt.ModuleID
+import sbt.Path
 
 trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
 
+  val manifestRegex = """(?i).*META-INF/MANIFEST.MF"""
+    
     def getFiles(root: File, skipHidden: Boolean = true): Stream[File] =  
-      if (!root.exists || (skipHidden && root.isHidden)) Stream.empty  
+      if (!root.exists || (skipHidden && root.isHidden) || 
+          manifestRegex.r.pattern.matcher(root.getAbsolutePath()).matches()) Stream.empty  
       else root #:: ( 
         root.listFiles match { 
           case null => Stream.empty 
@@ -39,7 +49,8 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
       val warDir = target
       val packageName = id + "-" + version
       val war = warDir / (packageName + ".war")
-
+      val manifestString = "Manifest-Version: 1.0\n"
+        
       s.log.info("Packaging " + war.getCanonicalPath + " ...")
 
       IO.createDirectory(warDir)
@@ -119,17 +130,28 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
       val additionnalResources = filesToInclude.map { f =>
         f -> Path.relativizeFile(webappResource, f).get.getPath
       }
-      
+          
       additionnalResources.foreach { r => 
         s.log.debug("Embedding " + r._1 + " -> /" + r._2)
       }
 
+      val metaInfFolder = webappResource / "META-INF"
+      val manifest  = if (metaInfFolder.exists()) {
+        val option = metaInfFolder.listFiles.find(f => 
+          manifestRegex.r.pattern.matcher(f.getAbsolutePath()).matches());
+        if (option.isDefined){
+          new Manifest(new FileInputStream(option.get))
+        }
+        else {
+      	  new Manifest(new ByteArrayInputStream(manifestString.getBytes))            
+        }
+      }
+      else {
+        new Manifest(new ByteArrayInputStream(manifestString.getBytes))
+      } 
+      
       // Package final jar
       val jarContent = libs ++ additionnalResources;
-      
-      val manifest = new Manifest(
-        new ByteArrayInputStream((
-          "Manifest-Version: 1.0\n").getBytes))
 
       IO.jar(jarContent, war, manifest)
 
