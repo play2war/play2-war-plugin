@@ -1,6 +1,6 @@
 # WAR Plugin for Play framework 2.0
 
-    Current version: 0.7
+    Current version: 0.7.1
 
     Project-status: BETA
     
@@ -20,7 +20,7 @@ Other references built with Play 2 and Play2War:
 ## Compatibiity with Play2
 * Play 2.0.0 : Play2War 0.3, 0.4
 * Play 2.0.1 : Play2War 0.5
-* Play 2.0.2 : Play2War 0.6, 0.7
+* Play 2.0.2 : Play2War 0.6, 0.7+
 
 ## What's new ?
 
@@ -142,7 +142,7 @@ In ``APP_HOME/project/plugins.sbt``, add:
 ```scala
 resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.7")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.7.1")
 ```
 ### Import Play2War SBT settings
 
