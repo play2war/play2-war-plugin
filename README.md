@@ -1,10 +1,12 @@
 # WAR Plugin for Play framework 2.0
 
-    Current version: 0.5
+    Current version: 0.7.1
 
     Project-status: BETA
+    
+[![Build Status](https://play-war.ci.cloudbees.com/job/Play_2_War_-_on_push_-_with_integration_tests_-_on_develop_branch/badge/icon)](https://play-war.ci.cloudbees.com/job/Play_2_War_-_on_push_-_with_integration_tests_-_on_develop_branch/)
 
-This project is a module for Play framework 2 to package your apps into standard WAR packages.
+This project is a module for Play framework 2 to package your apps into standard WAR packages. It can be used with **Servlet 3.0 and 2.5 containers** (Tomcat 6/7, Jetty 6/78, JBoss 5/6/7, ...)
 
 Live demo: JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
 
@@ -12,11 +14,14 @@ Other references built with Play 2 and Play2War:
  - [Factile](http://factile.net/) (Survey platform)
 
 ## Known limitations
-* **Play2War is only compatible with Servlet 3.0 containers** (Tomcat 7, Jetty 8, JBoss 7, ...)
 * **Play2War is only compatible with Java 6 JRE** (most of the application servers aren't compatible with too)
 * **Your WAR must be deployed at root context** (sub-context deployment will be available with Play 2.1)
-* As of version 0.3.1, it is only compatible with Play **2.0.1** (use Play2War 0.3 if you need Play 2.0 compatibility)
- 
+
+## Compatibiity with Play2
+* Play 2.0.0 : Play2War 0.3, 0.4
+* Play 2.0.1 : Play2War 0.5
+* Play 2.0.2 : Play2War 0.6, 0.7+
+
 ## What's new ?
 
 See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
@@ -24,71 +29,58 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 ## Features
 <table>
   <tr>
-	<th rowspan="2" colspan="2">Feature</th>
-    <th rowspan="2">Native Play 2</th>
-	<th colspan="2">Servlet engine</th>
+	<th rowspan="2" colspan="2">Features</th>
+        <th rowspan="2">Native Play 2</th>
+	<th colspan="3">Servlet engine</th>
   </tr>
   <tr>
+        <th>3.1</th>
 	<th>3.0</th>
 	<th>2.4/2.5</th>
   </tr>
   <tr>
-	<td colspan="2">Available ?</td>
+	<td colspan="2">Availability</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-    <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-    <td>TBD</td>
+	<td>TBD</td>
+        <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+        <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
   <tr>
-	<td rowspan="4">HTTP</td>
-    <td>Asynchronous request<br/>processing</td>
+	<td colspan="2">Performances</td>
+	<td>++</td>
+	<td>?</td>
+        <td>+</td>
+        <td>-</td>
+  </tr>
+  <tr>
+	<td rowspan="2">HTTP</td>
+        <td>Asynchronous request<br/>processing</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+        <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+        <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
   </tr>
   <tr>
-    <td>GET/POST<br/>HTTP 1.0/1.1</td>
+        <td>Web Socket</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td>TBD</td>
-  </tr>
-  <tr>
-    <td>Chunked response<br/>For long-polling</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td>TBD</td>
-  </tr>
-  <tr>
-    <td>Web Socket</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>  
   </tr>
   <tr>
-	<td rowspan="4">Container</td>
-    <td>Data sources</td>
+	<td rowspan="2">Container</td>
+        <td>Data sources</td>
 	<td>Built-in<br/>(<a href="http://jolbox.com/">Bone CP</a>)</td>
-	<td colspan="2">Built-in (<a href="http://jolbox.com/">Bone CP</a>)<br/>External DS support : TBD</td>
+	<td colspan="3">Built-in (<a href="http://jolbox.com/">Bone CP</a>)<br/>External DS support : TBD</td>
   </tr>
   <tr>
-    <td>Root context path
-    <br/>Eg: http://local/</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" title="WAR package must be deployed at root context" height="20"></td>
-  </tr>
-  <tr>
-    <td>Non root context path
-    <br/>Eg: http://local/myAppContext</td>
+        <td>Non root context path
+        <br/>Eg: http://local/myAppContext</td>
 	<td>
         2.0.x : <img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context">
         <br/>2.1.x (alpha) : <img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
-    </td>
-	<td colspan="2"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD for Play 2.1</td>
-  </tr>
-  <tr>
-    <td>WAR customization<br/>(web.xml, ...)</td>
-	<td>N/A</td>
-	<td>TBD</td>
-	<td>TBD</td>  
+        </td>
+	<td colspan="3"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD for Play 2.1</td>
   </tr>
 </table>
 
@@ -96,7 +88,7 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 <table>
   <tr>
 	<th>Servlet engine</th>
-    <th>Server</th>
+        <th>Server</th>
 	<th>Standalone deployment</th>
 	<th>PaaS</th>
   </tr>
@@ -125,14 +117,14 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 	<td>TBD</td>
   </tr>
   <tr>
-	<td rowspan="2">Servlet 2.4/2.5</td>
+	<td rowspan="2">Servlet 2.5</td>
 	<td>Tomcat 6</td>
-	<td>TBD</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td>TBD<br/>(Cloudbees)</td>
   </tr>
   <tr>
-	<td>Jetty 6</td>
-	<td>TBD</td>
+	<td>Jetty 7</td>
+	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td>TBD</td>
   </tr>
 </table>
@@ -150,30 +142,47 @@ In ``APP_HOME/project/plugins.sbt``, add:
 ```scala
 resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.5")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.7.1")
 ```
+### Import Play2War SBT settings
 
-### Add play2war runtime
-
-In ``APP_HOME/project/Build.scala``, modify ``appDependencies`` and ``main`` values to add:
+In ``APP_HOME/project/Build.scala``, add:
 
 ```scala
-val appDependencies = Seq(
-  ...
-  "com.github.play2war" %% "play2-war-core" % "0.5"
-  ...
+...
+import PlayProject._
+import com.github.play2war.plugin._
+```
+
+### Move all settings in a variable and add Play2War SBT settings to your project's settings
+
+```scala
+val appVersion      = "1.0-SNAPSHOT"
+
+val projectSettings = Play2WarPlugin.play2WarSettings ++ Seq(
+  // Your settings
 )
 
-val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
-  ...
-  resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
-  ...
+...
+
+val main = PlayProject(
+   appName, appVersion, appDependencies, mainLang = JAVA
+).settings(projectSettings: _*)
+```
+
+### Configure servlet container version
+
+```scala
+val projectSettings = Play2WarPlugin.play2WarSettings ++ Seq(
+  Play2WarKeys.servletVersion := "3.0"
+  // Or Play2WarKeys.servletVersion := "2.5"
 )
+
 ```
 
 ### Configure logging
 
-You probably need to override default Play 2.0 logging configuration because :
+You probably need to override default Play 2.0 logging configuration because:
 
 - An external file will be written in ``$USER_HOME/logs/...``
 
@@ -204,14 +213,20 @@ Create a file ``APP_HOME/conf/logger.xml`` with the following content :
     <appender-ref ref="STDOUT" />
   </root>
 ```
-  
+
+**Warning: there is a known issue with JBoss and Play logger** (see [#54](/dlecan/play2-war-plugin/issues/54)).
+
 </configuration>
 
 ## Packaging
 
-If Play runtime is available, run
+Package with:
 
     play package
+
+or with
+
+    sbt package
 
 Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_<YOUR_VERSION>.war``
 

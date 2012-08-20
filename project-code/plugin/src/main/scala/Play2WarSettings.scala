@@ -1,4 +1,4 @@
-package com.github.play2.warplugin
+package com.github.play2war.plugin
 
 import sbt.{ `package` => _, _ }
 import sbt.Keys._
@@ -8,8 +8,19 @@ import Play2WarKeys._
 trait Play2WarSettings {
   this: Play2WarCommands =>
 
-  lazy val defaultSettings = Seq[Setting[_]](
-    //    defaultServletVersion <<= "3.x",
+  lazy val play2WarSettings = Seq[Setting[_]](
+    
+    libraryDependencies <++= (servletVersion) { (v) =>
+      val servletVersionString = v match {
+        case "2.5" => "25"
+        case _ => "30"
+      }
+      Seq("com.github.play2war" %% ("play2-war-core-servlet" + servletVersionString) % com.github.play2war.plugin.Play2WarVersion.current)
+    },
+    
+    resolvers ++= Seq("Play2war plugin" at "http://repository-play-war.forge.cloudbees.com/release/"),
+
+    webappResource <<= baseDirectory / "war",
 
     // War attifact
     artifact in war <<= moduleName(n => Artifact(n, "war", "war")),
