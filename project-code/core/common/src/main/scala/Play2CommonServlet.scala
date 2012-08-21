@@ -92,7 +92,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
       def remoteAddress = rRemoteAddress
 
       override def toString = {
-        super.toString + "\nPath: " + path + "\nParameters: " + queryString + "\nHeaders: " + headers + "\nCookies: " + rCookies
+        super.toString + "\nURI: " + uri + "\nMethod: " + method + "\nPath: " + path + "\nParameters: " + queryString + "\nHeaders: " + headers + "\nCookies: " + rCookies
       }
     }
     Logger("play").trace("HTTP request content: " + requestHeader)
