@@ -75,7 +75,8 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
     //    val keepAlive -> non-sens
     //    val websocketableRequest -> non-sens
     val version = servletRequest.getProtocol.substring("HTTP/".length, servletRequest.getProtocol.length)
-    val servletUri = servletRequest.getRequestURI + (if(servletRequest.getQueryString == null) "" else "?" + servletRequest.getQueryString)
+    val servletPath = servletRequest.getRequestURI
+    val servletUri = servletPath + Option(servletRequest.getQueryString).map { "?" + _ }
     val parameters = getHttpParameters(servletRequest)
     val rHeaders = getPlayHeaders(servletRequest)
     val rCookies = getPlayCookies(servletRequest)
@@ -84,7 +85,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
     val requestHeader = new RequestHeader {
       def uri = servletUri
-      def path = uri
+      def path = servletPath
       def method = httpMethod
       def queryString = parameters
       def headers = rHeaders
@@ -92,7 +93,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
       def remoteAddress = rRemoteAddress
 
       override def toString = {
-        super.toString + "\nPath: " + path + "\nParameters: " + queryString + "\nHeaders: " + headers + "\nCookies: " + rCookies
+        super.toString + "\nURI: " + uri + "\nMethod: " + method + "\nPath: " + path + "\nParameters: " + queryString + "\nHeaders: " + headers + "\nCookies: " + rCookies
       }
     }
     Logger("play").trace("HTTP request content: " + requestHeader)
@@ -282,7 +283,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
               _.right.map(b =>
                 new Request[action.BODY_CONTENT] {
                   def uri = servletUri
-                  def path = servletUri
+                  def path = servletPath
                   def method = httpMethod
                   def queryString = parameters
                   def headers = rHeaders
