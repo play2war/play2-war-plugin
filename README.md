@@ -21,6 +21,7 @@ Other references built with Play 2 and Play2War:
 * Play 2.0.0 : Play2War 0.3, 0.4
 * Play 2.0.1 : Play2War 0.5
 * Play 2.0.2 : Play2War 0.6, 0.7+
+* Play 2.0.3 : TBD
 
 ## What's new ?
 
