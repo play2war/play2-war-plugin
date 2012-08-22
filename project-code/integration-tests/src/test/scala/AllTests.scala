@@ -1,4 +1,4 @@
-//
+package com.github.play2war.plugin.it
 
 import java.net.URL
 import org.scalatest.junit.JUnitRunner
