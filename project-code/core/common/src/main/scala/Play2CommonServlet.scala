@@ -268,12 +268,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
               Enumerator(body).andThen(Enumerator.enumInput(EOF))
             }
 
-            try {
-              (bodyEnumerator |>> bodyParser): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
-            } finally {
-              getHttpRequest(execContext).getInputStream.close
-            }
-            //                            }
+            (bodyEnumerator |>> bodyParser): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
           }
 
         val eventuallyResultOrRequest =
