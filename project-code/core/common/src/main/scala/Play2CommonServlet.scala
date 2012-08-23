@@ -264,7 +264,6 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
             }
 
             lazy val bodyEnumerator = {
-              // val body = Stream.continually(getHttpRequest(execContext).getInputStream.read).takeWhile(-1 !=).map(_.toByte).toArray
               Enumerator.fromStream(getHttpRequest(execContext).getInputStream).andThen(Enumerator.enumInput(EOF))
             }
 
