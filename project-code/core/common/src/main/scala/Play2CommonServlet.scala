@@ -81,16 +81,25 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
     val rHeaders = getPlayHeaders(servletRequest)
     val rCookies = getPlayCookies(servletRequest)
     val httpMethod = servletRequest.getMethod
-    val rRemoteAddress = servletRequest.getRemoteAddr
-
+    
+    def rRemoteAddress =  {
+      val remoteAddress = servletRequest.getRemoteAddr
+      (for {
+        xff <- rHeaders.get(X_FORWARDED_FOR)
+        app <- server.applicationProvider.get.right.toOption
+        trustxforwarded <- app.configuration.getBoolean("trustxforwarded").orElse(Some(false))
+        if remoteAddress == "127.0.0.1" || trustxforwarded
+      } yield xff).getOrElse(remoteAddress)
+    }
+    
     val requestHeader = new RequestHeader {
       def uri = servletUri
       def path = servletPath
       def method = httpMethod
       def queryString = parameters
       def headers = rHeaders
+      lazy val remoteAddress = rRemoteAddress
       def username = None
-      def remoteAddress = rRemoteAddress
 
       override def toString = {
         super.toString + "\nURI: " + uri + "\nMethod: " + method + "\nPath: " + path + "\nParameters: " + queryString + "\nHeaders: " + headers + "\nCookies: " + rCookies
@@ -245,30 +254,31 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
         val eventuallyBodyParser = server.getBodyParser[action.BODY_CONTENT](requestHeader, bodyParser)
 
-        val eventuallyResultOrBody =
+        val _ =
           eventuallyBodyParser.flatMap { bodyParser =>
 
             requestHeader.headers.get("Expect") match {
               case Some("100-continue") => {
-                bodyParser.fold(
-                  (_, _) => Promise.pure(()),
+                bodyParser.pureFold(
+                  (_, _) => (),
                   k => {
                     //                        val continue = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE)
                     //                        e.getChannel.write(continue)
-                    Promise.pure(())
+                    ()
                   },
-                  (_, _) => Promise.pure(()))
-
+                  (_, _) => ()
+                )
               }
-              case _ => Logger("play").trace("Expect header:" + requestHeader.headers.get("Expect"))
-            }
-
-            lazy val bodyEnumerator = {
-              Enumerator.fromStream(getHttpRequest(execContext).getInputStream).andThen(Enumerator.enumInput(EOF))
-            }
-
-            (bodyEnumerator |>> bodyParser): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
+            
+            case _ => Promise.pure()
           }
+        }
+
+        lazy val bodyEnumerator = {
+          Enumerator.fromStream(getHttpRequest(execContext).getInputStream).andThen(Enumerator.enumInput(EOF))
+        }
+
+        val eventuallyResultOrBody = eventuallyBodyParser.flatMap(it => bodyEnumerator |>> it): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
 
         val eventuallyResultOrRequest =
           eventuallyResultOrBody
@@ -281,8 +291,8 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                   def method = httpMethod
                   def queryString = parameters
                   def headers = rHeaders
+                  lazy val remoteAddress = rRemoteAddress
                   def username = None
-                  def remoteAddress = rRemoteAddress
                   val body = b
                 })
             }
