@@ -76,7 +76,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
     //    val websocketableRequest -> non-sens
     val version = servletRequest.getProtocol.substring("HTTP/".length, servletRequest.getProtocol.length)
     val servletPath = servletRequest.getRequestURI
-    val servletUri = servletPath + Option(servletRequest.getQueryString).map { "?" + _ }
+    val servletUri = servletPath + Option(servletRequest.getQueryString).map { "?" + _ }.getOrElse { "" }
     val parameters = getHttpParameters(servletRequest)
     val rHeaders = getPlayHeaders(servletRequest)
     val rCookies = getPlayCookies(servletRequest)
@@ -268,12 +268,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
               Enumerator(body).andThen(Enumerator.enumInput(EOF))
             }
 
-            try {
-              (bodyEnumerator |>> bodyParser): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
-            } finally {
-              getHttpRequest(execContext).getInputStream.close
-            }
-            //                            }
+            (bodyEnumerator |>> bodyParser): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
           }
 
         val eventuallyResultOrRequest =
