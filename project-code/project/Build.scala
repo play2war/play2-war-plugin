@@ -49,7 +49,7 @@ object Build extends Build {
 
       libraryDependencies <++= (scalaVersion, sbtVersion) { (scalaVersion, sbtVersion) =>
         Seq(
-          "play" % "sbt-plugin" % play2Version extra ("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion))
+          "play" % "sbt-plugin" % play2Version % "provided->default" extra ("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion))
       }))
 
   lazy val play2WarIntegrationTests = Project(id = "integration-tests",
