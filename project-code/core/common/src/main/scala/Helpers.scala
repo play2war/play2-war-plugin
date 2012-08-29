@@ -68,3 +68,13 @@ trait HTTPHelpers {
   
   def getServletCookie(pCookie: play.api.mvc.Cookie): ServletCookie
 }
+
+trait RichHttpServletRequest {
+  
+  def getRichInputStream(): Option[java.io.InputStream] 
+}
+
+trait RichHttpServletResponse {
+  
+  def getRichOutputStream(): Option[java.io.OutputStream] 
+}

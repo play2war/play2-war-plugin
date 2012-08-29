@@ -40,12 +40,12 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
   /**
    * Get HTTP request.
    */
-  protected def getHttpRequest(execContext: T): HttpServletRequest
+  protected def getHttpRequest(execContext: T): RichHttpServletRequest
 
   /**
    * Get HTTP response.
    */
-  protected def getHttpResponse(execContext: T): HttpServletResponse
+  protected def getHttpResponse(execContext: T): RichHttpServletResponse
 
   /**
    * Call just after service(...).
@@ -151,8 +151,10 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                   val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
                     Promise.pure(
                       {
-                        getHttpResponse(execContext).getOutputStream.write(r.writeable.transform(x))
-                        getHttpResponse(execContext).getOutputStream.flush
+                        getHttpResponse(execContext).getRichOutputStream.map { os =>
+                          os.write(r.writeable.transform(x))
+                          os.flush
+                        }
                       }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
                   }
 
