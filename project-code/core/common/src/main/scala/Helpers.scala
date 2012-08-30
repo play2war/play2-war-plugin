@@ -71,10 +71,12 @@ trait HTTPHelpers {
 
 trait RichHttpServletRequest {
   
-  def getRichInputStream(): Option[java.io.InputStream] 
+  def getRichInputStream: Option[java.io.InputStream]
 }
 
 trait RichHttpServletResponse {
   
-  def getRichOutputStream(): Option[java.io.OutputStream] 
+  def getRichOutputStream: Option[java.io.OutputStream]
+  
+  def getHttpServletResponse: Option[HttpServletResponse]
 }
