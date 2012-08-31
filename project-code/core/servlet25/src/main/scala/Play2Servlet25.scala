@@ -49,8 +49,24 @@ class Play2Servlet extends play.core.server.servlet.Play2Servlet[Tuple3[HttpServ
 	Map.empty[String, Seq[String]] ++ parameterMap.mapValues(Arrays.asList(_: _*).asScala)
   }
   
-  protected override def getHttpRequest(executionContext: Tuple3[HttpServletRequest, HttpServletResponse, Object]): HttpServletRequest = executionContext._1
+  protected override def getHttpRequest(executionContext: Tuple3[HttpServletRequest, HttpServletResponse, Object]): RichHttpServletRequest = {
+    new RichHttpServletRequest {
+      def getRichInputStream(): Option[java.io.InputStream] = {
+        Option(executionContext._1.getInputStream)
+      }
+    }
+  }
   
-  protected override def getHttpResponse(executionContext: Tuple3[HttpServletRequest, HttpServletResponse, Object]): HttpServletResponse = executionContext._2
+  protected override def getHttpResponse(executionContext: Tuple3[HttpServletRequest, HttpServletResponse, Object]): RichHttpServletResponse = {
+    new RichHttpServletResponse {
+        def getRichOutputStream: Option[java.io.OutputStream] = {
+          Option(executionContext._2.getOutputStream)
+        }
+  
+        def getHttpServletResponse: Option[HttpServletResponse] = {
+          Option(executionContext._2)
+        }
+    }
+  }
 
 }

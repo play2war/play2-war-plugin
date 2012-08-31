@@ -40,12 +40,12 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
   /**
    * Get HTTP request.
    */
-  protected def getHttpRequest(execContext: T): HttpServletRequest
+  protected def getHttpRequest(execContext: T): RichHttpServletRequest
 
   /**
    * Get HTTP response.
    */
-  protected def getHttpResponse(execContext: T): HttpServletResponse
+  protected def getHttpResponse(execContext: T): RichHttpServletResponse
 
   /**
    * Call just after service(...).
@@ -112,106 +112,50 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
       def handle(result: Result) {
 
-        getHttpResponse(execContext) match {
+        getHttpResponse(execContext).getHttpServletResponse.foreach { httpResponse =>
 
-          // Handle only HttpServletResponse
-          case httpResponse: HttpServletResponse => {
+          result match {
 
-            result match {
+            case AsyncResult(p) => p.extend1 {
+              case Redeemed(v) => handle(v)
+              case Thrown(e) => {
+                Logger("play").error("Waiting for a promise, but got an error: " + e.getMessage, e)
+                handle(Results.InternalServerError)
+              }
+            }
 
-              case AsyncResult(p) => p.extend1 {
-                case Redeemed(v) => handle(v)
-                case Thrown(e) => {
-                  Logger("play").error("Waiting for a promise, but got an error: " + e.getMessage, e)
-                  handle(Results.InternalServerError)
+            case r @ SimpleResult(ResponseHeader(status, headers), body) => {
+              Logger("play").trace("Sending simple result: " + r)
+
+              httpResponse.setStatus(status)
+
+              // Set response headers
+              headers.filterNot(_ == (CONTENT_LENGTH, "-1")).foreach {
+
+                case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
+                  getServletCookies(value).map {
+                    c => httpResponse.addCookie(c)
+                  }
                 }
+
+                case (name, value) => httpResponse.setHeader(name, value)
               }
 
-              case r @ SimpleResult(ResponseHeader(status, headers), body) => {
-                Logger("play").trace("Sending simple result: " + r)
-
-                httpResponse.setStatus(status)
-
-                // Set response headers
-                headers.filterNot(_ == (CONTENT_LENGTH, "-1")).foreach {
-
-                  case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
-                    getServletCookies(value).map {
-                      c => httpResponse.addCookie(c)
-                    }
-                  }
-
-                  case (name, value) => httpResponse.setHeader(name, value)
-                }
-
-                // Stream the result
-                headers.get(CONTENT_LENGTH).map { contentLength =>
-                  Logger("play").trace("Result with Content-length: " + contentLength)
-
-                  val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
-                    Promise.pure(
-                      {
-                        getHttpResponse(execContext).getOutputStream.write(r.writeable.transform(x))
-                        getHttpResponse(execContext).getOutputStream.flush
-                      }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
-                  }
-
-                  val bodyIteratee = {
-                    val writeIteratee = Iteratee.fold1(
-                      Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
-
-                    writeIteratee.mapDone { _ =>
-                      onHttpResponseComplete(execContext)
-                    }
-                  }
-
-                  body(bodyIteratee)
-                }.getOrElse {
-                  Logger("play").trace("Result without Content-length")
-
-                  // No Content-Length header specified, buffer in-memory
-                  val byteBuffer = new ByteArrayOutputStream
-                  val writer: Function2[ByteArrayOutputStream, r.BODY_CONTENT, Unit] = (b, x) => b.write(r.writeable.transform(x))
-                  val stringIteratee = Iteratee.fold(byteBuffer)((b, e: r.BODY_CONTENT) => { writer(b, e); b })
-                  val p = body |>> stringIteratee
-
-                  p.flatMap(i => i.run)
-                    .onRedeem { buffer =>
-                      Logger("play").trace("Buffer size to send: " + buffer.size)
-                      getHttpResponse(execContext).setContentLength(buffer.size)
-                      getHttpResponse(execContext).getOutputStream.flush
-                      buffer.writeTo(getHttpResponse(execContext).getOutputStream)
-                      onHttpResponseComplete(execContext)
-                    }
-                }
-              }
-
-              case r @ ChunkedResult(ResponseHeader(status, headers), chunks) => {
-                Logger("play").trace("Sending chunked result: " + r)
-
-                httpResponse.setStatus(status)
-
-                // Copy headers to netty response
-                headers.foreach {
-
-                  case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
-                    getServletCookies(value).map {
-                      c => httpResponse.addCookie(c)
-                    }
-                  }
-
-                  case (name, value) => httpResponse.setHeader(name, value)
-                }
+              // Stream the result
+              headers.get(CONTENT_LENGTH).map { contentLength =>
+                Logger("play").trace("Result with Content-length: " + contentLength)
 
                 val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
                   Promise.pure(
                     {
-                      getHttpResponse(execContext).getOutputStream.write(r.writeable.transform(x))
-                      getHttpResponse(execContext).getOutputStream.flush
+                      getHttpResponse(execContext).getRichOutputStream.foreach { os =>
+                        os.write(r.writeable.transform(x))
+                        os.flush
+                      }
                     }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
                 }
 
-                val chunksIteratee = {
+                val bodyIteratee = {
                   val writeIteratee = Iteratee.fold1(
                     Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
 
@@ -220,24 +164,82 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                   }
                 }
 
-                chunks(chunksIteratee)
+                body(bodyIteratee)
+              }.getOrElse {
+                Logger("play").trace("Result without Content-length")
+
+                // No Content-Length header specified, buffer in-memory
+                val byteBuffer = new ByteArrayOutputStream
+                val writer: Function2[ByteArrayOutputStream, r.BODY_CONTENT, Unit] = (b, x) => b.write(r.writeable.transform(x))
+                val stringIteratee = Iteratee.fold(byteBuffer)((b, e: r.BODY_CONTENT) => { writer(b, e); b })
+                val p = body |>> stringIteratee
+
+                p.flatMap(i => i.run)
+                  .onRedeem { buffer =>
+                    Logger("play").trace("Buffer size to send: " + buffer.size)
+                    getHttpResponse(execContext).getRichOutputStream.map { os =>
+                  	 getHttpResponse(execContext).getHttpServletResponse.map(_.setContentLength(buffer.size))
+                  	 os.flush
+                       buffer.writeTo(os)
+                    }
+                    onHttpResponseComplete(execContext)
+                  }
+              }
+            }
+
+            case r @ ChunkedResult(ResponseHeader(status, headers), chunks) => {
+              Logger("play").trace("Sending chunked result: " + r)
+
+              httpResponse.setStatus(status)
+
+              // Copy headers to netty response
+              headers.foreach {
+
+                case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
+                  getServletCookies(value).map {
+                    c => httpResponse.addCookie(c)
+                  }
+                }
+
+                case (name, value) => httpResponse.setHeader(name, value)
               }
 
-              case defaultResponse @ _ =>
-                Logger("play").trace("Default response: " + defaultResponse)
-                Logger("play").error("Unhandle default response: " + defaultResponse)
+              val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
+                Promise.pure(
+                  {
+                    getHttpResponse(execContext).getRichOutputStream.foreach { os =>
+                      os.write(r.writeable.transform(x))
+                      os.flush
+                    }
+                  }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
+              }
 
-                httpResponse.setContentLength(0);
-                httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-                onHttpResponseComplete(execContext)
-            } // end match result
+              val chunksIteratee = {
+                val writeIteratee = Iteratee.fold1(
+                  Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
 
-          } // end case HttpServletResponse
+                writeIteratee.mapDone { _ =>
+                  onHttpResponseComplete(execContext)
+                }
+              }
 
-          case unexpected => Logger("play").error("Oops, unexpected message received in Play server (please report this problem): " + unexpected)
+              chunks(chunksIteratee)
+            }
 
-        } // end match getResponse
+            case defaultResponse @ _ =>
+              Logger("play").trace("Default response: " + defaultResponse)
+              Logger("play").error("Unhandle default response: " + defaultResponse)
+
+              httpResponse.setContentLength(0);
+              httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+              onHttpResponseComplete(execContext)
+
+          } // end match result
+
+        } // end match foreach
+
       } // end handle method
+
     }
 
     // get handler for request
@@ -274,11 +276,12 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
           }
         }
 
-        lazy val bodyEnumerator = {
-          Enumerator.fromStream(getHttpRequest(execContext).getInputStream).andThen(Enumerator.enumInput(EOF))
-        }
+        lazy val bodyEnumerator = getHttpRequest(execContext).getRichInputStream.map { is =>
+          Enumerator.fromStream(is).andThen(Enumerator.eof)
+        }.getOrElse(Enumerator.eof)
 
-        val eventuallyResultOrBody = eventuallyBodyParser.flatMap(it => bodyEnumerator |>> it): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
+        val eventuallyResultOrBody = eventuallyBodyParser.flatMap(it => 
+          bodyEnumerator |>> it): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
 
         val eventuallyResultOrRequest =
           eventuallyResultOrBody
