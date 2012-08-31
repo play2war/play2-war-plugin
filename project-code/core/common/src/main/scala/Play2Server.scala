@@ -1,6 +1,7 @@
 package play.core.server.servlet
 
 import java.io._
+import java.util.logging.Handler
 
 import play.core._
 import play.core.server._
@@ -37,6 +38,12 @@ class Play2WarServer(appProvider: WarApplication) extends Server with ServerWith
 
 class WarApplication(classLoader: ClassLoader, val mode: Mode.Mode) extends ApplicationProvider {
 
+  // See https://github.com/dlecan/play2-war-plugin/issues/54
+  // Store all handlers
+  val julHandlers:Option[Array[Handler]] = Option(java.util.logging.Logger.getLogger("")).map { root =>
+    root.getHandlers
+  }
+
   val applicationPath = Option(System.getProperty("user.home")).map(new File(_)).getOrElse(new File(""))
 
   val application = new Application(applicationPath, classLoader, None, mode)
@@ -45,6 +52,13 @@ class WarApplication(classLoader: ClassLoader, val mode: Mode.Mode) extends Appl
   // without substitutions
   Logger.configure(Map("application.home" -> path.getAbsolutePath), Map.empty,
     mode)
+  
+  // Restore handlers after Play logger initialization
+  Option(java.util.logging.Logger.getLogger("")).map { root =>
+    julHandlers.map { handlers =>
+      handlers.foreach(root.addHandler(_))
+    }
+  }
   
   Play.start(application)
 
