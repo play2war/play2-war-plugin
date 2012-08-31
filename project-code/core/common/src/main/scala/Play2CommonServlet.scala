@@ -112,7 +112,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
       def handle(result: Result) {
 
-        getHttpResponse(execContext) match {
+        getHttpResponse(execContext).getHttpServletResponse match {
 
           // Handle only HttpServletResponse
           case httpResponse: HttpServletResponse => {
