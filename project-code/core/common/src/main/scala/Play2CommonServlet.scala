@@ -4,6 +4,7 @@ import javax.servlet._
 import javax.servlet.http.{ Cookie => ServletCookie, _ }
 import java.io._
 import java.util.Arrays
+import java.util.logging.Handler
 
 import play.api._
 import play.api.mvc._
@@ -336,11 +337,17 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
   override def contextInitialized(e: ServletContextEvent) = {
     e.getServletContext.log("PlayServletWrapper > contextInitialized")
 
+    // See https://github.com/dlecan/play2-war-plugin/issues/54
+    // Store all handlers before Play Logger.configure(...)
+    val julHandlers:Option[Array[Handler]] = Option(java.util.logging.Logger.getLogger("")).map { root =>
+      root.getHandlers
+    }
+    
     Logger.configure(Map.empty, Map.empty, Mode.Prod)
 
     val classLoader = getClass.getClassLoader;
 
-    Play2Servlet.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod))
+    Play2Servlet.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod, julHandlers))
   }
 
   override def contextDestroyed(e: ServletContextEvent) = {

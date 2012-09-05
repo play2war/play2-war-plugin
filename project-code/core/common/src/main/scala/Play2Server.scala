@@ -36,13 +36,7 @@ class Play2WarServer(appProvider: WarApplication) extends Server with ServerWith
   }
 }
 
-class WarApplication(classLoader: ClassLoader, val mode: Mode.Mode) extends ApplicationProvider {
-
-  // See https://github.com/dlecan/play2-war-plugin/issues/54
-  // Store all handlers
-  val julHandlers:Option[Array[Handler]] = Option(java.util.logging.Logger.getLogger("")).map { root =>
-    root.getHandlers
-  }
+class WarApplication(val classLoader: ClassLoader, val mode: Mode.Mode, val julHandlers: Option[Array[Handler]]) extends ApplicationProvider {
 
   val applicationPath = Option(System.getProperty("user.home")).map(new File(_)).getOrElse(new File(""))
 
