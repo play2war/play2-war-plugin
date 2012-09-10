@@ -219,6 +219,17 @@ Create a file ``APP_HOME/conf/logger.xml`` with the following content :
 
 </configuration>
 
+### Embed custom WAR configuration files
+
+You can embed custom WAR configuration files, such as `MANIFEST.MF`, `web.xml`, ...
+For this, copy then in your `APP_HOME/war` folder. Don't forget to add subfolders !
+
+Samples:
+
+- `APP_HOME/war/myfile.txt` will result in `app_home.war!/myfile`
+- `APP_HOME/war/META-INF/MANIFEST.MF` will result in `app_home.war!/META-INF/MANIFEST.MF`
+- `APP_HOME/war/WEB-INF/web.xml` will result in `app_home.war!/WEB-INF/web.xml`
+
 ## Packaging
 
 Package with:
