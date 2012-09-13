@@ -20,6 +20,10 @@ import server.Server
 
 import scala.collection.JavaConverters._
 
+object Play2Servlet {
+  val asyncTimeout = play.core.server.servlet.Play2Servlet.configuration.getInt("servlet30.asynctimeout").getOrElse(-1)
+}
+
 @WebServlet(name = "Play", urlPatterns = Array { "/" }, asyncSupported = true)
 @WebListener
 class Play2Servlet extends play.core.server.servlet.Play2Servlet[Tuple2[AsyncContext, AsyncListener]] with Helpers {
@@ -27,7 +31,7 @@ class Play2Servlet extends play.core.server.servlet.Play2Servlet[Tuple2[AsyncCon
   protected override def onBeginService(request: HttpServletRequest, response: HttpServletResponse): Tuple2[AsyncContext, AsyncListener] = {
     val asyncListener = new AsyncListener(request.toString)
     val asyncContext = request.startAsync
-    asyncContext.setTimeout(-1);
+    asyncContext.setTimeout(play.core.server.servlet30.Play2Servlet.asyncTimeout);
 
     (asyncContext, asyncListener);
   }
