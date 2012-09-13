@@ -86,6 +86,9 @@ private[servlet30] class AsyncListener(val requestId: String) extends javax.serv
   val withError = new AtomicBoolean(false)
 
   val withTimeout = new AtomicBoolean(false)
+  
+  // Need a default constructor for JBoss
+  def this() = this("Unknown request id")
 
   override def onComplete(event: AsyncEvent) {
     // Logger("play").trace("onComplete: " + requestId)
