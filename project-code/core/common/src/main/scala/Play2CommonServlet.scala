@@ -20,6 +20,7 @@ import scala.collection.JavaConverters._
 
 object Play2Servlet {
   var playServer: Play2WarServer = null
+  var configuration: Configuration = null
 }
 
 /**
@@ -347,7 +348,11 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
     val classLoader = getClass.getClassLoader;
 
-    Play2Servlet.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod, julHandlers))
+    val application = new WarApplication(classLoader, Mode.Prod, julHandlers)
+
+    Play2Servlet.configuration = application.get.right.map { _.configuration }.right.getOrElse(Configuration.empty)
+
+    Play2Servlet.playServer = new Play2WarServer(application)
   }
 
   override def contextDestroyed(e: ServletContextEvent) = {
