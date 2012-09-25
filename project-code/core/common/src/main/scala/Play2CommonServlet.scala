@@ -206,16 +206,23 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                 case (name, value) => httpResponse.setHeader(name, value)
               }
 
+              var hasError = false
+
               val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
                 Promise.pure(
                   {
-                    getHttpResponse(execContext).getRichOutputStream.foreach { os =>
-                      os.write(r.writeable.transform(x))
-                      os.flush
+                    if (hasError) {
+                      ()
+                    } else {
+                      getHttpResponse(execContext).getRichOutputStream.foreach { os =>
+                        os.write(r.writeable.transform(x))
+                        os.flush
+                      }
                     }
                   }).extend1 {
                     case Redeemed(()) => ()
                     case Thrown(ex) => {
+                      hasError = true
                       Logger("play").debug(ex.toString)
                     }
                   }
