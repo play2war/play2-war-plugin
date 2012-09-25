@@ -213,7 +213,12 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                       os.write(r.writeable.transform(x))
                       os.flush
                     }
-                  }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
+                  }).extend1 {
+                    case Redeemed(()) => ()
+                    case Thrown(ex) => {
+                      Logger("play").debug(ex.toString)
+                    }
+                  }
               }
 
               val chunksIteratee = {
