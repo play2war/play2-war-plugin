@@ -5,7 +5,6 @@ import javax.servlet.http.{ Cookie => ServletCookie, _ }
 import java.io._
 import java.util.Arrays
 import java.util.logging.Handler
-
 import play.api._
 import play.api.mvc._
 import play.api.http._
@@ -15,8 +14,8 @@ import play.api.libs.iteratee.Input._
 import play.api.libs.concurrent._
 import play.core._
 import server.Server
-
 import scala.collection.JavaConverters._
+import java.util.concurrent.atomic.AtomicBoolean
 
 object Play2Servlet {
   var playServer: Play2WarServer = null
@@ -27,18 +26,18 @@ object Play2Servlet {
  * Mother class for all servlet implementations for Play2.
  */
 abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
-  
+
   protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]]
-  
+
   protected def getPlayHeaders(request: HttpServletRequest): Headers
-  
+
   protected def getPlayCookies(request: HttpServletRequest): Cookies
 
   /**
    * Get a list of cookies from "flat" cookie representation (one-line-string cookie).
    */
   protected def getServletCookies(flatCookie: String): Seq[ServletCookie]
-  
+
   /**
    * Get HTTP request.
    */
@@ -71,7 +70,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
     Logger("play").trace("HTTP request received: " + servletRequest)
 
     val execContext: T = onBeginService(servletRequest, servletResponse)
-    
+
     val server = Play2Servlet.playServer
 
     //    val keepAlive -> non-sens
@@ -83,8 +82,8 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
     val rHeaders = getPlayHeaders(servletRequest)
     val rCookies = getPlayCookies(servletRequest)
     val httpMethod = servletRequest.getMethod
-    
-    def rRemoteAddress =  {
+
+    def rRemoteAddress = {
       val remoteAddress = servletRequest.getRemoteAddr
       (for {
         xff <- rHeaders.get(X_FORWARDED_FOR)
@@ -93,7 +92,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
         if remoteAddress == "127.0.0.1" || trustxforwarded
       } yield xff).getOrElse(remoteAddress)
     }
-    
+
     val requestHeader = new RequestHeader {
       def uri = servletUri
       def path = servletPath
@@ -147,21 +146,33 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
               headers.get(CONTENT_LENGTH).map { contentLength =>
                 Logger("play").trace("Result with Content-length: " + contentLength)
 
+                var hasError: AtomicBoolean = new AtomicBoolean(false)
+
                 val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
                   Promise.pure(
                     {
-                      getHttpResponse(execContext).getRichOutputStream.foreach { os =>
-                        os.write(r.writeable.transform(x))
-                        os.flush
+                      if (hasError.get) {
+                        ()
+                      } else {
+                        getHttpResponse(execContext).getRichOutputStream.foreach { os =>
+                          os.write(r.writeable.transform(x))
+                          os.flush
+                        }
                       }
-                    }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
+                    }).extend1 {
+                      case Redeemed(()) => ()
+                      case Thrown(ex) => {
+                        hasError.set(true)
+                        Logger("play").debug("Exception received while writing to client: " + ex.toString)
+                      }
+                    }
                 }
 
                 val bodyIteratee = {
                   val writeIteratee = Iteratee.fold1(
                     Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
 
-                  writeIteratee.mapDone { _ =>
+                  Enumeratee.breakE[r.BODY_CONTENT](_ => hasError.get)(writeIteratee).mapDone { _ =>
                     onHttpResponseComplete(execContext)
                   }
                 }
@@ -180,9 +191,9 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                   .onRedeem { buffer =>
                     Logger("play").trace("Buffer size to send: " + buffer.size)
                     getHttpResponse(execContext).getRichOutputStream.map { os =>
-                  	 getHttpResponse(execContext).getHttpServletResponse.map(_.setContentLength(buffer.size))
-                  	 os.flush
-                       buffer.writeTo(os)
+                      getHttpResponse(execContext).getHttpServletResponse.map(_.setContentLength(buffer.size))
+                      os.flush
+                      buffer.writeTo(os)
                     }
                     onHttpResponseComplete(execContext)
                   }
@@ -206,12 +217,12 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                 case (name, value) => httpResponse.setHeader(name, value)
               }
 
-              var hasError = false
+              var hasError: AtomicBoolean = new AtomicBoolean(false)
 
               val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
                 Promise.pure(
                   {
-                    if (hasError) {
+                    if (hasError.get) {
                       ()
                     } else {
                       getHttpResponse(execContext).getRichOutputStream.foreach { os =>
@@ -222,8 +233,8 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                   }).extend1 {
                     case Redeemed(()) => ()
                     case Thrown(ex) => {
-                      hasError = true
-                      Logger("play").debug(ex.toString)
+                      hasError.set(true)
+                      Logger("play").debug("Exception received while writing to client: " + ex.toString)
                     }
                   }
               }
@@ -232,7 +243,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                 val writeIteratee = Iteratee.fold1(
                   Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
 
-                writeIteratee.mapDone { _ =>
+                Enumeratee.breakE[r.BODY_CONTENT](_ => hasError.get)(writeIteratee).mapDone { _ =>
                   onHttpResponseComplete(execContext)
                 }
               }
@@ -282,19 +293,18 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                     //                        e.getChannel.write(continue)
                     ()
                   },
-                  (_, _) => ()
-                )
+                  (_, _) => ())
               }
-            
-            case _ => Promise.pure()
+
+              case _ => Promise.pure()
+            }
           }
-        }
 
         lazy val bodyEnumerator = getHttpRequest(execContext).getRichInputStream.map { is =>
           Enumerator.fromStream(is).andThen(Enumerator.eof)
         }.getOrElse(Enumerator.eof)
 
-        val eventuallyResultOrBody = eventuallyBodyParser.flatMap(it => 
+        val eventuallyResultOrBody = eventuallyBodyParser.flatMap(it =>
           bodyEnumerator |>> it): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
 
         val eventuallyResultOrRequest =
@@ -344,7 +354,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
     }
 
     onFinishService(execContext)
-    
+
   }
 
   override def contextInitialized(e: ServletContextEvent) = {
@@ -352,10 +362,10 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
     // See https://github.com/dlecan/play2-war-plugin/issues/54
     // Store all handlers before Play Logger.configure(...)
-    val julHandlers:Option[Array[Handler]] = Option(java.util.logging.Logger.getLogger("")).map { root =>
+    val julHandlers: Option[Array[Handler]] = Option(java.util.logging.Logger.getLogger("")).map { root =>
       root.getHandlers
     }
-    
+
     Logger.configure(Map.empty, Map.empty, Mode.Prod)
 
     val classLoader = getClass.getClassLoader;
