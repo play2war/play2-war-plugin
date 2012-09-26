@@ -16,6 +16,7 @@ import play.core._
 import server.Server
 
 import scala.collection.JavaConverters._
+import java.util.concurrent.atomic.AtomicBoolean
 
 object Play2Servlet {
   var playServer: Play2WarServer = null
@@ -25,18 +26,18 @@ object Play2Servlet {
  * Mother class for all servlet implementations for Play2.
  */
 abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
-  
+
   protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]]
-  
+
   protected def getPlayHeaders(request: HttpServletRequest): Headers
-  
+
   protected def getPlayCookies(request: HttpServletRequest): Cookies
 
   /**
    * Get a list of cookies from "flat" cookie representation (one-line-string cookie).
    */
   protected def getServletCookies(flatCookie: String): Seq[ServletCookie]
-  
+
   /**
    * Get HTTP request.
    */
@@ -69,7 +70,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
     Logger("play").trace("HTTP request received: " + servletRequest)
 
     val execContext: T = onBeginService(servletRequest, servletResponse)
-    
+
     val server = Play2Servlet.playServer
 
     //    val keepAlive -> non-sens
@@ -81,8 +82,8 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
     val rHeaders = getPlayHeaders(servletRequest)
     val rCookies = getPlayCookies(servletRequest)
     val httpMethod = servletRequest.getMethod
-    
-    def rRemoteAddress =  {
+
+    def rRemoteAddress = {
       val remoteAddress = servletRequest.getRemoteAddr
       (for {
         xff <- rHeaders.get(X_FORWARDED_FOR)
@@ -91,7 +92,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
         if remoteAddress == "127.0.0.1" || trustxforwarded
       } yield xff).getOrElse(remoteAddress)
     }
-    
+
     val requestHeader = new RequestHeader {
       def uri = servletUri
       def path = servletPath
@@ -148,19 +149,31 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                 headers.get(CONTENT_LENGTH).map { contentLength =>
                   Logger("play").trace("Result with Content-length: " + contentLength)
 
+                  var hasError: AtomicBoolean = new AtomicBoolean(false)
+
                   val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
                     Promise.pure(
                       {
-                        getHttpResponse(execContext).getOutputStream.write(r.writeable.transform(x))
-                        getHttpResponse(execContext).getOutputStream.flush
-                      }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
+                        if (hasError.get) {
+                          ()
+                        } else {
+                          getHttpResponse(execContext).getOutputStream.write(r.writeable.transform(x))
+                          getHttpResponse(execContext).getOutputStream.flush
+                        }
+                      }).extend1 {
+                        case Redeemed(()) => ()
+                        case Thrown(ex) => {
+                          hasError.set(true)
+                          Logger("play").debug(ex.toString)
+                        }
+                      }
                   }
 
                   val bodyIteratee = {
                     val writeIteratee = Iteratee.fold1(
                       Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
 
-                    writeIteratee.mapDone { _ =>
+                    Enumeratee.breakE[r.BODY_CONTENT](_ => hasError.get)(writeIteratee).mapDone { _ =>
                       onHttpResponseComplete(execContext)
                     }
                   }
@@ -203,19 +216,31 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                   case (name, value) => httpResponse.setHeader(name, value)
                 }
 
+                var hasError: AtomicBoolean = new AtomicBoolean(false)
+
                 val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
                   Promise.pure(
                     {
-                      getHttpResponse(execContext).getOutputStream.write(r.writeable.transform(x))
-                      getHttpResponse(execContext).getOutputStream.flush
-                    }).extend1 { case Redeemed(()) => (); case Thrown(ex) => Logger("play").debug(ex.toString) }
+                      if (hasError.get) {
+                        ()
+                      } else {
+                        getHttpResponse(execContext).getOutputStream.write(r.writeable.transform(x))
+                        getHttpResponse(execContext).getOutputStream.flush
+                      }
+                    }).extend1 {
+                      case Redeemed(()) => ()
+                      case Thrown(ex) => {
+                        hasError.set(true)
+                        Logger("play").debug(ex.toString)
+                      }
+                    }
                 }
 
                 val chunksIteratee = {
                   val writeIteratee = Iteratee.fold1(
                     Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
 
-                  writeIteratee.mapDone { _ =>
+                  Enumeratee.breakE[r.BODY_CONTENT](_ => hasError.get)(writeIteratee).mapDone { _ =>
                     onHttpResponseComplete(execContext)
                   }
                 }
@@ -266,13 +291,12 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                     //                        e.getChannel.write(continue)
                     ()
                   },
-                  (_, _) => ()
-                )
+                  (_, _) => ())
               }
-            
-            case _ => Promise.pure()
+
+              case _ => Promise.pure()
+            }
           }
-        }
 
         lazy val bodyEnumerator = {
           Enumerator.fromStream(getHttpRequest(execContext).getInputStream).andThen(Enumerator.enumInput(EOF))
@@ -327,7 +351,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
     }
 
     onFinishService(execContext)
-    
+
   }
 
   override def contextInitialized(e: ServletContextEvent) = {
