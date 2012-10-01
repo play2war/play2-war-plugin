@@ -85,6 +85,10 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   </tr>
 </table>
 
+Native Play 2 is a much better deployment model, so why choosing WAR packaging ?
+- Ops don't want to change their deployment model and still want to use WAR in your company
+- Because Play 2 has a lot of lacks around SSL support
+
 ## Server compatibility
 <table>
   <tr>
