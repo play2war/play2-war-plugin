@@ -31,11 +31,11 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 <table>
   <tr>
 	<th rowspan="2" colspan="2">Features</th>
-        <th rowspan="2">Native Play 2</th>
+    <th rowspan="2">Native Play 2</th>
 	<th colspan="3">Servlet engine</th>
   </tr>
   <tr>
-        <th>3.1</th>
+    <th>3.1</th>
 	<th>3.0</th>
 	<th>2.4/2.5</th>
   </tr>
@@ -43,26 +43,26 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 	<td colspan="2">Availability</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td>TBD</td>
-        <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-        <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+    <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+    <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
   <tr>
 	<td colspan="2">Performances</td>
 	<td>++</td>
 	<td>?</td>
-        <td>+</td>
-        <td>-</td>
+    <td>+</td>
+    <td>-</td>
   </tr>
   <tr>
 	<td rowspan="2">HTTP</td>
-        <td>Asynchronous request<br/>processing</td>
+    <td>Asynchronous request<br/>processing</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-        <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-        <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+    <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+    <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
   </tr>
   <tr>
-        <td>Web Socket</td>
+    <td>Web Socket</td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
 	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
@@ -70,12 +70,12 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   </tr>
   <tr>
 	<td rowspan="2">Container</td>
-        <td>Data sources</td>
+    <td>Data sources</td>
 	<td>Built-in<br/>(<a href="http://jolbox.com/">Bone CP</a>)</td>
 	<td colspan="3">Built-in (<a href="http://jolbox.com/">Bone CP</a>)<br/>External DS support : TBD</td>
   </tr>
   <tr>
-        <td>Non root context path
+    <td>Non root context path
         <br/>Eg: http://local/myAppContext</td>
 	<td>
         2.0.x : <img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context">
