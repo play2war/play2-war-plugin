@@ -445,11 +445,11 @@ class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container {
   override def containerName = "jetty8x"
 }
 
-@RunWith(classOf[JUnitRunner])
-class Jetty9xTests extends AbstractPlay2WarTests with Servlet30Container {
-  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.0.0.M0/jetty-distribution-9.0.0.M0.tar.gz"
-  override def containerName = "jetty9x"
-}
+//@RunWith(classOf[JUnitRunner])
+//class Jetty9xTests extends AbstractPlay2WarTests with Servlet30Container {
+//  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.0.0.M0/jetty-distribution-9.0.0.M0.tar.gz"
+//  override def containerName = "jetty9x"
+//}
 
 // Doesn't work yet : deployment of sample war fails : Command deploy requires an operand of type class java.io.File
 //@RunWith(classOf[JUnitRunner])
