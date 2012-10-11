@@ -100,10 +100,20 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <th>PaaS</th>
   </tr>
   <tr>
-  <td rowspan="4">Servlet 3.0</td>
+  <td rowspan="5">Servlet 3.0</td>
   <td>Tomcat 7</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  </tr>
+  <tr>
+  <td>Jetty 8</td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  </tr>
+  <tr>
+  <td>Jetty 9</td>
+  <td>TBD</td>
+  <td>TBD</td>
   </tr>
   <tr>
   <td>JBoss 7.0</td>
