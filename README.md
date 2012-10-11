@@ -30,58 +30,58 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 ## Features
 <table>
   <tr>
-	<th rowspan="2" colspan="2">Features</th>
-    <th rowspan="2">Native Play 2</th>
-	<th colspan="3">Servlet engine</th>
+  <th rowspan="2" colspan="2">Features</th>
+  <th rowspan="2">Native Play 2</th>
+  <th colspan="3">Servlet engine</th>
   </tr>
   <tr>
     <th>3.1</th>
-	<th>3.0</th>
-	<th>2.4/2.5</th>
+  <th>3.0</th>
+  <th>2.4/2.5</th>
   </tr>
   <tr>
-	<td colspan="2">Availability</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td>TBD</td>
+  <td colspan="2">Availability</td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td>TBD</td>
     <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
     <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
   <tr>
-	<td colspan="2">Performances</td>
-	<td>++</td>
-	<td>?</td>
+  <td colspan="2">Performances</td>
+  <td>++</td>
+  <td>?</td>
     <td>+</td>
     <td>-</td>
   </tr>
   <tr>
-	<td rowspan="2">HTTP</td>
+  <td rowspan="2">HTTP</td>
     <td>Asynchronous request<br/>processing</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
     <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
     <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
   </tr>
   <tr>
     <td>Web Socket</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>  
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>  
   </tr>
   <tr>
-	<td rowspan="2">Container</td>
+  <td rowspan="2">Container</td>
     <td>Data sources</td>
-	<td>Built-in<br/>(<a href="http://jolbox.com/">Bone CP</a>)</td>
-	<td colspan="3">Built-in (<a href="http://jolbox.com/">Bone CP</a>)<br/>External DS support : TBD</td>
+  <td>Built-in<br/>(<a href="http://jolbox.com/">Bone CP</a>)</td>
+  <td colspan="3">Built-in (<a href="http://jolbox.com/">Bone CP</a>)<br/>External DS support : TBD</td>
   </tr>
   <tr>
     <td>Non root context path
         <br/>Eg: http://local/myAppContext</td>
-	<td>
+  <td>
         2.0.x : <img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context">
         <br/>2.1.x (alpha) : <img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
         </td>
-	<td colspan="3"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD for Play 2.1</td>
+  <td colspan="3"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD for Play 2.1</td>
   </tr>
 </table>
 
@@ -92,45 +92,45 @@ Native Play 2 is a much better deployment model, so why choosing WAR packaging ?
 ## Server compatibility
 <table>
   <tr>
-	<th>Servlet engine</th>
+  <th>Servlet engine</th>
         <th>Server</th>
-	<th>Standalone deployment</th>
-	<th>PaaS</th>
+  <th>Standalone deployment</th>
+  <th>PaaS</th>
   </tr>
   <tr>
-	<td rowspan="4">Servlet 3.0</td>
-	<td>Tomcat 7</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td rowspan="4">Servlet 3.0</td>
+  <td>Tomcat 7</td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
   <tr>
-	<td>JBoss 7.0</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
-		<a href="http://servlet30.play-war.cloudbees.net/" title="Play 2 WAR demo hosted at Cloudbees PaaS provider">Demo</a> @Cloudbees
-		<br/><a href="https://github.com/dlecan/play2-war-plugin/wiki/FAQ#jboss7-deployment-at-cloudbees">Need extra configuration</a> when deploying
-	</td>
+  <td>JBoss 7.0</td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
+    <a href="http://servlet30.play-war.cloudbees.net/" title="Play 2 WAR demo hosted at Cloudbees PaaS provider">Demo</a> @Cloudbees
+    <br/><a href="https://github.com/dlecan/play2-war-plugin/wiki/FAQ#jboss7-deployment-at-cloudbees">Need extra configuration</a> when deploying
+  </td>
   </tr>
   <tr>
-	<td>JBoss 7.1</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td>TBD<br/>(Openshift)</td>
+  <td>JBoss 7.1</td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td>TBD<br/>(Openshift)</td>
   </tr>
   <tr>
-	<td>Glassfish 3</td>
-	<td>TBD</td>
-	<td>TBD</td>
+  <td>Glassfish 3</td>
+  <td>TBD</td>
+  <td>TBD</td>
   </tr>
   <tr>
-	<td rowspan="2">Servlet 2.5</td>
-	<td>Tomcat 6</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td>TBD<br/>(Cloudbees)</td>
+  <td rowspan="2">Servlet 2.5</td>
+  <td>Tomcat 6</td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td>TBD<br/>(Cloudbees)</td>
   </tr>
   <tr>
-	<td>Jetty 7</td>
-	<td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-	<td>TBD</td>
+  <td>Jetty 7</td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td>TBD</td>
   </tr>
 </table>
 
