@@ -175,9 +175,7 @@ import com.github.play2war.plugin._
 
 ```scala
 val appVersion      = "1.0-SNAPSHOT"
-
 ...
-
 val main = PlayProject(appName, appVersion, appDependencies, mainLang = JAVA).settings(
   // ... Your own settings here
   Play2WarKeys.servletVersion := "3.0"
