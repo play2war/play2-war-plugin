@@ -96,7 +96,7 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <tr>
   <th>Servlet engine</th>
         <th>Server</th>
-  <th>Standalone deployment</th>
+  <th>In your company</th>
   <th>PaaS</th>
   </tr>
   <tr>
