@@ -171,30 +171,18 @@ import PlayProject._
 import com.github.play2war.plugin._
 ```
 
-### Move all settings in a variable and add Play2War SBT settings to your project's settings
+### Configure servlet container version and add all Play2war settings in your project configuration
 
 ```scala
 val appVersion      = "1.0-SNAPSHOT"
 
-val projectSettings = Play2WarPlugin.play2WarSettings ++ Seq(
-  // Your settings
-)
-
 ...
 
-val main = PlayProject(
-   appName, appVersion, appDependencies, mainLang = JAVA
-).settings(projectSettings: _*)
-```
-
-### Configure servlet container version
-
-```scala
-val projectSettings = Play2WarPlugin.play2WarSettings ++ Seq(
+val main = PlayProject(appName, appVersion, appDependencies, mainLang = JAVA).settings(
+  // ... Your own settings here
   Play2WarKeys.servletVersion := "3.0"
   // Or Play2WarKeys.servletVersion := "2.5"
-)
-
+).settings(Play2WarPlugin.play2WarSettings: _*)
 ```
 
 ### Configure logging
