@@ -8,6 +8,11 @@
 
 This project is a module for Play framework 2 to package your apps into standard WAR packages. It can be used with **Servlet 3.0 and 2.5 containers** (Tomcat 6/7, Jetty 6/78, JBoss 5/6/7, ...)
 
+Why choosing WAR packaging when native Play 2 is a better deployment model (features and performances) ?
+- Ops don't want to change their deployment model and still want to use WAR in your company
+- SSL is available, easy to configure and well documented on JBoss, Tomcat, ... when SSL will be only available on Play 2.1
+- You need to add extra Servlet filters specific to your company (to handle SSO, ...)
+
 Live demo: JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
 
 Other references built with Play 2 and Play2War:
@@ -22,6 +27,7 @@ Other references built with Play 2 and Play2War:
 * Play 2.0.1 : Play2War 0.5
 * Play 2.0.2 : Play2War 0.6, 0.7.x
 * Play 2.0.3 : Play2War 0.7.x
+* Play 2.0.4 : Play2War 0.7.x
 
 ## What's new ?
 
@@ -84,10 +90,6 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <td colspan="3"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD for Play 2.1</td>
   </tr>
 </table>
-
-Native Play 2 is a much better deployment model, so why choosing WAR packaging ?
-- Ops don't want to change their deployment model and still want to use WAR in your company
-- Because Play 2 has a lot of lacks around SSL support
 
 ## Server compatibility
 <table>
