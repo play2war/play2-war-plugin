@@ -252,21 +252,36 @@ Deployment in a sub-context is a known limitation which is fixed for Play 2.1 (s
 The best way to deploy at root context is to include a configuration file into the WAR file to indicate to your application server where to deploy the application.
 But Play2War doesn't support file inclusion yet (see [#4](/dlecan/play2-war-plugin/issues/4)).
 
-### How to deploy at root context in Tomcat 7
+### Tomcat 7 : how to deploy at root context ?
 
 Rename the generated war *ROOT.war* before deployment.
 
-### How to deploy at root context in Jetty 8
+### Jetty 8/9 : how to deploy at root context ?
 
 Rename the generated war *ROOT.war* before deployment.
 
-### How to deploy at root context in JBoss 7.0.x
+### JBoss 7.0.x
+
+#### Extra configuration
+
+If you plan to use Java and EBean persistence model (not JPA), you must add extra configuration below to integrate Play runtime with JBoss VFS (Virtual File Sytem).
+
+In your `APP_HOME/project/Build.scala` file, add:
+
+```scala
+val appDependencies = Seq(
+  // ... Actual dependencies
+  "com.dlecan.reflections" % "jboss7-vfs-integration" % "1.0.1" // add this after your others dependencies
+)
+```
+
+#### How to deploy at root context ?
 
 In ``standalone/configuration/standalone.xml``, comment the ``subsystem`` named ``urn:jboss:domain:pojo:1.0``.
 
 Then follow explanations for JBoss 7.1.x below.
 
-### How to deploy at root context in JBoss 7.1.x
+### JBoss 7.1.x : how to deploy at root context ?
 
 First, disable default welcome page in ``standalone/configuration/standalone.xml`` by changing ``enable-welcome-root="true"`` to ``enable-welcome-root="false"``:
 
