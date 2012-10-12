@@ -6,7 +6,7 @@
     
 [![Build Status](https://play-war.ci.cloudbees.com/job/Play_2_War_-_on_push_-_with_integration_tests_-_on_develop_branch/badge/icon)](https://play-war.ci.cloudbees.com/job/Play_2_War_-_on_push_-_with_integration_tests_-_on_develop_branch/)
 
-This project is a module for Play framework 2 to package your apps into standard WAR packages. It can be used with **Servlet 3.0 and 2.5 containers** (Tomcat 6/7, Jetty 6/78, JBoss 5/6/7, ...)
+This project is a module for Play framework 2 to package your apps into standard WAR packages. It can be used with **Servlet 3.0 and 2.5 containers** (Tomcat 6/7, Jetty 7/8/9, JBoss 5/6/7, ...)
 
 Why choosing WAR packaging when native Play 2 is a better deployment model (features and performances) ?
 - Ops don't want to change their deployment model and still want to use WAR in your company
