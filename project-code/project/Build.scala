@@ -23,7 +23,7 @@ object Build extends Build {
   lazy val root = Project(id = "play2-war",
     base = file("."),
     settings = commonSettings ++ Seq(
-      publishArtifact := false)) aggregate (play2WarCoreCommon, play2WarCoreservlet30, play2WarCoreservlet25, play2WarPlugin, play2WarIntegrationTests)
+      publishArtifact := false)) aggregate (play2WarCoreCommon, play2WarCoreservlet30, play2WarCoreservlet25, play2WarPlugin, play2WarIntegrationTests, play2WarWebsocketCore, play2WarWebsocketTomcat, play2WarWebsocketServlet31)
 
   //
   // Servlet implementations
@@ -78,9 +78,23 @@ object Build extends Build {
       parallelExecution in Test := false,
       testOptions in Test += Tests.Argument("-oD"),
       testOptions in Test += Tests.Argument("-Dwar.servlet30=" + servlet30SampleWarPath),
-	  testOptions in Test += Tests.Argument("-Dwar.servlet25=" + servlet25SampleWarPath),
+      testOptions in Test += Tests.Argument("-Dwar.servlet25=" + servlet25SampleWarPath),
       testListeners <<= target.map(t => Seq(new eu.henkelmann.sbt.JUnitXmlTestsListener(t.getAbsolutePath)))))
 
+  //
+  // Websocket implementations
+  //
+  lazy val play2WarWebsocketCore = Project(id = "websocket-core",
+    base = file("websocket/core"),
+    settings = commonSettings ++ Seq())
+
+  lazy val play2WarWebsocketTomcat = Project(id = "websocket-tomcat",
+    base = file("websocket/tomcat"),
+    settings = commonSettings ++ Seq())
+
+  lazy val play2WarWebsocketServlet31 = Project(id = "websocket-servlet31",
+    base = file("websocket/servlet31"),
+    settings = commonSettings ++ Seq())
 
   //
   // Settings
