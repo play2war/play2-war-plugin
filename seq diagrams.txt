@@ -1,0 +1,12 @@
+title HTTP GET
+
+Netty->PlayDefaultUpstreamHandler: messageReceived
+PlayDefaultUpstreamHandler->PlayDefaultUpstreamHandler: requestHeader
+PlayDefaultUpstreamHandler->PlayDefaultUpstreamHandler: response
+PlayDefaultUpstreamHandler->PlayServer: getHandlerFor(requestHeader)
+PlayServer-->PlayDefaultUpstreamHandler: handler
+PlayDefaultUpstreamHandler->Response:response.handle(handler)
+Response-->PlayDefaultUpstreamHandler:
+Response->Response: writeGetResponseToClient
+PlayDefaultUpstreamHandler-->Netty:
+
