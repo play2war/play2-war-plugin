@@ -87,7 +87,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
               s.log.info("WEB-INF/web.xml not found, generate it in " + webxmlFolder)
               IO.write(webxml,
                 """<?xml version="1.0" ?>
-<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
         version="2.5">
