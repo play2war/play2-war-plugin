@@ -4,7 +4,7 @@ import javax.servlet._
 import javax.servlet.http.{ Cookie => ServletCookie, _ }
 import java.io._
 import java.util.Arrays
-
+import java.util.logging.Handler
 import play.api._
 import play.api.mvc._
 import play.api.http._
@@ -14,12 +14,12 @@ import play.api.libs.iteratee.Input._
 import play.api.libs.concurrent._
 import play.core._
 import server.Server
-
 import scala.collection.JavaConverters._
 import java.util.concurrent.atomic.AtomicBoolean
 
 object Play2Servlet {
   var playServer: Play2WarServer = null
+  var configuration: Configuration = null
 }
 
 /**
@@ -41,12 +41,12 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
   /**
    * Get HTTP request.
    */
-  protected def getHttpRequest(execContext: T): HttpServletRequest
+  protected def getHttpRequest(execContext: T): RichHttpServletRequest
 
   /**
    * Get HTTP response.
    */
-  protected def getHttpResponse(execContext: T): HttpServletResponse
+  protected def getHttpResponse(execContext: T): RichHttpServletResponse
 
   /**
    * Call just after service(...).
@@ -113,108 +113,38 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
       def handle(result: Result) {
 
-        getHttpResponse(execContext) match {
+        getHttpResponse(execContext).getHttpServletResponse.foreach { httpResponse =>
 
-          // Handle only HttpServletResponse
-          case httpResponse: HttpServletResponse => {
+          result match {
 
-            result match {
+            case AsyncResult(p) => p.extend1 {
+              case Redeemed(v) => handle(v)
+              case Thrown(e) => {
+                Logger("play").error("Waiting for a promise, but got an error: " + e.getMessage, e)
+                handle(Results.InternalServerError)
+              }
+            }
 
-              case AsyncResult(p) => p.extend1 {
-                case Redeemed(v) => handle(v)
-                case Thrown(e) => {
-                  Logger("play").error("Waiting for a promise, but got an error: " + e.getMessage, e)
-                  handle(Results.InternalServerError)
+            case r @ SimpleResult(ResponseHeader(status, headers), body) => {
+              Logger("play").trace("Sending simple result: " + r)
+
+              httpResponse.setStatus(status)
+
+              // Set response headers
+              headers.filterNot(_ == (CONTENT_LENGTH, "-1")).foreach {
+
+                case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
+                  getServletCookies(value).map {
+                    c => httpResponse.addCookie(c)
+                  }
                 }
+
+                case (name, value) => httpResponse.setHeader(name, value)
               }
 
-              case r @ SimpleResult(ResponseHeader(status, headers), body) => {
-                Logger("play").trace("Sending simple result: " + r)
-
-                httpResponse.setStatus(status)
-
-                // Set response headers
-                headers.filterNot(_ == (CONTENT_LENGTH, "-1")).foreach {
-
-                  case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
-                    getServletCookies(value).map {
-                      c => httpResponse.addCookie(c)
-                    }
-                  }
-
-                  case (name, value) => httpResponse.setHeader(name, value)
-                }
-
-                // Stream the result
-                headers.get(CONTENT_LENGTH).map { contentLength =>
-                  Logger("play").trace("Result with Content-length: " + contentLength)
-
-                  var hasError: AtomicBoolean = new AtomicBoolean(false)
-
-                  val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
-                    Promise.pure(
-                      {
-                        if (hasError.get) {
-                          ()
-                        } else {
-                          getHttpResponse(execContext).getOutputStream.write(r.writeable.transform(x))
-                          getHttpResponse(execContext).getOutputStream.flush
-                        }
-                      }).extend1 {
-                        case Redeemed(()) => ()
-                        case Thrown(ex) => {
-                          hasError.set(true)
-                          Logger("play").debug(ex.toString)
-                        }
-                      }
-                  }
-
-                  val bodyIteratee = {
-                    val writeIteratee = Iteratee.fold1(
-                      Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
-
-                    Enumeratee.breakE[r.BODY_CONTENT](_ => hasError.get)(writeIteratee).mapDone { _ =>
-                      onHttpResponseComplete(execContext)
-                    }
-                  }
-
-                  body(bodyIteratee)
-                }.getOrElse {
-                  Logger("play").trace("Result without Content-length")
-
-                  // No Content-Length header specified, buffer in-memory
-                  val byteBuffer = new ByteArrayOutputStream
-                  val writer: Function2[ByteArrayOutputStream, r.BODY_CONTENT, Unit] = (b, x) => b.write(r.writeable.transform(x))
-                  val stringIteratee = Iteratee.fold(byteBuffer)((b, e: r.BODY_CONTENT) => { writer(b, e); b })
-                  val p = body |>> stringIteratee
-
-                  p.flatMap(i => i.run)
-                    .onRedeem { buffer =>
-                      Logger("play").trace("Buffer size to send: " + buffer.size)
-                      getHttpResponse(execContext).setContentLength(buffer.size)
-                      getHttpResponse(execContext).getOutputStream.flush
-                      buffer.writeTo(getHttpResponse(execContext).getOutputStream)
-                      onHttpResponseComplete(execContext)
-                    }
-                }
-              }
-
-              case r @ ChunkedResult(ResponseHeader(status, headers), chunks) => {
-                Logger("play").trace("Sending chunked result: " + r)
-
-                httpResponse.setStatus(status)
-
-                // Copy headers to netty response
-                headers.foreach {
-
-                  case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
-                    getServletCookies(value).map {
-                      c => httpResponse.addCookie(c)
-                    }
-                  }
-
-                  case (name, value) => httpResponse.setHeader(name, value)
-                }
+              // Stream the result
+              headers.get(CONTENT_LENGTH).map { contentLength =>
+                Logger("play").trace("Result with Content-length: " + contentLength)
 
                 var hasError: AtomicBoolean = new AtomicBoolean(false)
 
@@ -224,19 +154,21 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                       if (hasError.get) {
                         ()
                       } else {
-                        getHttpResponse(execContext).getOutputStream.write(r.writeable.transform(x))
-                        getHttpResponse(execContext).getOutputStream.flush
+                        getHttpResponse(execContext).getRichOutputStream.foreach { os =>
+                          os.write(r.writeable.transform(x))
+                          os.flush
+                        }
                       }
                     }).extend1 {
                       case Redeemed(()) => ()
                       case Thrown(ex) => {
                         hasError.set(true)
-                        Logger("play").debug(ex.toString)
+                        Logger("play").debug("Exception received while writing to client: " + ex.toString)
                       }
                     }
                 }
 
-                val chunksIteratee = {
+                val bodyIteratee = {
                   val writeIteratee = Iteratee.fold1(
                     Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
 
@@ -245,24 +177,94 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
                   }
                 }
 
-                chunks(chunksIteratee)
+                body(bodyIteratee)
+              }.getOrElse {
+                Logger("play").trace("Result without Content-length")
+
+                // No Content-Length header specified, buffer in-memory
+                val byteBuffer = new ByteArrayOutputStream
+                val writer: Function2[ByteArrayOutputStream, r.BODY_CONTENT, Unit] = (b, x) => b.write(r.writeable.transform(x))
+                val stringIteratee = Iteratee.fold(byteBuffer)((b, e: r.BODY_CONTENT) => { writer(b, e); b })
+                val p = body |>> stringIteratee
+
+                p.flatMap(i => i.run)
+                  .onRedeem { buffer =>
+                    Logger("play").trace("Buffer size to send: " + buffer.size)
+                    getHttpResponse(execContext).getRichOutputStream.map { os =>
+                      getHttpResponse(execContext).getHttpServletResponse.map(_.setContentLength(buffer.size))
+                      os.flush
+                      buffer.writeTo(os)
+                    }
+                    onHttpResponseComplete(execContext)
+                  }
+              }
+            }
+
+            case r @ ChunkedResult(ResponseHeader(status, headers), chunks) => {
+              Logger("play").trace("Sending chunked result: " + r)
+
+              httpResponse.setStatus(status)
+
+              // Copy headers to netty response
+              headers.foreach {
+
+                case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
+                  getServletCookies(value).map {
+                    c => httpResponse.addCookie(c)
+                  }
+                }
+
+                case (name, value) => httpResponse.setHeader(name, value)
               }
 
-              case defaultResponse @ _ =>
-                Logger("play").trace("Default response: " + defaultResponse)
-                Logger("play").error("Unhandle default response: " + defaultResponse)
+              var hasError: AtomicBoolean = new AtomicBoolean(false)
 
-                httpResponse.setContentLength(0);
-                httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-                onHttpResponseComplete(execContext)
-            } // end match result
+              val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
+                Promise.pure(
+                  {
+                    if (hasError.get) {
+                      ()
+                    } else {
+                      getHttpResponse(execContext).getRichOutputStream.foreach { os =>
+                        os.write(r.writeable.transform(x))
+                        os.flush
+                      }
+                    }
+                  }).extend1 {
+                    case Redeemed(()) => ()
+                    case Thrown(ex) => {
+                      hasError.set(true)
+                      Logger("play").debug("Exception received while writing to client: " + ex.toString)
+                    }
+                  }
+              }
 
-          } // end case HttpServletResponse
+              val chunksIteratee = {
+                val writeIteratee = Iteratee.fold1(
+                  Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
 
-          case unexpected => Logger("play").error("Oops, unexpected message received in Play server (please report this problem): " + unexpected)
+                Enumeratee.breakE[r.BODY_CONTENT](_ => hasError.get)(writeIteratee).mapDone { _ =>
+                  onHttpResponseComplete(execContext)
+                }
+              }
 
-        } // end match getResponse
+              chunks(chunksIteratee)
+            }
+
+            case defaultResponse @ _ =>
+              Logger("play").trace("Default response: " + defaultResponse)
+              Logger("play").error("Unhandle default response: " + defaultResponse)
+
+              httpResponse.setContentLength(0);
+              httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+              onHttpResponseComplete(execContext)
+
+          } // end match result
+
+        } // end match foreach
+
       } // end handle method
+
     }
 
     // get handler for request
@@ -298,11 +300,12 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
             }
           }
 
-        lazy val bodyEnumerator = {
-          Enumerator.fromStream(getHttpRequest(execContext).getInputStream).andThen(Enumerator.enumInput(EOF))
-        }
+        lazy val bodyEnumerator = getHttpRequest(execContext).getRichInputStream.map { is =>
+          Enumerator.fromStream(is).andThen(Enumerator.eof)
+        }.getOrElse(Enumerator.eof)
 
-        val eventuallyResultOrBody = eventuallyBodyParser.flatMap(it => bodyEnumerator |>> it): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
+        val eventuallyResultOrBody = eventuallyBodyParser.flatMap(it =>
+          bodyEnumerator |>> it): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
 
         val eventuallyResultOrRequest =
           eventuallyResultOrBody
@@ -357,11 +360,21 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
   override def contextInitialized(e: ServletContextEvent) = {
     e.getServletContext.log("PlayServletWrapper > contextInitialized")
 
+    // See https://github.com/dlecan/play2-war-plugin/issues/54
+    // Store all handlers before Play Logger.configure(...)
+    val julHandlers: Option[Array[Handler]] = Option(java.util.logging.Logger.getLogger("")).map { root =>
+      root.getHandlers
+    }
+
     Logger.configure(Map.empty, Map.empty, Mode.Prod)
 
     val classLoader = getClass.getClassLoader;
 
-    Play2Servlet.playServer = new Play2WarServer(new WarApplication(classLoader, Mode.Prod))
+    val application = new WarApplication(classLoader, Mode.Prod, julHandlers)
+
+    Play2Servlet.configuration = application.get.right.map { _.configuration }.right.getOrElse(Configuration.empty)
+
+    Play2Servlet.playServer = new Play2WarServer(application)
   }
 
   override def contextDestroyed(e: ServletContextEvent) = {

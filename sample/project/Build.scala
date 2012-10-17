@@ -29,9 +29,6 @@ object ApplicationBuild extends Build {
   )
 
   lazy val common = PlayProject(appName + "common", appVersion, appDependencies, mainLang = SCALA, path = file("common"), settings = commonSettings ++ playProjectSettings)
-  /*dependsOn (core)
-
-  lazy val core = Project("core", file("core"))*/
 
   lazy val warProjectSettings = playProjectSettings ++ Play2WarPlugin.play2WarSettings ++ Seq(
     publishArtifact in (Compile, packageBin) := false

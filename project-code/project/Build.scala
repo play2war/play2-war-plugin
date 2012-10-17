@@ -49,7 +49,7 @@ object Build extends Build {
 
       libraryDependencies <++= (scalaVersion, sbtVersion) { (scalaVersion, sbtVersion) =>
         Seq(
-          "play" % "sbt-plugin" % play2Version extra ("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion))
+          "play" % "sbt-plugin" % play2Version % "provided->default(compile)" extra ("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion))
       }))
 
   lazy val play2WarIntegrationTests = Project(id = "integration-tests",
@@ -60,7 +60,7 @@ object Build extends Build {
 
       libraryDependencies += "org.scalatest" %% "scalatest" % "1.8" % "test",
       libraryDependencies += "junit" % "junit" % "4.10" % "test",
-      libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.2.3" % "test",
+      libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.2.4" % "test",
       libraryDependencies += "net.sourceforge.htmlunit" % "htmlunit" % "2.9" % "test",
 
       parallelExecution in Test := false,
@@ -94,7 +94,7 @@ object Build extends Build {
     val buildOrganization = "com.github.play2war"
     val defaultPlay2Version = "2.0.2"
     val play2Version = Option(System.getProperty("play2.version")).filterNot(_.isEmpty).getOrElse(defaultPlay2Version)
-    val buildVersion = "0.7.4"
+    val buildVersion = "0.8"
 
     val buildSettings = Defaults.defaultSettings ++ Seq(
       organization := buildOrganization,
