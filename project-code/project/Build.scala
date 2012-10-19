@@ -90,7 +90,8 @@ object Build extends Build {
 
   lazy val play2WarWebsocketTomcat = Project(id = "websocket-tomcat",
     base = file("websocket/tomcat"),
-    settings = commonSettings ++ Seq())
+    settings = commonSettings ++ Seq(
+      libraryDependencies += "org.apache.tomcat" % "tomcat-catalina" % "7.0.32"))
 
   lazy val play2WarWebsocketServlet31 = Project(id = "websocket-servlet31",
     base = file("websocket/servlet31"),
