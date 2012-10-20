@@ -5,16 +5,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.net.URLDecoder
 import java.util.logging.Handler
 
-import javax.servlet.ServletContext
 import javax.servlet.ServletContextEvent
 import javax.servlet.ServletContextListener
 import javax.servlet.http.{Cookie => ServletCookie}
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import play.api.Configuration
 import play.api.Logger
-import play.api.Mode
 import play.api.http.HeaderNames.CONTENT_LENGTH
 import play.api.http.HeaderNames.X_FORWARDED_FOR
 import play.api.libs.concurrent.Promise
@@ -36,7 +33,6 @@ import play.api.mvc.Result
 import play.api.mvc.Results
 import play.api.mvc.SimpleResult
 import play.api.mvc.WebSocket
->>>>>>> Package organisation
 
 import javax.servlet.ServletContextEvent
 import javax.servlet.ServletContextListener
