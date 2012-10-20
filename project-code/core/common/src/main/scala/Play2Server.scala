@@ -1,17 +1,15 @@
 package play.core.server.servlet
 
-import java.io._
+import java.io.File
 import java.util.logging.Handler
 
-import play.core._
-import play.core.server._
-import play.api._
-import play.api.mvc._
-import play.api.libs.iteratee._
-import play.api.libs.iteratee.Input._
-import play.api.libs.concurrent._
-
-import scala.collection.JavaConverters._
+import play.api.Application
+import play.api.Logger
+import play.api.Mode
+import play.api.Play
+import play.core.ApplicationProvider
+import play.core.server.Server
+import play.core.server.ServerWithStop
 
 class Play2WarServer(appProvider: WarApplication) extends Server with ServerWithStop {
 
