@@ -21,7 +21,7 @@ import server.Server
 import scala.collection.JavaConverters._
 
 object Play2Servlet {
-  val asyncTimeout = play.core.server.servlet.Play2Servlet.configuration.getInt("servlet30.asynctimeout").getOrElse(-1)
+  val asyncTimeout = Play2WarServer.configuration.getInt("servlet30.asynctimeout").getOrElse(-1)
   Logger("play").debug("Async timeout for HTTP requests: " + asyncTimeout + " seconds")
 }
 

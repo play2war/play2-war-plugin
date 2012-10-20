@@ -2,18 +2,14 @@ package play.core.server.servlet
 
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.logging.Handler
 
-import javax.servlet.ServletContext
 import javax.servlet.ServletContextEvent
 import javax.servlet.ServletContextListener
 import javax.servlet.http.{Cookie => ServletCookie}
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import play.api.Configuration
 import play.api.Logger
-import play.api.Mode
 import play.api.http.HeaderNames.CONTENT_LENGTH
 import play.api.http.HeaderNames.X_FORWARDED_FOR
 import play.api.libs.concurrent.Promise
@@ -35,11 +31,6 @@ import play.api.mvc.Result
 import play.api.mvc.Results
 import play.api.mvc.SimpleResult
 import play.api.mvc.WebSocket
-
-object Play2Servlet {
-  var playServer: Play2WarServer = null
-  var configuration: Configuration = null
-}
 
 /**
  * Mother class for all servlet implementations for Play2.
@@ -90,7 +81,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
     val execContext: T = onBeginService(servletRequest, servletResponse)
 
-    val server = Play2Servlet.playServer
+    val server = Play2WarServer.playServer
 
     //    val keepAlive -> non-sens
     //    val websocketableRequest -> non-sens
@@ -379,41 +370,21 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
   override def contextInitialized(e: ServletContextEvent) = {
     e.getServletContext.log("PlayServletWrapper > contextInitialized")
 
-    // See https://github.com/dlecan/play2-war-plugin/issues/54
-    // Store all handlers before Play Logger.configure(...)
-    val julHandlers: Option[Array[Handler]] = Option(java.util.logging.Logger.getLogger("")).map { root =>
-      root.getHandlers
-    }
-
-    Logger.configure(Map.empty, Map.empty, Mode.Prod)
-
-    val classLoader = getClass.getClassLoader;
-
-    val application = new WarApplication(classLoader, Mode.Prod, julHandlers)
-
-    Play2Servlet.configuration = application.get.right.map { _.configuration }.right.getOrElse(Configuration.empty)
-
-    Play2Servlet.playServer = new Play2WarServer(application)
+    // Init or get singleton
+    Play2WarServer
   }
 
   override def contextDestroyed(e: ServletContextEvent) = {
     e.getServletContext.log("PlayServletWrapper > contextDestroyed")
 
-    stopPlayServer(e.getServletContext)
+    Play2WarServer.stop(e.getServletContext)
   }
 
   override def destroy = {
     getServletContext.log("PlayServletWrapper > destroy")
 
-    stopPlayServer(getServletContext)
+    Play2WarServer.stop(getServletContext)
   }
 
-  private def stopPlayServer(sc: ServletContext) = {
-    Option(Play2Servlet.playServer).map {
-      s =>
-        s.stop()
-        Play2Servlet.playServer = null
-        sc.log("Play server stopped")
-    } // if playServer is null, nothing to do
-  }
+
 }
