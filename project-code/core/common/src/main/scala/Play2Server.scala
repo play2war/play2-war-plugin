@@ -41,6 +41,12 @@ object Play2WarServer {
       }
     }
   }
+
+  def handleRequest(requestHandler: RequestHandler) = {
+
+    requestHandler(playServer)
+
+  }
 }
 
 class Play2WarServer(appProvider: WarApplication) extends Server with ServerWithStop {
