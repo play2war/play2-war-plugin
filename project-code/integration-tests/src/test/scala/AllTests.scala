@@ -366,8 +366,8 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
   feature("The container must handle POST requests with 'multipart/form-data' enctype") {
     
-    // 2 routes to test
-    List("/upload", "/upload2").foreach {
+    // routes where to test file upload
+    List("/upload", "/upload2", "/uploadJava", "/uploadJava2").foreach {
       case (route) => {
 
         scenario("container sends an image to " + route) {
