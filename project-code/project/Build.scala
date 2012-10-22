@@ -66,7 +66,7 @@ object Build extends Build {
       parallelExecution in Test := false,
       testOptions in Test += Tests.Argument("-oD"),
       testOptions in Test += Tests.Argument("-Dwar.servlet30=" + servlet30SampleWarPath),
-	  testOptions in Test += Tests.Argument("-Dwar.servlet25=" + servlet25SampleWarPath),
+	    testOptions in Test += Tests.Argument("-Dwar.servlet25=" + servlet25SampleWarPath),
       testListeners <<= target.map(t => Seq(new eu.henkelmann.sbt.JUnitXmlTestsListener(t.getAbsolutePath)))))
 
   def commonSettings = buildSettings ++
@@ -79,15 +79,35 @@ object Build extends Build {
       publishArtifact in (Compile, packageDoc) := false,
       publishArtifact in Test := false,
 
-      //      publishTo := Some(Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish")) ),
-      //      publishTo <<= (version) {
-      //		version: String =>
-      //		  if (version.trim.endsWith("SNAPSHOT")) Some("snapshot" at cloudbees + "snapshot/")
-      //		  else                                   Some("release"  at cloudbees + "release/")
-      //	  },
-      //      credentials += Credentials(file("/private/play-war/.credentials")),
-      //      credentials += Credentials(file(Path.userHome.absolutePath + "/.ivy2/.credentials")),
-      publishMavenStyle := true)
+      // Publishing settings
+      // Snapshots : Ivy style
+      // Releases : Maven style
+
+      publishTo <<= (version) {
+        version: String =>
+          val repo = {
+      	    if (version.trim.endsWith("SNAPSHOT")) {
+              // Cloudbees repo
+              Resolver.url("snapshot",  url(cloudbees + "snapshot/"))(Resolver.ivyStylePatterns)
+
+              // To deploy locally with Ivy style
+              // Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish"))(Resolver.ivyStylePatterns)
+            } else {
+              // Cloudbees repo
+              Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish"))
+            }
+          }
+          Some(repo)
+      },
+      
+      credentials += Credentials(file("/private/play-war/.credentials")),
+      credentials += Credentials(file(Path.userHome.absolutePath + "/.ivy2/.credentials")),
+      
+      publishMavenStyle <<= (version) {
+        version: String =>
+          if (version.trim.endsWith("SNAPSHOT")) false
+          else                                   true
+      })
 
   object BuildSettings {
 
