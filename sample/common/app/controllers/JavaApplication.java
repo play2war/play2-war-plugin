@@ -27,7 +27,7 @@ public class JavaApplication extends Controller {
 
   @BodyParser.Of(BodyParser.MultipartFormData.class)
   public static Result upload2() {
-    upload();
+    return upload();
   }
 }
             
