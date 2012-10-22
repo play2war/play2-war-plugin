@@ -26,6 +26,9 @@ GET		/uploadForm					controllers.Application.uploadForm
 POST	/upload						controllers.Application.upload
 POST	/upload2					controllers.Application.upload2
 
+POST    /uploadJava                 controllers.JavaApplication.upload
+POST    /uploadJava2                controllers.JavaApplication.upload2
+
 GET     /clock                      controllers.Application.liveClock
 
 # Map static resources from the /public folder to the /assets URL path
