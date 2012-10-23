@@ -35,13 +35,8 @@ object ApplicationBuild extends Build {
     publishArtifact in (Compile, packageBin) := false
   )
 
-  // TODO: remove this ugly dependency
-  lazy val servletAppDependencies = appDependencies ++ Seq(
-    // "com.github.play2war" %% ("play2-war-core-common") % "0.9-SNAPSHOT"
-  )
+  lazy val servlet25 = PlayProject(appName + "servlet25", appVersion, appDependencies, mainLang = SCALA, path = file("servlet25"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "2.5")) dependsOn (common)
 
-  lazy val servlet25 = PlayProject(appName + "servlet25", appVersion, servletAppDependencies, mainLang = SCALA, path = file("servlet25"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "2.5")) dependsOn (common)
-
-  lazy val servlet30 = PlayProject(appName + "servlet30", appVersion, servletAppDependencies, mainLang = SCALA, path = file("servlet30"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "3.0")) dependsOn (common)
+  lazy val servlet30 = PlayProject(appName + "servlet30", appVersion, appDependencies, mainLang = SCALA, path = file("servlet30"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "3.0")) dependsOn (common)
 
 }
