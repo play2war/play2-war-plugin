@@ -31,19 +31,19 @@ object Build extends Build {
   lazy val play2WarCoreCommon = Project(id = "play2-war-core-common",
     base = file("core/common"),
     settings = commonSettings ++ Seq(
-      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api") exclude ("javax.servlet", "javax.servlet-api"),
+      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api"),
       libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default"))
 
   lazy val play2WarCoreservlet30 = Project(id = "play2-war-core-servlet30",
     base = file("core/servlet30"),
     settings = commonSettings ++ Seq(
-      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api") exclude ("javax.servlet", "javax.servlet-api"),
+      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api"),
       libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "provided->default")) dependsOn (play2WarCoreCommon)
 
   lazy val play2WarCoreservlet25 = Project(id = "play2-war-core-servlet25",
     base = file("core/servlet25"),
     settings = commonSettings ++ Seq(
-      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api") exclude ("javax.servlet", "javax.servlet-api"),
+      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api"),
       libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default")) dependsOn (play2WarCoreCommon)
 
   //
