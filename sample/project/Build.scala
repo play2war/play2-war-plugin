@@ -37,7 +37,7 @@ object ApplicationBuild extends Build {
 
   // TODO: remove this ugly dependency
   lazy val servletAppDependencies = appDependencies ++ Seq(
-    "com.github.play2war" %% ("play2-war-core-common") % "0.9-SNAPSHOT"
+    // "com.github.play2war" %% ("play2-war-core-common") % "0.9-SNAPSHOT"
   )
 
   lazy val servlet25 = PlayProject(appName + "servlet25", appVersion, servletAppDependencies, mainLang = SCALA, path = file("servlet25"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "2.5")) dependsOn (common)
