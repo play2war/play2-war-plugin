@@ -215,6 +215,8 @@ Create a file ``APP_HOME/conf/logger.xml`` with the following content :
   <root level="ERROR">
     <appender-ref ref="STDOUT" />
   </root>
+  
+</configuration>
 ```
 
 </configuration>
