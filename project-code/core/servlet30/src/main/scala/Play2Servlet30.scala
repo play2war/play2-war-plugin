@@ -6,6 +6,7 @@ import javax.servlet.http._
 import java.io._
 import java.util.concurrent.atomic._
 import java.util.Arrays
+import java.net.URLDecoder
 
 import play.api._
 import play.api.mvc._
@@ -46,7 +47,16 @@ class Play2Servlet extends play.core.server.servlet.Play2Servlet[Tuple2[AsyncCon
   }
 
   protected override def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
-    Map.empty[String, Seq[String]] ++ request.getParameterMap.asScala.mapValues(Arrays.asList(_: _*).asScala)
+    request.getQueryString match {
+      case null|"" => Map.empty
+      case queryString => queryString.replaceFirst("^?", "").split("&").map(_.split("=")).map { array => 
+        array.length match {
+          case 0 => None
+          case 1 => Some(URLDecoder.decode(array(0), "UTF-8") -> "")
+          case _ => Some(URLDecoder.decode(array(0), "UTF-8") -> URLDecoder.decode(array(1), "UTF-8"))
+        }
+      }.flatten.groupBy(_._1).map { case (key, value) => key -> value.map(_._2).toSeq }.toMap
+    }
   }
 
   protected override def getHttpRequest(execContext: Tuple2[AsyncContext, AsyncListener]): RichHttpServletRequest = {
