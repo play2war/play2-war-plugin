@@ -20,7 +20,7 @@ GET     /bigContent                 controllers.Application.bigContent
 GET     /chunkedBigContent          controllers.Application.chunkedBigContent
 
 GET		/echo						controllers.Application.echo
-POST	/echo						controllers.Application.echo
+POST	/echo2						controllers.Application.echo2
 
 GET		/uploadForm					controllers.Application.uploadForm
 POST	/upload						controllers.Application.upload
