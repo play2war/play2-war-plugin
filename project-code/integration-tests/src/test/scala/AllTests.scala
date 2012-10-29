@@ -183,11 +183,11 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
    ******************
    */
 
-  feature("The container should query parameters") {
+  feature("The container should handle GET/POST parameters") {
 
     scenario("Container reads GET parameters") {
 
-      val page = givenWhenGet("a page", "/echo", parameters = Map("param1" -> "value1", "param2" -> "value2"))
+      val page = givenWhenGet("a page", "/echoGetParameters", parameters = Map("param1" -> "value1", "param2" -> "value2"))
 
       then("page body should contain parameters values")
       page.map { p =>
@@ -202,7 +202,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
     scenario("Container reads POST parameters") {
 
-      val page = givenWhenGet("a page", "/echo", method = "POST", parameters = Map("param1" -> "value1", "param2" -> "value2"))
+      val page = givenWhenGet("a page", "/echoPostParameters", method = "POST", parameters = Map("param1" -> "value1", "param2" -> "value2"))
 
       then("page body should contain parameters values")
       page.map { p =>

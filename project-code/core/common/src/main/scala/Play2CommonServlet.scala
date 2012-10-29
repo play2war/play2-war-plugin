@@ -16,6 +16,7 @@ import play.core._
 import server.Server
 import scala.collection.JavaConverters._
 import java.util.concurrent.atomic.AtomicBoolean
+import java.net.URLDecoder
 
 object Play2Servlet {
   var playServer: Play2WarServer = null
@@ -26,8 +27,6 @@ object Play2Servlet {
  * Mother class for all servlet implementations for Play2.
  */
 abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
-
-  protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]]
 
   protected def getPlayHeaders(request: HttpServletRequest): Headers
 
@@ -355,6 +354,19 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
     onFinishService(execContext)
 
+  }
+
+  protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
+    request.getQueryString match {
+      case null | "" => Map.empty
+      case queryString => queryString.replaceFirst("^?", "").split("&").map(_.split("=")).map { array =>
+        array.length match {
+          case 0 => None
+          case 1 => Some(URLDecoder.decode(array(0), "UTF-8") -> "")
+          case _ => Some(URLDecoder.decode(array(0), "UTF-8") -> URLDecoder.decode(array(1), "UTF-8"))
+        }
+      }.flatten.groupBy(_._1).map { case (key, value) => key -> value.map(_._2).toSeq }.toMap
+    }
   }
 
   override def contextInitialized(e: ServletContextEvent) = {

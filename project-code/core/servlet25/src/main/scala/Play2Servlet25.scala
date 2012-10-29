@@ -4,6 +4,7 @@ import javax.servlet._
 import javax.servlet.http._
 import java.io._
 import java.util.Arrays
+import java.net.URLDecoder
 
 import play.api._
 import play.api.mvc._
@@ -42,11 +43,6 @@ class Play2Servlet extends play.core.server.servlet.Play2Servlet[Tuple3[HttpServ
     execContext._3.synchronized {
       execContext._3.notify()
     }
-  }
-  
-  protected override def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
-    val parameterMap = request.getParameterMap.asInstanceOf[java.util.Map[String, Array[String]]].asScala
-	Map.empty[String, Seq[String]] ++ parameterMap.mapValues(Arrays.asList(_: _*).asScala)
   }
   
   protected override def getHttpRequest(executionContext: Tuple3[HttpServletRequest, HttpServletResponse, Object]): RichHttpServletRequest = {
