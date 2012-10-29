@@ -37,8 +37,6 @@ import play.api.mvc.WebSocket
  */
 abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
-  protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]]
-
   protected def getPlayHeaders(request: HttpServletRequest): Headers
 
   protected def getPlayCookies(request: HttpServletRequest): Cookies
@@ -365,6 +363,19 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
     onFinishService(execContext)
 
+  }
+
+  protected override def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
+    request.getQueryString match {
+      case null|"" => Map.empty
+      case queryString => queryString.replaceFirst("^?", "").split("&").map(_.split("=")).map { array =>
+        array.length match {
+          case 0 => None
+          case 1 => Some(URLDecoder.decode(array(0), "UTF-8") -> "")
+          case _ => Some(URLDecoder.decode(array(0), "UTF-8") -> URLDecoder.decode(array(1), "UTF-8"))
+        }
+      }.flatten.groupBy(_._1).map { case (key, value) => key -> value.map(_._2).toSeq }.toMap
+    }
   }
 
   override def contextInitialized(e: ServletContextEvent) = {
