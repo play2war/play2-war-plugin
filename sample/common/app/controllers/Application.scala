@@ -120,11 +120,11 @@ object Application extends Controller {
     Ok.stream(dataContent >>> Enumerator.eof)
   }
 
-  def echo = Action { request =>
+  def echoGetParameters = Action { request =>
     Ok(views.html.echo(request.queryString))
   }
   
-  def echo2 = Action { request =>
+  def echoPostParameters = Action { request =>
     Ok(views.html.echo(request.body.asFormUrlEncoded.get))
   }
   
