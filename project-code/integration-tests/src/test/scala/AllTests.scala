@@ -183,7 +183,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
    ******************
    */
 
-  feature("The container should query parameters") {
+  feature("The container should handle GET/POST parameters") {
 
     scenario("Container reads GET parameters") {
 
