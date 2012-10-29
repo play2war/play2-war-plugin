@@ -16,6 +16,7 @@ import play.core._
 import server.Server
 import scala.collection.JavaConverters._
 import java.util.concurrent.atomic.AtomicBoolean
+import java.net.URLDecoder
 
 object Play2Servlet {
   var playServer: Play2WarServer = null
@@ -355,7 +356,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
   }
 
-  protected override def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
+  protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
     request.getQueryString match {
       case null | "" => Map.empty
       case queryString => queryString.replaceFirst("^?", "").split("&").map(_.split("=")).map { array =>
