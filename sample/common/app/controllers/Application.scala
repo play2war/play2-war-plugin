@@ -124,6 +124,10 @@ object Application extends Controller {
     Ok(views.html.echo(request.queryString))
   }
   
+  def echo2 = Action { request =>
+    Ok(views.html.echo(request.body.asFormUrlEncoded.get))
+  }
+  
   def uploadForm = Action { 
     Ok(views.html.uploadForm())
   }
