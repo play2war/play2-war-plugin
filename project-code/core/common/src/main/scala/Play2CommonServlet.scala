@@ -2,6 +2,7 @@ package play.core.server.servlet
 
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.atomic.AtomicBoolean
+import java.net.URLDecoder
 
 import javax.servlet.ServletContextEvent
 import javax.servlet.ServletContextListener
@@ -365,7 +366,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
   }
 
-  protected override def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
+  protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
     request.getQueryString match {
       case null | "" => Map.empty
       case queryString => queryString.replaceFirst("^?", "").split("&").map(_.split("=")).map { array =>
