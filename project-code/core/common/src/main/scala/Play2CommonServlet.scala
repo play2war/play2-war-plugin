@@ -367,7 +367,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
   protected override def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
     request.getQueryString match {
-      case null|"" => Map.empty
+      case null | "" => Map.empty
       case queryString => queryString.replaceFirst("^?", "").split("&").map(_.split("=")).map { array =>
         array.length match {
           case 0 => None
