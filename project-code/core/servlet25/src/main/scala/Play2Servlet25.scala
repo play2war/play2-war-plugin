@@ -14,7 +14,7 @@ import play.api.libs.iteratee._
 import play.api.libs.iteratee.Input._
 import play.api.libs.concurrent._
 import play.core._
-import play.core.server.servlet._
+import play.core.server.servlet.{Play2Servlet =>_, _}
 import play.core.server.servlet25.Play2Servlet._
 import server.Server
 
