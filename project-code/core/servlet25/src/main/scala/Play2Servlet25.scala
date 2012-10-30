@@ -22,9 +22,10 @@ import scala.collection.JavaConverters._
 
 object Play2Servlet {
 
-  // 30 minutes in milliseconds
-  // val WAIT_TIMEOUT = 30 * 60 * 1000
-  val WAIT_TIMEOUT = 10 * 1000
+  val DEFAULT_TIMEOUT = 10 * 1000
+  
+  val syncTimeout = play.core.server.servlet.Play2Servlet.configuration.getInt("servlet25.synctimeout").getOrElse(DEFAULT_TIMEOUT)
+  Logger("play").debug("Sync timeout for HTTP requests: " + syncTimeout + " seconds")
 }
 
 class Play2Servlet extends play.core.server.servlet.Play2Servlet[Tuple3[HttpServletRequest, HttpServletResponse, Object]] with Helpers {
@@ -35,7 +36,7 @@ class Play2Servlet extends play.core.server.servlet.Play2Servlet[Tuple3[HttpServ
 
   protected override def onFinishService(execContext: Tuple3[HttpServletRequest, HttpServletResponse, Object]) = {
     execContext._3.synchronized {
-      execContext._3.wait(WAIT_TIMEOUT)
+      execContext._3.wait(Play2Servlet.syncTimeout)
     }
   }
   
