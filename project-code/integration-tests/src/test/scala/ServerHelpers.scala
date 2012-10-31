@@ -64,7 +64,11 @@ trait CargoContainerManager extends BeforeAndAfterAll {
 
     println("WAR file to deploy: " + warPath)
 
-    val containerUrlToDownload: String = containerFileNameInCloudbeesCache.map(c => "file:///private/play-war/cargo-containers/" + c).getOrElse(containerUrl)
+    val containerUrlToDownload: String = containerFileNameInCloudbeesCache.flatMap { c =>
+      val path = "file:///private/play-war/cargo-containers/" + c
+      if (new File(path).exists) Option(path)
+      else None
+    }.getOrElse(containerUrl)
 
     println("Download container " + containerName + " from " + containerUrlToDownload + " ...")
     val installer = new ZipURLInstaller(new URL(containerUrlToDownload))
