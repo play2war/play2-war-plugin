@@ -66,7 +66,7 @@ import play.api.mvc.WebSocket
 /**
  * Mother class for all servlet implementations for Play2.
  */
-abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
+abstract class GenericPlay2Servlet[T] extends HttpServlet with ServletContextListener {
 
   protected def getPlayHeaders(request: HttpServletRequest): Headers
 
@@ -427,6 +427,5 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
     Play2WarServer.stop(getServletContext)
   }
-
 
 }
