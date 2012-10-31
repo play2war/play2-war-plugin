@@ -183,11 +183,11 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
    ******************
    */
 
-  feature("The container should query parameters") {
+  feature("The container should handle GET/POST parameters") {
 
     scenario("Container reads GET parameters") {
 
-      val page = givenWhenGet("a page", "/echo", parameters = Map("param1" -> "value1", "param2" -> "value2"))
+      val page = givenWhenGet("a page", "/echoGetParameters", parameters = Map("param1" -> "value1", "param2" -> "value2"))
 
       then("page body should contain parameters values")
       page.map { p =>
@@ -202,7 +202,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
     scenario("Container reads POST parameters") {
 
-      val page = givenWhenGet("a page", "/echo", method = "POST", parameters = Map("param1" -> "value1", "param2" -> "value2"))
+      val page = givenWhenGet("a page", "/echoPostParameters", method = "POST", parameters = Map("param1" -> "value1", "param2" -> "value2"))
 
       then("page body should contain parameters values")
       page.map { p =>
@@ -366,8 +366,8 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
   feature("The container must handle POST requests with 'multipart/form-data' enctype") {
     
-    // 2 routes to test
-    List("/upload", "/upload2").foreach {
+    // routes where to test file upload
+    List("/upload", "/upload2", "/uploadJava", "/uploadJava2").foreach {
       case (route) => {
 
         scenario("container sends an image to " + route) {
@@ -420,6 +420,7 @@ class Tomcat7027Tests extends AbstractTomcat7x {
 @RunWith(classOf[JUnitRunner])
 class Tomcat6xTests extends AbstractPlay2WarTests with Servlet25Container {
   override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-6/v6.0.35/bin/apache-tomcat-6.0.35.tar.gz"
+  override def containerFileNameInCloudbeesCache = Option("apache-tomcat-6.0.35.tar.gz")
   override def containerName = "tomcat6x"
 }
 
@@ -431,17 +432,26 @@ class Tomcat7027Tests extends AbstractTomcat7x {
 @RunWith(classOf[JUnitRunner])
 class Jetty7xTests extends AbstractPlay2WarTests with Servlet25Container {
   override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/7.6.5.v20120716/jetty-distribution-7.6.5.v20120716.tar.gz"
+  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-7.6.5.v20120716.tar.gz")
   override def containerName = "jetty7x"
 }
 
+// @RunWith(classOf[JUnitRunner])
+// class Tomcat7029Tests extends AbstractTomcat7x {
+//   override def tomcatVersion = "7.0.29"
+//   override def containerFileNameInCloudbeesCache = Option("apache-tomcat-7.0.29.zip")
+// }
+
 @RunWith(classOf[JUnitRunner])
 class Tomcat7029Tests extends AbstractTomcat7x {
-  override def tomcatVersion = "7.0.29"
+  override def tomcatVersion = "7.0.32"
+  override def containerFileNameInCloudbeesCache = Option("apache-tomcat-7.0.32.zip")
 }
 
 @RunWith(classOf[JUnitRunner])
 class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container {
   override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
+  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-8.1.3.v20120416.tar.gz")
   override def containerName = "jetty8x"
 }
 

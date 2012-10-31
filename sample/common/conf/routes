@@ -19,12 +19,15 @@ GET     /internalServerError        controllers.Application.internalServerError
 GET     /bigContent                 controllers.Application.bigContent
 GET     /chunkedBigContent          controllers.Application.chunkedBigContent
 
-GET		/echo						controllers.Application.echo
-POST	/echo						controllers.Application.echo
+GET     /echoGetParameters          controllers.Application.echoGetParameters
+POST    /echoPostParameters         controllers.Application.echoPostParameters
 
-GET		/uploadForm					controllers.Application.uploadForm
-POST	/upload						controllers.Application.upload
-POST	/upload2					controllers.Application.upload2
+GET     /uploadForm                 controllers.Application.uploadForm
+POST    /upload                     controllers.Application.upload
+POST    /upload2                    controllers.Application.upload2
+
+POST    /uploadJava                 controllers.JavaApplication.upload
+POST    /uploadJava2                controllers.JavaApplication.upload2
 
 GET     /clock                      controllers.Application.liveClock
 
