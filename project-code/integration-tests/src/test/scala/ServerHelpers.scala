@@ -26,19 +26,19 @@ import java.io.File
 trait ServletContainer {
 
   protected val WAR_KEY = "war.servlet"
-  
+
   def keyServletContainer: String
-  
+
   def keyWarPath: String = WAR_KEY + keyServletContainer
-  
+
 }
 
 trait Servlet30Container extends ServletContainer {
-    def keyServletContainer = "30"
+  def keyServletContainer = "30"
 }
 
 trait Servlet25Container extends ServletContainer {
-    def keyServletContainer = "25"
+  def keyServletContainer = "25"
 }
 
 trait CargoContainerManager extends BeforeAndAfterAll {
@@ -55,7 +55,7 @@ trait CargoContainerManager extends BeforeAndAfterAll {
   def containerName: String
 
   def context = "/"
-  
+
   def keyWarPath: String
 
   abstract override def beforeAll(configMap: Map[String, Any]) {
