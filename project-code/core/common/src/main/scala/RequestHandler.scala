@@ -1,6 +1,6 @@
 package play.core.server.servlet
 
-import javax.servlet.http.{Cookie => ServletCookie}
+import javax.servlet.http.{ Cookie => ServletCookie }
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import play.api.mvc.Cookies
@@ -27,6 +27,7 @@ import play.api.mvc.Request
 import play.api.http.HeaderNames.CONTENT_LENGTH
 import play.api.http.HeaderNames.X_FORWARDED_FOR
 import java.io.ByteArrayOutputStream
+import java.net.URLDecoder
 
 trait RequestHandler {
 
@@ -74,10 +75,10 @@ trait HttpServletRequestHandler[T] extends RequestHandler {
 
 }
 
-abstract class Play2GenericServletRequestHandler[T] (val servletRequest: HttpServletRequest, val servletResponse: HttpServletResponse) extends HttpServletRequestHandler[T] {
-  
+abstract class Play2GenericServletRequestHandler[T](val servletRequest: HttpServletRequest, val servletResponse: HttpServletResponse) extends HttpServletRequestHandler[T] {
+
   override def apply(server: Play2WarServer) = {
-    
+
     val execContext: T = onBeginService(servletRequest, servletResponse)
 
     val server = Play2WarServer.playServer
@@ -363,8 +364,20 @@ abstract class Play2GenericServletRequestHandler[T] (val servletRequest: HttpSer
     }
 
     onFinishService(execContext)
-    
-    
+
   }
-  
+
+  override protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
+    request.getQueryString match {
+      case null | "" => Map.empty
+      case queryString => queryString.replaceFirst("^?", "").split("&").map(_.split("=")).map { array =>
+        array.length match {
+          case 0 => None
+          case 1 => Some(URLDecoder.decode(array(0), "UTF-8") -> "")
+          case _ => Some(URLDecoder.decode(array(0), "UTF-8") -> URLDecoder.decode(array(1), "UTF-8"))
+        }
+      }.flatten.groupBy(_._1).map { case (key, value) => key -> value.map(_._2).toSeq }.toMap
+    }
+  }
+
 }
