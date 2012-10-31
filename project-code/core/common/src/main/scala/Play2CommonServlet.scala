@@ -2,6 +2,37 @@ package play.core.server.servlet
 
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.atomic.AtomicBoolean
+import java.net.URLDecoder
+import java.util.logging.Handler
+
+import javax.servlet.ServletContextEvent
+import javax.servlet.ServletContextListener
+import javax.servlet.http.{Cookie => ServletCookie}
+import javax.servlet.http.HttpServlet
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+import play.api.Logger
+import play.api.http.HeaderNames.CONTENT_LENGTH
+import play.api.http.HeaderNames.X_FORWARDED_FOR
+import play.api.libs.concurrent.Promise
+import play.api.libs.concurrent.Redeemed
+import play.api.libs.concurrent.Thrown
+import play.api.libs.iteratee.Enumeratee
+import play.api.libs.iteratee.Enumerator
+import play.api.libs.iteratee.Iteratee
+import play.api.mvc.Action
+import play.api.mvc.AsyncResult
+import play.api.mvc.ChunkedResult
+import play.api.mvc.Cookies
+import play.api.mvc.Headers
+import play.api.mvc.Request
+import play.api.mvc.RequestHeader
+import play.api.mvc.Response
+import play.api.mvc.ResponseHeader
+import play.api.mvc.Result
+import play.api.mvc.Results
+import play.api.mvc.SimpleResult
+import play.api.mvc.WebSocket
 
 import javax.servlet.ServletContextEvent
 import javax.servlet.ServletContextListener
@@ -36,8 +67,6 @@ import play.api.mvc.WebSocket
  * Mother class for all servlet implementations for Play2.
  */
 abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
-
-  protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]]
 
   protected def getPlayHeaders(request: HttpServletRequest): Headers
 
@@ -365,6 +394,29 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
     onFinishService(execContext)
 
+  }
+
+  protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
+    request.getQueryString match {
+      case null | "" => Map.empty
+      case queryString => queryString.replaceFirst("^?", "").split("&").map(_.split("=")).map { array =>
+        array.length match {
+          case 0 => None
+          case 1 => Some(URLDecoder.decode(array(0), "UTF-8") -> "")
+          case _ => Some(URLDecoder.decode(array(0), "UTF-8") -> URLDecoder.decode(array(1), "UTF-8"))
+        }
+      }.flatten.groupBy(_._1).map { case (key, value) => key -> value.map(_._2).toSeq }.toMap
+    }
+  }
+
+  override def contextInitialized(e: ServletContextEvent) = {
+    e.getServletContext.log("PlayServletWrapper > contextInitialized")
+
+    // See https://github.com/dlecan/play2-war-plugin/issues/54
+    // Store all handlers before Play Logger.configure(...)
+    val julHandlers: Option[Array[Handler]] = Option(java.util.logging.Logger.getLogger("")).map { root =>
+      root.getHandlers
+    }
   }
 
   override def contextInitialized(e: ServletContextEvent) = {

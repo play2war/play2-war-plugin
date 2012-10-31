@@ -18,7 +18,11 @@ trait Play2WarSettings {
       Seq("com.github.play2war" %% ("play2-war-core-servlet" + servletVersionString) % com.github.play2war.plugin.Play2WarVersion.current)
     },
     
-    resolvers ++= Seq("Play2war plugin" at "http://repository-play-war.forge.cloudbees.com/release/"),
+    resolvers ++= Seq(
+      // Releases
+      "Play2war plugin" at "http://repository-play-war.forge.cloudbees.com/release/",
+      // Snapshots
+      Resolver.url("Play2war plugin snapshot", url("http://repository-play-war.forge.cloudbees.com/snapshot/"))(Resolver.ivyStylePatterns)),
 
     webappResource <<= baseDirectory / "war",
 

@@ -6,6 +6,7 @@ import javax.servlet.http._
 import java.io._
 import java.util.concurrent.atomic._
 import java.util.Arrays
+import java.net.URLDecoder
 
 import play.api._
 import play.api.mvc._
@@ -43,10 +44,6 @@ class Play2Servlet extends play.core.server.servlet.Play2Servlet[Tuple2[AsyncCon
 
   protected override def onHttpResponseComplete(execContext: Tuple2[AsyncContext, AsyncListener]) = {
     execContext._1.complete
-  }
-
-  protected override def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
-    Map.empty[String, Seq[String]] ++ request.getParameterMap.asScala.mapValues(Arrays.asList(_: _*).asScala)
   }
 
   protected override def getHttpRequest(execContext: Tuple2[AsyncContext, AsyncListener]): RichHttpServletRequest = {
