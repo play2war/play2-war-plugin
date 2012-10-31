@@ -16,8 +16,9 @@ import play.core._
 import server.Server
 import scala.collection.JavaConverters._
 import java.util.concurrent.atomic.AtomicBoolean
+import java.net.URLDecoder
 
-object Play2Servlet {
+object GenericPlay2Servlet {
   var playServer: Play2WarServer = null
   var configuration: Configuration = null
 }
@@ -25,9 +26,7 @@ object Play2Servlet {
 /**
  * Mother class for all servlet implementations for Play2.
  */
-abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
-
-  protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]]
+abstract class GenericPlay2Servlet[T] extends HttpServlet with ServletContextListener {
 
   protected def getPlayHeaders(request: HttpServletRequest): Headers
 
@@ -71,7 +70,7 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
     val execContext: T = onBeginService(servletRequest, servletResponse)
 
-    val server = Play2Servlet.playServer
+    val server = GenericPlay2Servlet.playServer
 
     //    val keepAlive -> non-sens
     //    val websocketableRequest -> non-sens
@@ -357,6 +356,19 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
   }
 
+  protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
+    request.getQueryString match {
+      case null | "" => Map.empty
+      case queryString => queryString.replaceFirst("^?", "").split("&").map(_.split("=")).map { array =>
+        array.length match {
+          case 0 => None
+          case 1 => Some(URLDecoder.decode(array(0), "UTF-8") -> "")
+          case _ => Some(URLDecoder.decode(array(0), "UTF-8") -> URLDecoder.decode(array(1), "UTF-8"))
+        }
+      }.flatten.groupBy(_._1).map { case (key, value) => key -> value.map(_._2).toSeq }.toMap
+    }
+  }
+
   override def contextInitialized(e: ServletContextEvent) = {
     e.getServletContext.log("PlayServletWrapper > contextInitialized")
 
@@ -372,9 +384,9 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
 
     val application = new WarApplication(classLoader, Mode.Prod, julHandlers)
 
-    Play2Servlet.configuration = application.get.right.map { _.configuration }.right.getOrElse(Configuration.empty)
+    GenericPlay2Servlet.configuration = application.get.right.map { _.configuration }.right.getOrElse(Configuration.empty)
 
-    Play2Servlet.playServer = new Play2WarServer(application)
+    GenericPlay2Servlet.playServer = new Play2WarServer(application)
   }
 
   override def contextDestroyed(e: ServletContextEvent) = {
@@ -390,10 +402,10 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
   }
 
   private def stopPlayServer(sc: ServletContext) = {
-    Option(Play2Servlet.playServer).map {
+    Option(GenericPlay2Servlet.playServer).map {
       s =>
         s.stop()
-        Play2Servlet.playServer = null
+        GenericPlay2Servlet.playServer = null
         sc.log("Play server stopped")
     } // if playServer is null, nothing to do
   }

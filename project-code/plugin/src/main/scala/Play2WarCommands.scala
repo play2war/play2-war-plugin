@@ -43,6 +43,13 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
     (packaged, dependencies, target, id, version, webappResource, s, servletVersion) =>
 
       s.log.info("Build WAR package for servlet container: " + servletVersion)
+
+      if(dependencies.exists(_.data.name.contains("play2-war-core-common"))) {
+        s.log.debug("play2-war-core-common found in dependencies!")
+      } else {
+        s.log.error("play2-war-core-common not found in dependencies!")
+        throw new IllegalArgumentException("play2-war-core-common not found in dependencies!")
+      }
     
       import sbt.NameFilter._
 

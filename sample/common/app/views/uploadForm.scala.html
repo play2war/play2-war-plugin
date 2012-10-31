@@ -16,7 +16,31 @@
 		<div class="span8">
 			@form(action = routes.Application.upload, 'enctype -> "multipart/form-data") {
 				<input type="file" name="uploadedFile" />
-				<input type="submit" value="Upload" />
+				<input type="submit" value="Upload (Scala)" />
+			}
+		</div><!-- /.span -->
+	  </div><!-- /.row -->
+	  <div class="row">
+		<div class="span8">
+			@form(action = routes.Application.upload2, 'enctype -> "multipart/form-data") {
+				<input type="file" name="uploadedFile" />
+				<input type="submit" value="Upload2 (Scala)" />
+			}
+		</div><!-- /.span -->
+	  </div><!-- /.row -->
+	  <div class="row">
+		<div class="span8">
+			@form(action = routes.JavaApplication.upload, 'enctype -> "multipart/form-data") {
+				<input type="file" name="uploadedFile" />
+				<input type="submit" value="Upload (Java)" />
+			}
+		</div><!-- /.span -->
+	  </div><!-- /.row -->
+	  <div class="row">
+		<div class="span8">
+			@form(action = routes.JavaApplication.upload2, 'enctype -> "multipart/form-data") {
+				<input type="file" name="uploadedFile" />
+				<input type="submit" value="Upload2 (Java)" />
 			}
 		</div><!-- /.span -->
 	  </div><!-- /.row -->

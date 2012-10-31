@@ -10,7 +10,8 @@ object ApplicationBuild extends Build {
 
   lazy val commonSettings = Defaults.defaultSettings ++ Seq(
     //      resolvers += "Local Repository" at "http://localhost:8090/publish",
-    resolvers += (Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns)),
+    resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns),
+    resolvers += Resolver.url("Play2war plugin snapshot", url("http://repository-play-war.forge.cloudbees.com/snapshot/"))(Resolver.ivyStylePatterns),
 
     publishArtifact in (Compile, packageDoc) := false,
     publishArtifact in (Compile, packageSrc) := false,
@@ -35,7 +36,7 @@ object ApplicationBuild extends Build {
   )
 
   lazy val servlet25 = PlayProject(appName + "servlet25", appVersion, appDependencies, mainLang = SCALA, path = file("servlet25"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "2.5")) dependsOn (common)
-  
+
   lazy val servlet30 = PlayProject(appName + "servlet30", appVersion, appDependencies, mainLang = SCALA, path = file("servlet30"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "3.0")) dependsOn (common)
 
 }
