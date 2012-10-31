@@ -412,16 +412,6 @@ abstract class Play2Servlet[T] extends HttpServlet with ServletContextListener {
   override def contextInitialized(e: ServletContextEvent) = {
     e.getServletContext.log("PlayServletWrapper > contextInitialized")
 
-    // See https://github.com/dlecan/play2-war-plugin/issues/54
-    // Store all handlers before Play Logger.configure(...)
-    val julHandlers: Option[Array[Handler]] = Option(java.util.logging.Logger.getLogger("")).map { root =>
-      root.getHandlers
-    }
-  }
-
-  override def contextInitialized(e: ServletContextEvent) = {
-    e.getServletContext.log("PlayServletWrapper > contextInitialized")
-
     // Init or get singleton
     Play2WarServer
   }
