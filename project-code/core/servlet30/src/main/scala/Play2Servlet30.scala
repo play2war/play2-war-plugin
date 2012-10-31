@@ -1,34 +1,28 @@
 package play.core.server.servlet30
 
-import javax.servlet._
-import javax.servlet.annotation._
-import javax.servlet.http._
-import java.io._
-import java.util.concurrent.atomic._
-import java.util.Arrays
-import java.net.URLDecoder
+import java.io.InputStream
+import java.io.OutputStream
+import java.util.concurrent.atomic.AtomicBoolean
 
-import play.api._
-import play.api.mvc._
-import play.api.http._
-import play.api.http.HeaderNames._
-import play.api.libs.iteratee._
-import play.api.libs.iteratee.Input._
-import play.api.libs.concurrent._
-import play.core._
-import play.core.server.servlet._
-import server.Server
-
-import scala.collection.JavaConverters._
+import javax.servlet.AsyncContext
+import javax.servlet.AsyncEvent
+import javax.servlet.annotation.WebListener
+import javax.servlet.annotation.WebServlet
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+import play.api.Logger
+import play.core.server.servlet.GenericPlay2Servlet
+import play.core.server.servlet.RichHttpServletRequest
+import play.core.server.servlet.RichHttpServletResponse
 
 object Play2Servlet {
-  val asyncTimeout = play.core.server.servlet.Play2Servlet.configuration.getInt("servlet30.asynctimeout").getOrElse(-1)
+  val asyncTimeout = GenericPlay2Servlet.configuration.getInt("servlet30.asynctimeout").getOrElse(-1)
   Logger("play").debug("Async timeout for HTTP requests: " + asyncTimeout + " seconds")
 }
 
 @WebServlet(name = "Play", urlPatterns = Array { "/" }, asyncSupported = true)
 @WebListener
-class Play2Servlet extends play.core.server.servlet.Play2Servlet[Tuple2[AsyncContext, AsyncListener]] with Helpers {
+class Play2Servlet extends GenericPlay2Servlet[Tuple2[AsyncContext, AsyncListener]] with Helpers {
 
   protected override def onBeginService(request: HttpServletRequest, response: HttpServletResponse): Tuple2[AsyncContext, AsyncListener] = {
     val asyncListener = new AsyncListener(request.toString)
