@@ -49,7 +49,7 @@ object Play2WarServer {
   }
 }
 
-class Play2WarServer(appProvider: WarApplication) extends Server with ServerWithStop {
+private[servlet] class Play2WarServer(appProvider: WarApplication) extends Server with ServerWithStop {
 
   def mode = appProvider.mode
 
@@ -72,7 +72,7 @@ class Play2WarServer(appProvider: WarApplication) extends Server with ServerWith
   }
 }
 
-class WarApplication(val classLoader: ClassLoader, val mode: Mode.Mode, val julHandlers: Option[Array[Handler]]) extends ApplicationProvider {
+private[servlet]class WarApplication(val classLoader: ClassLoader, val mode: Mode.Mode, val julHandlers: Option[Array[Handler]]) extends ApplicationProvider {
 
   val applicationPath = Option(System.getProperty("user.home")).map(new File(_)).getOrElse(new File(""))
 
