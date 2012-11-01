@@ -35,7 +35,7 @@ trait RequestHandler {
 
 }
 
-trait HttpServletRequestHandler[T] extends RequestHandler {
+trait HttpServletRequestHandler extends RequestHandler {
 
   protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]]
 
@@ -51,35 +51,28 @@ trait HttpServletRequestHandler[T] extends RequestHandler {
   /**
    * Get HTTP request.
    */
-  protected def getHttpRequest(execContext: T): RichHttpServletRequest
+  protected def getHttpRequest(): RichHttpServletRequest
 
   /**
    * Get HTTP response.
    */
-  protected def getHttpResponse(execContext: T): RichHttpServletResponse
-
-  /**
-   * Call just after service(...).
-   */
-  protected def onBeginService(request: HttpServletRequest, response: HttpServletResponse): T
+  protected def getHttpResponse(): RichHttpServletResponse
 
   /**
    * Call just before end of service(...).
    */
-  protected def onFinishService(execContext: T): Unit
+  protected def onFinishService(): Unit
 
   /**
    * Call every time the HTTP response must be terminated (completed).
    */
-  protected def onHttpResponseComplete(execContext: T): Unit
+  protected def onHttpResponseComplete(): Unit
 
 }
 
-abstract class Play2GenericServletRequestHandler[T](val servletRequest: HttpServletRequest, val servletResponse: HttpServletResponse) extends HttpServletRequestHandler[T] {
+abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServletRequest, val servletResponse: HttpServletResponse) extends HttpServletRequestHandler {
 
   override def apply(server: Play2WarServer) = {
-
-    val execContext: T = onBeginService(servletRequest, servletResponse)
 
     val server = Play2WarServer.playServer
 
@@ -123,7 +116,7 @@ abstract class Play2GenericServletRequestHandler[T](val servletRequest: HttpServ
 
       def handle(result: Result) {
 
-        getHttpResponse(execContext).getHttpServletResponse.foreach { httpResponse =>
+        getHttpResponse().getHttpServletResponse.foreach { httpResponse =>
 
           result match {
 
@@ -164,7 +157,7 @@ abstract class Play2GenericServletRequestHandler[T](val servletRequest: HttpServ
                       if (hasError.get) {
                         ()
                       } else {
-                        getHttpResponse(execContext).getRichOutputStream.foreach { os =>
+                        getHttpResponse().getRichOutputStream.foreach { os =>
                           os.write(r.writeable.transform(x))
                           os.flush
                         }
@@ -183,7 +176,7 @@ abstract class Play2GenericServletRequestHandler[T](val servletRequest: HttpServ
                     Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
 
                   Enumeratee.breakE[r.BODY_CONTENT](_ => hasError.get)(writeIteratee).mapDone { _ =>
-                    onHttpResponseComplete(execContext)
+                    onHttpResponseComplete()
                   }
                 }
 
@@ -200,12 +193,12 @@ abstract class Play2GenericServletRequestHandler[T](val servletRequest: HttpServ
                 p.flatMap(i => i.run)
                   .onRedeem { buffer =>
                     Logger("play").trace("Buffer size to send: " + buffer.size)
-                    getHttpResponse(execContext).getRichOutputStream.map { os =>
-                      getHttpResponse(execContext).getHttpServletResponse.map(_.setContentLength(buffer.size))
+                    getHttpResponse().getRichOutputStream.map { os =>
+                      getHttpResponse().getHttpServletResponse.map(_.setContentLength(buffer.size))
                       os.flush
                       buffer.writeTo(os)
                     }
-                    onHttpResponseComplete(execContext)
+                    onHttpResponseComplete()
                   }
               }
             }
@@ -235,7 +228,7 @@ abstract class Play2GenericServletRequestHandler[T](val servletRequest: HttpServ
                     if (hasError.get) {
                       ()
                     } else {
-                      getHttpResponse(execContext).getRichOutputStream.foreach { os =>
+                      getHttpResponse().getRichOutputStream.foreach { os =>
                         os.write(r.writeable.transform(x))
                         os.flush
                       }
@@ -254,7 +247,7 @@ abstract class Play2GenericServletRequestHandler[T](val servletRequest: HttpServ
                   Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
 
                 Enumeratee.breakE[r.BODY_CONTENT](_ => hasError.get)(writeIteratee).mapDone { _ =>
-                  onHttpResponseComplete(execContext)
+                  onHttpResponseComplete()
                 }
               }
 
@@ -267,7 +260,7 @@ abstract class Play2GenericServletRequestHandler[T](val servletRequest: HttpServ
 
               httpResponse.setContentLength(0);
               httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-              onHttpResponseComplete(execContext)
+              onHttpResponseComplete()
 
           } // end match result
 
@@ -310,7 +303,7 @@ abstract class Play2GenericServletRequestHandler[T](val servletRequest: HttpServ
             }
           }
 
-        lazy val bodyEnumerator = getHttpRequest(execContext).getRichInputStream.map { is =>
+        lazy val bodyEnumerator = getHttpRequest().getRichInputStream.map { is =>
           Enumerator.fromStream(is).andThen(Enumerator.eof)
         }.getOrElse(Enumerator.eof)
 
@@ -363,7 +356,7 @@ abstract class Play2GenericServletRequestHandler[T](val servletRequest: HttpServ
       }
     }
 
-    onFinishService(execContext)
+    onFinishService()
 
   }
 

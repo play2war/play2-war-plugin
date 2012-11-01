@@ -3,40 +3,37 @@ package play.core.server.servlet30
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.atomic.AtomicBoolean
-import javax.servlet.AsyncContext
+
 import javax.servlet.AsyncEvent
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import play.api.Logger
+import play.core.server.servlet.Play2GenericServletRequestHandler
 import play.core.server.servlet.RichHttpServletRequest
 import play.core.server.servlet.RichHttpServletResponse
-import play.core.server.servlet.Play2GenericServletRequestHandler
 
 class Play2Servlet30RequestHandler(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse)
-  extends Play2GenericServletRequestHandler[Tuple2[AsyncContext, AsyncListener]](servletRequest, servletResponse)
+  extends Play2GenericServletRequestHandler(servletRequest, servletResponse)
   with Helpers {
 
-  protected override def onBeginService(request: HttpServletRequest, response: HttpServletResponse): Tuple2[AsyncContext, AsyncListener] = {
-    val asyncListener = new AsyncListener(request.toString)
-    val asyncContext = request.startAsync
-    asyncContext.setTimeout(play.core.server.servlet30.Play2Servlet.asyncTimeout);
+  val asyncListener = new AsyncListener(servletRequest.toString)
+  
+  val asyncContext = servletRequest.startAsync
+  asyncContext.setTimeout(play.core.server.servlet30.Play2Servlet.asyncTimeout);
 
-    (asyncContext, asyncListener);
-  }
-
-  protected override def onFinishService(execContext: Tuple2[AsyncContext, AsyncListener]) = {
+  protected override def onFinishService() = {
     // Nothing to do
   }
 
-  protected override def onHttpResponseComplete(execContext: Tuple2[AsyncContext, AsyncListener]) = {
-    execContext._1.complete
+  protected override def onHttpResponseComplete() = {
+    asyncContext.complete
   }
 
-  protected override def getHttpRequest(execContext: Tuple2[AsyncContext, AsyncListener]): RichHttpServletRequest = {
+  protected override def getHttpRequest(): RichHttpServletRequest = {
     new RichHttpServletRequest {
       def getRichInputStream(): Option[InputStream] = {
-        if (asyncContextAvailable(execContext._2)) {
-          Option(execContext._1.getRequest.getInputStream)
+        if (asyncContextAvailable(asyncListener)) {
+          Option(asyncContext.getRequest.getInputStream)
         } else {
           None
         }
@@ -44,19 +41,19 @@ class Play2Servlet30RequestHandler(servletRequest: HttpServletRequest, servletRe
     }
   }
 
-  protected override def getHttpResponse(execContext: Tuple2[AsyncContext, AsyncListener]): RichHttpServletResponse = {
+  protected override def getHttpResponse(): RichHttpServletResponse = {
     new RichHttpServletResponse {
       def getRichOutputStream: Option[OutputStream] = {
-        if (asyncContextAvailable(execContext._2)) {
-          Option(execContext._1.getResponse.getOutputStream)
+        if (asyncContextAvailable(asyncListener)) {
+          Option(asyncContext.getResponse.getOutputStream)
         } else {
           None
         }
       }
 
       def getHttpServletResponse: Option[HttpServletResponse] = {
-        if (asyncContextAvailable(execContext._2)) {
-          Option(execContext._1.getResponse.asInstanceOf[HttpServletResponse])
+        if (asyncContextAvailable(asyncListener)) {
+          Option(asyncContext.getResponse.asInstanceOf[HttpServletResponse])
         } else {
           None
         }
