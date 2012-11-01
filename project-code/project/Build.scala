@@ -86,17 +86,17 @@ object Build extends Build {
   //
   lazy val play2WarWebsocketCore = Project(id = "websocket-core",
     base = file("websocket/core"),
-    settings = commonSettings ++ Seq())
+    settings = commonSettings ++ Seq()) dependsOn (play2WarCoreservlet30)
 
   lazy val play2WarWebsocketTomcat = Project(id = "websocket-tomcat",
     base = file("websocket/tomcat"),
     settings = commonSettings ++ Seq(
       libraryDependencies += "org.apache.tomcat" % "tomcat-catalina" % "7.0.32",
-      libraryDependencies += "org.apache.tomcat" % "tomcat-coyote" % "7.0.32"))
+      libraryDependencies += "org.apache.tomcat" % "tomcat-coyote" % "7.0.32")) dependsOn (play2WarWebsocketCore)
 
   lazy val play2WarWebsocketServlet31 = Project(id = "websocket-servlet31",
     base = file("websocket/servlet31"),
-    settings = commonSettings ++ Seq())
+    settings = commonSettings ++ Seq()) dependsOn (play2WarWebsocketCore, play2WarCoreCommon)
 
   //
   // Settings
