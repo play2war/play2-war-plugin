@@ -3,6 +3,8 @@ package play.core.server.servlet25
 import play.api.Logger
 import play.core.server.servlet.GenericPlay2Servlet
 import play.core.server.servlet.Play2WarServer
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 object Play2Servlet {
 
@@ -13,5 +15,9 @@ object Play2Servlet {
 }
 
 class Play2Servlet extends GenericPlay2Servlet with Helpers {
+
+  override protected def getRequestHandler(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
+    new Play2Servlet25RequestHandler(servletRequest, servletResponse)
+  }
 
 }

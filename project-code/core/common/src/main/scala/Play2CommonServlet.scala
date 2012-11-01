@@ -71,9 +71,14 @@ abstract class GenericPlay2Servlet extends HttpServlet with ServletContextListen
   /**
    * Classic "service" servlet method.
    */
-  protected override def service(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
-    //	  Play2WarServer.handleRequest(requestHandler)
+  override protected def service(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
+
+    val requestHandler = getRequestHandler(servletRequest, servletResponse)
+
+    Play2WarServer.handleRequest(requestHandler)
   }
+
+  protected def getRequestHandler(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse): RequestHandler
 
   override def contextInitialized(e: ServletContextEvent) = {
     e.getServletContext.log("PlayServletWrapper > contextInitialized")
