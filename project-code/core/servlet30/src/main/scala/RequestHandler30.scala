@@ -12,8 +12,8 @@ import play.core.server.servlet.Play2GenericServletRequestHandler
 import play.core.server.servlet.RichHttpServletRequest
 import play.core.server.servlet.RichHttpServletResponse
 
-class Play2Servlet30RequestHandler(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse)
-  extends Play2GenericServletRequestHandler(servletRequest, servletResponse)
+class Play2Servlet30RequestHandler(servletRequest: HttpServletRequest)
+  extends Play2GenericServletRequestHandler(servletRequest, None)
   with Helpers {
 
   val asyncListener = new AsyncListener(servletRequest.toString)

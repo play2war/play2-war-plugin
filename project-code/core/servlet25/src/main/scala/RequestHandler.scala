@@ -7,7 +7,7 @@ import play.core.server.servlet.RichHttpServletRequest
 import play.core.server.servlet.RichHttpServletResponse
 
 class Play2Servlet25RequestHandler(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse)
-  extends Play2GenericServletRequestHandler(servletRequest, servletResponse)
+  extends Play2GenericServletRequestHandler(servletRequest, Option(servletResponse))
   with Helpers {
 
   val lock = new Object();

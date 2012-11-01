@@ -70,7 +70,7 @@ trait HttpServletRequestHandler extends RequestHandler {
 
 }
 
-abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServletRequest, val servletResponse: HttpServletResponse) extends HttpServletRequestHandler {
+abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServletRequest, val servletResponse: Option[HttpServletResponse]) extends HttpServletRequestHandler {
 
   override def apply(server: Play2WarServer) = {
 

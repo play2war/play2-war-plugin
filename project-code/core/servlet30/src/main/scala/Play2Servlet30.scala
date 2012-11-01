@@ -18,7 +18,7 @@ object Play2Servlet {
 class Play2Servlet extends GenericPlay2Servlet {
 
   override protected def getRequestHandler(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
-    new Play2Servlet30RequestHandler(servletRequest, servletResponse)
+    new Play2Servlet30RequestHandler(servletRequest)
   }
 
 }
