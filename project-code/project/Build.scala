@@ -16,6 +16,8 @@ object Build extends Build {
 
   val servlet25SampleProjectTargetDir = new File(curDir, "../sample/servlet25/target")
   val servlet25SampleWarPath = new File(servlet25SampleProjectTargetDir, "a-play2war-sample-servlet25-1.0-SNAPSHOT.war").getAbsolutePath
+  
+  val playDependency = "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api")
 
   //
   // Root project
@@ -31,19 +33,19 @@ object Build extends Build {
   lazy val play2WarCoreCommon = Project(id = "play2-war-core-common",
     base = file("core/common"),
     settings = commonSettings ++ Seq(
-      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api"),
+      libraryDependencies += playDependency,
       libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default"))
 
   lazy val play2WarCoreservlet30 = Project(id = "play2-war-core-servlet30",
     base = file("core/servlet30"),
     settings = commonSettings ++ Seq(
-      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api"),
+      libraryDependencies += playDependency,
       libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "provided->default")) dependsOn (play2WarCoreCommon)
 
   lazy val play2WarCoreservlet25 = Project(id = "play2-war-core-servlet25",
     base = file("core/servlet25"),
     settings = commonSettings ++ Seq(
-      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api"),
+      libraryDependencies += playDependency,
       libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default")) dependsOn (play2WarCoreCommon)
 
   //
@@ -92,7 +94,8 @@ object Build extends Build {
     base = file("websocket/tomcat"),
     settings = commonSettings ++ Seq(
       libraryDependencies += "org.apache.tomcat" % "tomcat-catalina" % "7.0.32",
-      libraryDependencies += "org.apache.tomcat" % "tomcat-coyote" % "7.0.32")) dependsOn (play2WarWebsocketCore)
+      libraryDependencies += "org.apache.tomcat" % "tomcat-coyote" % "7.0.32",
+      libraryDependencies += playDependency)) dependsOn (play2WarWebsocketCore)
 
   lazy val play2WarWebsocketServlet31 = Project(id = "websocket-servlet31",
     base = file("websocket/servlet31"),
