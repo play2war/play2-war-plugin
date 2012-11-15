@@ -1,0 +1,40 @@
+@(message: String)
+
+@main("Apache Tomcat WebSocket Examples: Echo") {
+    
+    <script type="text/javascript">
+        var ws = null;
+
+    </script>
+
+    <div>
+        <div id="connect-container">
+            <div>
+                <span>Connect using:</span>
+                <!-- echo example using streams on the server side -->
+                <input id="radio1" type="radio" name="group1" value="@controllers.routes.Application.echoStream()"
+                       onclick="updateTarget(this.value);"> <label for="radio1">streams</label>
+                <!-- echo example using messages on the server side -->
+                <input id="radio2" type="radio" name="group1" value="@controllers.routes.Application.echoMessage()"
+                       onclick="updateTarget(this.value);"> <label for="radio2">messages</label>
+            </div>
+            <div>
+                <input id="target" type="text" size="40" style="width: 350px"/>
+            </div>
+            <div>
+                <button id="connect" onclick="ws = connect();">Connect</button>
+                <button id="disconnect" disabled="disabled" onclick="ws = disconnect(ws);">Disconnect</button>
+            </div>
+            <div>
+                <textarea id="message" style="width: 350px">Here is a message!</textarea>
+            </div>
+            <div>
+                <button id="echo" onclick="echo(ws);" disabled="disabled">Echo message</button>
+            </div>
+        </div>
+        <div id="console-container">
+            <div id="console"></div>
+        </div>
+    </div>
+    
+}
