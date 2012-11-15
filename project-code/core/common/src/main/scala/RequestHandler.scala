@@ -350,9 +350,6 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
         //handle websocket action
         case Right((ws @ WebSocket(f), app)) => {
-          Logger("play").error("Impossible to serve Web Socket request:" + ws)
-          response.handle(Results.InternalServerError)
-
           onWebsocket(ws, f, app)
         }
 
