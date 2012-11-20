@@ -1,4 +1,4 @@
-# WAR Plugin for Play framework 2.0
+# WAR Plugin for Play framework 2.x
 
     Current version: 0.8.1
 
@@ -28,6 +28,7 @@ Other references built with Play 2 and Play2War:
 * Play 2.0.2 : Play2War 0.8.x
 * Play 2.0.3 : Play2War 0.8.x
 * Play 2.0.4 : Play2War 0.8.x
+* Play 2.1.x : Play2War 0.9.x (not released yet)
 
 ## What's new ?
 
@@ -41,21 +42,21 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <th colspan="3">Servlet engine</th>
   </tr>
   <tr>
-    <th>3.1</th>
+  <th>3.1</th>
   <th>3.0</th>
   <th>2.4/2.5</th>
   </tr>
   <tr>
   <td colspan="2">Availability</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-  <td>TBD</td>
+  <td>In progress</td>
     <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
     <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
   <tr>
   <td colspan="2">Performances</td>
+  <td>+++</td>
   <td>++</td>
-  <td>?</td>
     <td>+</td>
     <td>-</td>
   </tr>
@@ -82,12 +83,12 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   </tr>
   <tr>
     <td>Non root context path
-        <br/>Eg: http://local/myAppContext</td>
+        <br/>Eg: http://myhost/mySubAppContext</td>
   <td>
         2.0.x : <img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context">
-        <br/>2.1.x (alpha) : <img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
+        <br/>2.1.x : <img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
         </td>
-  <td colspan="3"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD for Play 2.1</td>
+  <td colspan="3"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>In progress for Play 2.1</td>
   </tr>
 </table>
 
@@ -100,7 +101,7 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <th>PaaS</th>
   </tr>
   <tr>
-  <td rowspan="5">Servlet 3.0</td>
+  <td rowspan="7">Servlet 3.0</td>
   <td>Tomcat 7</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
@@ -112,7 +113,7 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   </tr>
   <tr>
   <td>Jetty 9</td>
-  <td>TBD</td>
+  <td>In progress</td>
   <td>TBD</td>
   </tr>
   <tr>
@@ -134,15 +135,20 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <td>TBD</td>
   </tr>
   <tr>
+  <td>Glassfish 4</td>
+  <td>TBD</td>
+  <td>TBD</td>
+  </tr>
+  <tr>
   <td rowspan="2">Servlet 2.5</td>
   <td>Tomcat 6</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-  <td>TBD<br/>(Cloudbees)</td>
+  <td>-</td>
   </tr>
   <tr>
   <td>Jetty 7</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-  <td>TBD</td>
+  <td>-</td>
   </tr>
 </table>
 
