@@ -1,18 +1,17 @@
 package play.core.server.servlet
 
 import java.util.Arrays
-import java.util.concurrent._
+import java.util.Collections
 
-import javax.servlet.http.{ Cookie => ServletCookie, _ }
+import scala.Option.option2Iterable
+import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.collection.JavaConverters.enumerationAsScalaIteratorConverter
 
-import play.core._
-import play.api._
-import play.api.mvc._
-import play.api.libs.iteratee._
-import play.api.libs.iteratee.Input._
-import play.api.libs.concurrent._
-
-import scala.collection.JavaConverters._
+import javax.servlet.http.{Cookie => ServletCookie}
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+import play.api.mvc.Cookies
+import play.api.mvc.Headers
 
 trait HTTPHelpers {
 

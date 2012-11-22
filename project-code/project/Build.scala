@@ -17,11 +17,17 @@ object Build extends Build {
   val servlet25SampleProjectTargetDir = new File(curDir, "../sample/servlet25/target")
   val servlet25SampleWarPath = new File(servlet25SampleProjectTargetDir, "a-play2war-sample-servlet25-1.0-SNAPSHOT.war").getAbsolutePath
 
+  //
+  // Root project
+  //
   lazy val root = Project(id = "play2-war",
     base = file("."),
     settings = commonSettings ++ Seq(
       publishArtifact := false)) aggregate (play2WarCoreCommon, play2WarCoreservlet30, play2WarCoreservlet25, play2WarPlugin, play2WarIntegrationTests)
 
+  //
+  // Servlet implementations
+  //
   lazy val play2WarCoreCommon = Project(id = "play2-war-core-common",
     base = file("core/common"),
     settings = commonSettings ++ Seq(
@@ -40,6 +46,9 @@ object Build extends Build {
       libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api"),
       libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default")) dependsOn (play2WarCoreCommon)
 
+  //
+  // Plugin
+  //
   lazy val play2WarPlugin = Project(id = "play2-war-plugin",
     base = file("plugin"),
     settings = commonSettings ++ Seq(
@@ -52,6 +61,9 @@ object Build extends Build {
           "play" % "sbt-plugin" % play2Version % "provided->default(compile)" extra ("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion))
       }))
 
+  //
+  // Integration tests
+  //
   lazy val play2WarIntegrationTests = Project(id = "integration-tests",
     base = file("integration-tests"),
     settings = commonSettings ++ Seq(
@@ -66,9 +78,12 @@ object Build extends Build {
       parallelExecution in Test := false,
       testOptions in Test += Tests.Argument("-oD"),
       testOptions in Test += Tests.Argument("-Dwar.servlet30=" + servlet30SampleWarPath),
-	    testOptions in Test += Tests.Argument("-Dwar.servlet25=" + servlet25SampleWarPath),
+      testOptions in Test += Tests.Argument("-Dwar.servlet25=" + servlet25SampleWarPath),
       testListeners <<= target.map(t => Seq(new eu.henkelmann.sbt.JUnitXmlTestsListener(t.getAbsolutePath)))))
 
+  //
+  // Settings
+  //
   def commonSettings = buildSettings ++
     Seq(
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
