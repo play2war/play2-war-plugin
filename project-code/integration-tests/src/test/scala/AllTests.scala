@@ -456,14 +456,8 @@ class Jetty7xTests extends AbstractPlay2WarTests with Servlet25Container {
   override def containerName = "jetty7x"
 }
 
-// @RunWith(classOf[JUnitRunner])
-// class Tomcat7029Tests extends AbstractTomcat7x {
-//   override def tomcatVersion = "7.0.29"
-//   override def containerFileNameInCloudbeesCache = Option("apache-tomcat-7.0.29.zip")
-// }
-
 @RunWith(classOf[JUnitRunner])
-class Tomcat7029Tests extends AbstractTomcat7x {
+class Tomcat70xTests extends AbstractTomcat7x {
   override def tomcatVersion = "7.0.32"
   override def containerFileNameInCloudbeesCache = Option("apache-tomcat-7.0.32.zip")
 }
