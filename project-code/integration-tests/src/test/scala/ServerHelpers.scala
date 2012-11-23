@@ -66,8 +66,13 @@ trait CargoContainerManager extends BeforeAndAfterAll {
 
     val containerUrlToDownload: String = containerFileNameInCloudbeesCache.flatMap { c =>
       val path = "file:///private/play-war/cargo-containers/" + c
-      if (new File(path).exists) Option(path)
-      else None
+      if (new File(path).exists) {
+        println("Local container found: " + path)
+        Option(path)
+      } else {
+        println("Local container not found: " + path)
+        None
+      }
     }.getOrElse(containerUrl)
 
     println("Download container " + containerName + " from " + containerUrlToDownload + " ...")
