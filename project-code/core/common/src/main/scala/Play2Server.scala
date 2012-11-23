@@ -1,19 +1,55 @@
 package play.core.server.servlet
 
-import java.io._
+import java.io.File
 import java.util.logging.Handler
+import play.api.Application
+import play.api.Logger
+import play.api.Mode
+import play.api.Play
+import play.core.ApplicationProvider
+import play.core.server.Server
+import play.core.server.ServerWithStop
+import play.api.Configuration
+import javax.servlet.ServletContext
 
-import play.core._
-import play.core.server._
-import play.api._
-import play.api.mvc._
-import play.api.libs.iteratee._
-import play.api.libs.iteratee.Input._
-import play.api.libs.concurrent._
+object Play2WarServer {
 
-import scala.collection.JavaConverters._
+  // See https://github.com/dlecan/play2-war-plugin/issues/54
+  // Store all handlers before Play Logger.configure(...)
+  private val julHandlers: Option[Array[Handler]] = Option(java.util.logging.Logger.getLogger("")).map { root =>
+    root.getHandlers
+  }
 
-class Play2WarServer(appProvider: WarApplication) extends Server with ServerWithStop {
+  Logger.configure(Map.empty, Map.empty, Mode.Prod)
+
+  private val classLoader = getClass.getClassLoader;
+
+  private val application = new WarApplication(classLoader, Mode.Prod, julHandlers)
+
+  val configuration = application.get.right.map { _.configuration }.right.getOrElse(Configuration.empty)
+
+  val playServer = new Play2WarServer(application)
+
+  private var started = true
+
+  def stop(sc: ServletContext) = {
+    synchronized {
+      if (started) {
+        playServer.stop()
+        sc.log("Play server stopped")
+        started = false
+      }
+    }
+  }
+
+  def handleRequest(requestHandler: RequestHandler) = {
+
+    requestHandler(playServer)
+
+  }
+}
+
+private[servlet] class Play2WarServer(appProvider: WarApplication) extends Server with ServerWithStop {
 
   def mode = appProvider.mode
 
@@ -36,7 +72,7 @@ class Play2WarServer(appProvider: WarApplication) extends Server with ServerWith
   }
 }
 
-class WarApplication(val classLoader: ClassLoader, val mode: Mode.Mode, val julHandlers: Option[Array[Handler]]) extends ApplicationProvider {
+private[servlet]class WarApplication(val classLoader: ClassLoader, val mode: Mode.Mode, val julHandlers: Option[Array[Handler]]) extends ApplicationProvider {
 
   val applicationPath = Option(System.getProperty("user.home")).map(new File(_)).getOrElse(new File(""))
 
@@ -46,14 +82,14 @@ class WarApplication(val classLoader: ClassLoader, val mode: Mode.Mode, val julH
   // without substitutions
   Logger.configure(Map("application.home" -> path.getAbsolutePath), Map.empty,
     mode)
-  
+
   // Restore handlers after Play logger initialization
   Option(java.util.logging.Logger.getLogger("")).map { root =>
     julHandlers.map { handlers =>
       handlers.foreach(root.addHandler(_))
     }
   }
-  
+
   Play.start(application)
 
   def get = Right(application)
