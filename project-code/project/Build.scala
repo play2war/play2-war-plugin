@@ -1,7 +1,7 @@
 import sbt._
 import Keys._
 import java.io.File
-import com.typesafe.sbteclipse.plugin.EclipsePlugin.EclipseKeys
+// import com.typesafe.sbteclipse.plugin.EclipsePlugin.EclipseKeys
 
 object Build extends Build {
 
@@ -87,7 +87,7 @@ object Build extends Build {
   def commonSettings = buildSettings ++
     Seq(
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
-      EclipseKeys.withSource := true,
+      // EclipseKeys.withSource := true,
 
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
 
@@ -127,13 +127,19 @@ object Build extends Build {
   object BuildSettings {
 
     val buildOrganization = "com.github.play2war"
-    val defaultPlay2Version = "2.0.2"
+    val defaultPlay2Version = "2.1-RC1"
     val play2Version = Option(System.getProperty("play2.version")).filterNot(_.isEmpty).getOrElse(defaultPlay2Version)
     val buildVersion = "0.9-SNAPSHOT"
+    val buildScalaVersion = "2.10.0-RC3"
+    val buildScalaVersionForSbt = "2.9.2"
+    val buildSbtVersion   = "0.12.1"
+    val buildSbtVersionBinaryCompatible = "0.12"
 
     val buildSettings = Defaults.defaultSettings ++ Seq(
       organization := buildOrganization,
-      version := buildVersion)
+      version := buildVersion,
+      scalaVersion := buildScalaVersion,
+      checksums in update := Nil)
 
   }
 
