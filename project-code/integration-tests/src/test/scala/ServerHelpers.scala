@@ -58,6 +58,8 @@ trait CargoContainerManager extends BeforeAndAfterAll {
 
   def keyWarPath: String
 
+  def getJavaVersion: String
+
   abstract override def beforeAll(configMap: Map[String, Any]) {
 
     val warPath = configMap.get(keyWarPath).getOrElse(Nil)
@@ -65,10 +67,10 @@ trait CargoContainerManager extends BeforeAndAfterAll {
     println("WAR file to deploy: " + warPath)
 
     val containerUrlToDownload: String = containerFileNameInCloudbeesCache.flatMap { c =>
-      val path = "file:///private/play-war/cargo-containers/" + c
+      val path = "/private/play-war/cargo-containers/" + c
       if (new File(path).exists) {
         println("Local container found: " + path)
-        Option(path)
+        Option("file://" + path)
       } else {
         println("Local container not found: " + path)
         None
@@ -88,6 +90,14 @@ trait CargoContainerManager extends BeforeAndAfterAll {
 
     configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.MEDIUM.getLevel);
 
+    getJavaVersion match {
+      case "java6" => // Nothing, use current JVM
+      case "java7" => {
+        val java7Home = Option(System.getProperty("java7.home")).map(p => p).getOrElse(throw new RuntimeException("JAVA7_HOME not defined"))
+        configuration.setProperty(GeneralPropertySet.JAVA_HOME, java7Home)
+      }
+    }
+    
     val container =
       new DefaultContainerFactory().createContainer(
         containerName, ContainerType.INSTALLED, configuration).asInstanceOf[InstalledLocalContainer]
@@ -111,4 +121,22 @@ trait CargoContainerManager extends BeforeAndAfterAll {
       _.stop
     }
   }
+}
+
+trait JavaVersion {
+
+  def getJavaVersion: String
+
+}
+
+trait Java6 extends JavaVersion {
+
+  override def getJavaVersion = "java6"
+
+}
+
+trait Java7 extends JavaVersion {
+
+  override def getJavaVersion = "java7"
+
 }
