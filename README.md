@@ -19,7 +19,6 @@ Other references built with Play 2 and Play2War:
  - [Factile](http://factile.net/) (Survey platform)
 
 ## Known limitations
-* **Play2War is only compatible with Java 6 JRE** (most of the application servers aren't compatible with too)
 * **Your WAR must be deployed at root context** (sub-context deployment will be available with Play 2.1)
 
 ## Compatibiity with Play2
@@ -112,8 +111,8 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
   <tr>
-  <td>Jetty 9</td>
-  <td>In progress</td>
+  <td>Jetty 9 (M2)</td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   <td>TBD</td>
   </tr>
   <tr>
