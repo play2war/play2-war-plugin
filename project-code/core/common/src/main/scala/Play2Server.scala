@@ -67,13 +67,13 @@ private[servlet] class Play2WarServer(appProvider: WarApplication) extends Serve
     try {
       Play.stop()
     } catch {
-      case e => Logger("play").error("Error while stopping the application", e)
+      case e: Throwable => Logger("play").error("Error while stopping the application", e)
     }
 
     try {
       super.stop()
     } catch {
-      case e => Logger("play").error("Error while stopping akka", e)
+      case e: Throwable => Logger("play").error("Error while stopping akka", e)
     }
   }
 }
