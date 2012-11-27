@@ -3,7 +3,7 @@ package com.github.play2war.plugin
 import sbt.{ `package` => _, _ }
 import sbt.Keys._
 import PlayKeys._
-import Play2WarKeys._
+import com.github.play2war.plugin.Play2WarKeys._
 
 trait Play2WarSettings {
   this: Play2WarCommands =>
