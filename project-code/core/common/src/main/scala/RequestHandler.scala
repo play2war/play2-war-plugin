@@ -72,6 +72,8 @@ trait HttpServletRequestHandler extends RequestHandler {
 
 abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServletRequest, val servletResponse: Option[HttpServletResponse]) extends HttpServletRequestHandler {
 
+  private val requestIDs = new java.util.concurrent.atomic.AtomicLong(0)
+  
   override def apply(server: Play2WarServer) = {
 
     val server = Play2WarServer.playServer
@@ -97,6 +99,8 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
     }
 
     val requestHeader = new RequestHeader {
+      val id = requestIDs.incrementAndGet
+      val tags = Map.empty[String,String]
       def uri = servletUri
       def path = servletPath
       def method = httpMethod
