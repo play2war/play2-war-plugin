@@ -2,15 +2,21 @@ package play.core.server.servlet
 
 import java.io.File
 import java.util.logging.Handler
-import play.api.Application
+
+import scala.Option.apply
+import scala.Predef.Map.apply
+import scala.Right.apply
+
+import javax.servlet.ServletContext
+import play.api.Configuration
+import play.api.DefaultApplication
 import play.api.Logger
+import play.api.Logger.apply
 import play.api.Mode
 import play.api.Play
 import play.core.ApplicationProvider
 import play.core.server.Server
 import play.core.server.ServerWithStop
-import play.api.Configuration
-import javax.servlet.ServletContext
 
 object Play2WarServer {
 
@@ -76,7 +82,7 @@ private[servlet]class WarApplication(val classLoader: ClassLoader, val mode: Mod
 
   val applicationPath = Option(System.getProperty("user.home")).map(new File(_)).getOrElse(new File(""))
 
-  val application = new Application(applicationPath, classLoader, None, mode)
+  val application = new DefaultApplication(applicationPath, classLoader, None, mode)
 
   // Because of https://play.lighthouseapp.com/projects/82401-play-20/tickets/275, reconfigure Logger
   // without substitutions
