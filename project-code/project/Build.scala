@@ -139,8 +139,8 @@ object Build extends Build {
     val buildSbtVersionBinaryCompatible = "0.12"
 
     val buildSettings = Defaults.defaultSettings ++ Seq(
-      organization := buildOrganization,
-      version := buildVersion,
+      organization        := buildOrganization,
+      version             := buildVersion,
       scalaVersion        := buildScalaVersion,
       scalaBinaryVersion  := CrossVersion.binaryScalaVersion(buildScalaVersion),
       checksums in update := Nil)
