@@ -52,13 +52,15 @@ object Build extends Build {
   lazy val play2WarPlugin = Project(id = "play2-war-plugin",
     base = file("plugin"),
     settings = commonSettings ++ Seq(
+      scalaVersion := buildScalaVersionForSbt,
+      scalaBinaryVersion  := CrossVersion.binaryScalaVersion(buildScalaVersionForSbt),
       sbtPlugin := true,
 
       sourceGenerators in Compile <+= sourceManaged in Compile map Play2WarVersion,
 
       libraryDependencies <++= (scalaVersion, sbtVersion) { (scalaVersion, sbtVersion) =>
         Seq(
-          "play" % "sbt-plugin" % play2Version % "provided->default(compile)" extra ("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion))
+          "play" % "sbt-plugin" % play2Version % "provided->default(compile)" extra ("scalaVersion" -> buildScalaVersionForSbt, "sbtVersion" -> buildSbtVersionBinaryCompatible))
       }))
 
   //
@@ -69,8 +71,9 @@ object Build extends Build {
     settings = commonSettings ++ Seq(
       sbtPlugin := false,
       publishArtifact := false,
+      scalaBinaryVersion := buildScalaVersion,
 
-      libraryDependencies += "org.scalatest" %% "scalatest" % "1.8" % "test",
+      libraryDependencies += "org.scalatest" %% "scalatest" % "1.8-B1" % "test",
       libraryDependencies += "junit" % "junit" % "4.10" % "test",
       libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.3.1" % "test",
       libraryDependencies += "net.sourceforge.htmlunit" % "htmlunit" % "2.10" % "test",
@@ -138,7 +141,8 @@ object Build extends Build {
     val buildSettings = Defaults.defaultSettings ++ Seq(
       organization := buildOrganization,
       version := buildVersion,
-      scalaVersion := buildScalaVersion,
+      scalaVersion        := buildScalaVersion,
+      scalaBinaryVersion  := CrossVersion.binaryScalaVersion(buildScalaVersion),
       checksums in update := Nil)
 
   }
