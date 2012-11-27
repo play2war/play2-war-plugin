@@ -1,7 +1,7 @@
 import sbt._
 import Keys._
 import java.io.File
-// import com.typesafe.sbteclipse.plugin.EclipsePlugin.EclipseKeys
+import com.typesafe.sbteclipse.plugin.EclipsePlugin.EclipseKeys
 
 object Build extends Build {
 
@@ -90,7 +90,7 @@ object Build extends Build {
   def commonSettings = buildSettings ++
     Seq(
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
-      // EclipseKeys.withSource := true,
+      EclipseKeys.withSource := true,
 
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
 
