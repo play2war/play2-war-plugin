@@ -93,7 +93,7 @@ trait CargoContainerManager extends BeforeAndAfterAll {
     getJavaVersion match {
       case "java6" => // Nothing, use current JVM
       case "java7" => {
-        val java7Home = Option(System.getProperty("java7.home")).map(p => p).getOrElse(throw new RuntimeException("JAVA7_HOME not defined"))
+        val java7Home = Option(System.getProperty("java7.home")).map(p => p).getOrElse(throw new RuntimeException("-Djava7.home not defined"))
         configuration.setProperty(GeneralPropertySet.JAVA_HOME, java7Home)
       }
     }
