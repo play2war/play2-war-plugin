@@ -1,10 +1,10 @@
-# WAR Plugin for Play framework 2.0
+# WAR Plugin for Play framework 2.x
 
-    Current version: 0.8
+    Current version: 0.8.1
 
     Project-status: BETA
     
-[![Build Status](https://play-war.ci.cloudbees.com/job/Play_2_War_-_on_push_-_with_integration_tests_-_on_develop_branch/badge/icon)](https://play-war.ci.cloudbees.com/job/Play_2_War_-_on_push_-_with_integration_tests_-_on_develop_branch/)
+[![Build Status](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_204_Play_runtime/badge/icon)](https://play-war.ci.cloudbees.com/job/Play_2_War_-_on_push_-_with_integration_tests_-_on_develop_branch/)
 
 This project is a module for Play framework 2 to package your apps into standard WAR packages. It can be used with **Servlet 3.0 and 2.5 containers** (Tomcat 6/7, Jetty 7/8/9, JBoss 5/6/7, ...)
 
@@ -25,9 +25,10 @@ Other references built with Play 2 and Play2War:
 ## Compatibiity with Play2
 * Play 2.0.0 : Play2War 0.3, 0.4
 * Play 2.0.1 : Play2War 0.5
-* Play 2.0.2 : Play2War 0.6, 0.7.x, 0.8.x
-* Play 2.0.3 : Play2War 0.7.x, 0.8.x
-* Play 2.0.4 : Play2War 0.7.x, 0.8.x
+* Play 2.0.2 : Play2War 0.8.x
+* Play 2.0.3 : Play2War 0.8.x
+* Play 2.0.4 : Play2War 0.8.x
+* Play 2.1.x : Play2War 0.9.x (not released yet)
 
 ## What's new ?
 
@@ -41,21 +42,21 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <th colspan="3">Servlet engine</th>
   </tr>
   <tr>
-    <th>3.1</th>
+  <th>3.1</th>
   <th>3.0</th>
   <th>2.4/2.5</th>
   </tr>
   <tr>
   <td colspan="2">Availability</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-  <td>TBD</td>
+  <td>In progress</td>
     <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
     <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
   <tr>
   <td colspan="2">Performances</td>
+  <td>+++</td>
   <td>++</td>
-  <td>?</td>
     <td>+</td>
     <td>-</td>
   </tr>
@@ -82,12 +83,12 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   </tr>
   <tr>
     <td>Non root context path
-        <br/>Eg: http://local/myAppContext</td>
+        <br/>Eg: http://myhost/mySubAppContext</td>
   <td>
         2.0.x : <img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context">
-        <br/>2.1.x (alpha) : <img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
+        <br/>2.1.x : <img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
         </td>
-  <td colspan="3"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>TBD for Play 2.1</td>
+  <td colspan="3"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>In progress for Play 2.1</td>
   </tr>
 </table>
 
@@ -100,7 +101,7 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <th>PaaS</th>
   </tr>
   <tr>
-  <td rowspan="5">Servlet 3.0</td>
+  <td rowspan="7">Servlet 3.0</td>
   <td>Tomcat 7</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
@@ -112,7 +113,7 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   </tr>
   <tr>
   <td>Jetty 9</td>
-  <td>TBD</td>
+  <td>In progress</td>
   <td>TBD</td>
   </tr>
   <tr>
@@ -134,15 +135,20 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <td>TBD</td>
   </tr>
   <tr>
+  <td>Glassfish 4</td>
+  <td>TBD</td>
+  <td>TBD</td>
+  </tr>
+  <tr>
   <td rowspan="2">Servlet 2.5</td>
   <td>Tomcat 6</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-  <td>TBD<br/>(Cloudbees)</td>
+  <td>-</td>
   </tr>
   <tr>
   <td>Jetty 7</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-  <td>TBD</td>
+  <td>-</td>
   </tr>
 </table>
 
@@ -159,7 +165,7 @@ In ``APP_HOME/project/plugins.sbt``, add:
 ```scala
 resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.8")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.8.1")
 ```
 ### Import Play2War SBT settings
 

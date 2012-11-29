@@ -49,15 +49,35 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   def containerName = ""
 
   before {
+    onBefore
+  }
+
+  after {
+    onAfter
+  }
+
+  override def beforeAll(configMap: Map[String, Any]) {
+    super.beforeAll(configMap)
+
+    // Init WebClient
+    onBefore
+
+    // Warm up application
+    sendRequest(pageUrl = ROOT_URL + "/")
+
+    onAfter
+  }
+
+  def onBefore {
     webClient = new WebClient
     webClient.setJavaScriptEnabled(false)
     webClient.setThrowExceptionOnFailingStatusCode(false)
     webClient.getCookieManager.setCookiesEnabled(true)
-	webClient.setTimeout(HTTP_TIMEOUT)
+    webClient.setTimeout(HTTP_TIMEOUT)
     new SkipClockiFrameWrapper(webClient)
   }
 
-  after {
+  def onAfter {
     webClient.closeAllWindows
   }
 
