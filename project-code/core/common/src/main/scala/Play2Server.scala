@@ -2,6 +2,7 @@ package play.core.server.servlet
 
 import java.io.File
 import java.util.logging.Handler
+import java.net.InetSocketAddress
 
 import scala.Option.apply
 import scala.Predef.Map.apply
@@ -60,6 +61,9 @@ private[servlet] class Play2WarServer(appProvider: WarApplication) extends Serve
   def mode = appProvider.mode
 
   def applicationProvider = appProvider
+
+  // This isn't currently used for anything except local dev mode, so just stub this out for now
+  lazy val mainAddress = ???
 
   override def stop() = {
     Logger("play").info("Stopping play server...")

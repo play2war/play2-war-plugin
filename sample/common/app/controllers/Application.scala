@@ -7,8 +7,9 @@ import play.api.mvc._
 import play.api.libs.{ Comet }
 import play.api.libs.iteratee._
 import play.api.libs.concurrent._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-import akka.util.duration._
+import scala.concurrent.duration._
 
 object Application extends Controller {
 
@@ -19,8 +20,8 @@ object Application extends Controller {
   def setCookies = Action {
     val result = Ok(views.html.index("Cookies have been set."))
 
-    val cookie1 = new Cookie("cookie1", "value1", 3600)
-    val cookie2 = new Cookie("cookie2", "value2", 3600)
+    val cookie1 = new Cookie("cookie1", "value1", Some(3600))
+    val cookie2 = new Cookie("cookie2", "value2", Some(3600))
 
     result.withCookies(cookie1).withCookies(cookie2)
   }
