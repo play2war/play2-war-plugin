@@ -2,7 +2,7 @@
 
     Current version: 0.8.1
 
-    Project-status: BETA
+    Project-status: STABLE
     
 [![Build Status](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_204_Play_runtime/badge/icon)](https://play-war.ci.cloudbees.com/job/Play_2_War_-_on_push_-_with_integration_tests_-_on_develop_branch/)
 
@@ -10,7 +10,7 @@ This project is a module for Play framework 2 to package your apps into standard
 
 Why choosing WAR packaging when native Play 2 is a better deployment model (features and performances) ?
 - Ops don't want to change their deployment model and still want to use WAR in your company
-- SSL is available, easy to configure and well documented on JBoss, Tomcat, ... when SSL will be only available on Play 2.1
+- SSL is available, easy to configure and well documented on JBoss, Tomcat, ... when SSL is newer on Play 2.1
 - You need to add extra Servlet filters specific to your company (to handle SSO, ...)
 
 Live demo: JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
@@ -19,14 +19,10 @@ Other references built with Play 2 and Play2War:
  - [Factile](http://factile.net/) (Survey platform)
 
 ## Known limitations
-* **Your WAR must be deployed at root context** (sub-context deployment will be available with Play 2.1)
+* With Play 2.0.x, **your WAR must be deployed at root context**
 
 ## Compatibiity with Play2
-* Play 2.0.0 : Play2War 0.3, 0.4
-* Play 2.0.1 : Play2War 0.5
-* Play 2.0.2 : Play2War 0.8.x
-* Play 2.0.3 : Play2War 0.8.x
-* Play 2.0.4 : Play2War 0.8.x
+* Play 2.0.0 to 2.0.4 : Play2War 0.8.x
 * Play 2.1.x : Play2War 0.9.x (not released yet)
 
 ## What's new ?
