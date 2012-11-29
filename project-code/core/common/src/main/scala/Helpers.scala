@@ -26,19 +26,15 @@ trait HTTPHelpers {
           key.toString.toUpperCase -> {
             // /!\ It very important to COPY headers from request enumeration
             val headers = Collections.list(request.getHeaders(key.toString)).asScala
-            headers.map { t => t.toString }
+            headers.asInstanceOf[Seq[String]]
           }
       }.toMap
 
     new Headers {
 
-      def getAll(key: String) = allHeaders.get(key.toUpperCase).flatten.toSeq
-      def keys = allHeaders.keySet
-      override def toString = allHeaders.map {
-        case (k, v) => {
-          k + ": " + v.mkString(", ")
-        }
-      }.mkString("\n  ")
+      protected def data: Seq[(String, Seq[String])] = {
+        allHeaders.toSeq
+      }
     }
   }
 

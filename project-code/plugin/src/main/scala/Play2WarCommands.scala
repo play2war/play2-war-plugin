@@ -26,7 +26,7 @@ import sbt.IO
 import sbt.ModuleID
 import sbt.Path
 
-trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader {
+trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.PlayPositionMapper {
 
   val manifestRegex = """(?i).*META-INF/MANIFEST.MF"""
     
