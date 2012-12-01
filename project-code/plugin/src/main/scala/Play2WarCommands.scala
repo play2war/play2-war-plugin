@@ -30,7 +30,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
 
   val manifestRegex = """(?i).*META-INF/MANIFEST.MF"""
     
-    def getFiles(root: File, skipHidden: Boolean = true): Stream[File] =  
+    def getFiles(root: File, skipHidden: Boolean = false): Stream[File] =  
       if (!root.exists || (skipHidden && root.isHidden) || 
           manifestRegex.r.pattern.matcher(root.getAbsolutePath()).matches()) Stream.empty  
       else root #:: ( 
