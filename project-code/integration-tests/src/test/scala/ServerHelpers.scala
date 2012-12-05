@@ -23,6 +23,12 @@ import scala.collection.JavaConverters._
 import org.apache.commons.io.FileUtils
 import java.io.File
 
+trait WarContext {
+  
+  def context = "/" // p2wsample
+
+}
+
 trait ServletContainer {
 
   protected val WAR_KEY = "war.servlet"
@@ -41,7 +47,7 @@ trait Servlet25Container extends ServletContainer {
   def keyServletContainer = "25"
 }
 
-trait CargoContainerManager extends BeforeAndAfterAll {
+trait CargoContainerManager extends BeforeAndAfterAll with WarContext {
   self: Suite =>
 
   def getContainer: InstalledLocalContainer
@@ -53,8 +59,6 @@ trait CargoContainerManager extends BeforeAndAfterAll {
   def containerFileNameInCloudbeesCache: Option[String] = None
 
   def containerName: String
-
-  def context = "/"
 
   def keyWarPath: String
 

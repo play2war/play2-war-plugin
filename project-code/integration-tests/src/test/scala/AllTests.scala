@@ -32,7 +32,7 @@ object AbstractPlay2WarTests {
 
 }
 
-abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with CargoContainerManager with BeforeAndAfter {
+abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with CargoContainerManager with BeforeAndAfter with WarContext {
 
   import AbstractPlay2WarTests._
 
@@ -63,7 +63,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     onBefore
 
     // Warm up application
-    sendRequest(pageUrl = ROOT_URL + "/")
+    sendRequest(pageUrl = rootUrl)
 
     onAfter
   }
@@ -80,6 +80,8 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   def onAfter {
     webClient.closeAllWindows
   }
+
+  def rootUrl = ROOT_URL + context
 
   def sendRequest(pageUrl: String, method: String = "GET", parameters: Map[String, String] = Map.empty, howManyTimes: Int = 1): Option[Page] = {
 
@@ -106,7 +108,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     result
   }
 
-  def givenWhenGet(given: String, path: String, when: String = "page is loaded with %s method", root: String = ROOT_URL, method: String = "GET", parameters: Map[String, String] = Map.empty, howManyTimes: Int = 1): Option[Page] = {
+  def givenWhenGet(given: String, path: String, when: String = "page is loaded with %s method", root: String = rootUrl, method: String = "GET", parameters: Map[String, String] = Map.empty, howManyTimes: Int = 1): Option[Page] = {
 
     this.Given(given)
     val pageUrl = root + path
