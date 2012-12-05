@@ -25,7 +25,7 @@ import java.io.File
 
 trait WarContext {
   
-  def context = "/" // p2wsample
+  def context = "/p2wsample"
 
 }
 
