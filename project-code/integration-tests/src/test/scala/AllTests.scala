@@ -265,7 +265,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     scenario("Container gets cookies") {
 
       // Load cookies
-      webClient.getPage(ROOT_URL + "/setCookies")
+      webClient.getPage(rootUrl + "/setCookies")
 
       val page = givenWhenGet("a page", "/getCookies", "client sends cookies")
 
@@ -395,7 +395,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
         scenario("container sends an image to " + route) {
 
           this.Given("a form which sends a image to " + route)
-          val pageUrl = ROOT_URL + route
+          val pageUrl = rootUrl + route
 
           this.When("image is uploaded")
           info("Load page " + pageUrl)
