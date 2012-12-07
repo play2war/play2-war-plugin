@@ -1,6 +1,8 @@
 # WAR Plugin for Play framework 2.x
 
-    Current version: 0.8.1
+    Current versions:
+        Play 2.0.x : 0.8.1
+        Play 2.1.x : 0.9-RC1
 
     Project-status: STABLE
     
@@ -19,11 +21,7 @@ Other references built with Play 2 and Play2War:
  - [Factile](http://factile.net/) (Survey platform)
 
 ## Known limitations
-* With Play 2.0.x, **your WAR must be deployed at root context**
-
-## Compatibiity with Play2
-* Play 2.0.0 to 2.0.4 : Play2War 0.8.x
-* Play 2.1.x : Play2War 0.9.x (not released yet)
+* With Play 2.0.x, **your WAR must be deployed at root context** (no limitation with Play 2.1.x)
 
 ## What's new ?
 
@@ -71,19 +69,29 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>  
   </tr>
   <tr>
-  <td rowspan="2">Container</td>
-    <td>Data sources</td>
+  <td rowspan="3">Container</td>
+  <td>Data sources</td>
   <td>Built-in<br/>(<a href="http://jolbox.com/">Bone CP</a>)</td>
   <td colspan="3">Built-in (<a href="http://jolbox.com/">Bone CP</a>)<br/>External DS support : TBD</td>
   </tr>
   <tr>
-    <td>Non root context path
+    <td>Applications deployed at root context
+        <br/>Eg: http://myhost/</td>
+    <td colspan="4">
+      <p align="center">
+        <img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20" title="Any Play versions">
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td>Applications deployed at sub-context
         <br/>Eg: http://myhost/mySubAppContext</td>
-  <td>
-        2.0.x : <img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context">
-        <br/>2.1.x : <img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
-        </td>
-  <td colspan="3"><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" title="WAR package must be deployed at root context" height="20"><br/>In progress for Play 2.1</td>
+    <td colspan="4">
+      <p align="center">
+        Play 2.0.x : <img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context">
+        <br/>Play 2.1.x : <img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
+      </p>
+    </td>
   </tr>
 </table>
 
@@ -151,7 +159,7 @@ The plugin may work on others containers, such as Weblogic or Websphere (not tes
 
 ## Usage
 
-In the next descriptions, APP_HOME is the root of your Play 2.0 application you want to package as a WAR file.
+In the next descriptions, `APP_HOME` is the root of your Play 2.0 application you want to package as a WAR file.
 
 ### Add play2war plugin
 
@@ -160,7 +168,7 @@ In ``APP_HOME/project/plugins.sbt``, add:
 ```scala
 resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.8.1")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.9-RC1")
 ```
 ### Import Play2War SBT settings
 
