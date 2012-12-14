@@ -21,17 +21,11 @@ import play.core.server.ServerWithStop
 
 object Play2WarServer {
 
-  // See https://github.com/dlecan/play2-war-plugin/issues/54
-  // Store all handlers before Play Logger.configure(...)
-  private val julHandlers: Option[Array[Handler]] = Option(java.util.logging.Logger.getLogger("")).map { root =>
-    root.getHandlers
-  }
-
   Logger.configure(Map.empty, Map.empty, Mode.Prod)
 
   private val classLoader = getClass.getClassLoader;
 
-  private val application = new WarApplication(classLoader, Mode.Prod, julHandlers)
+  private val application = new WarApplication(classLoader, Mode.Prod)
 
   val configuration = application.get.right.map { _.configuration }.right.getOrElse(Configuration.empty)
 
@@ -82,7 +76,7 @@ private[servlet] class Play2WarServer(appProvider: WarApplication) extends Serve
   }
 }
 
-private[servlet]class WarApplication(val classLoader: ClassLoader, val mode: Mode.Mode, val julHandlers: Option[Array[Handler]]) extends ApplicationProvider {
+private[servlet]class WarApplication(val classLoader: ClassLoader, val mode: Mode.Mode) extends ApplicationProvider {
 
   val applicationPath = Option(System.getProperty("user.home")).map(new File(_)).getOrElse(new File(""))
 
@@ -92,13 +86,6 @@ private[servlet]class WarApplication(val classLoader: ClassLoader, val mode: Mod
   // without substitutions
   Logger.configure(Map("application.home" -> path.getAbsolutePath), Map.empty,
     mode)
-
-  // Restore handlers after Play logger initialization
-  Option(java.util.logging.Logger.getLogger("")).map { root =>
-    julHandlers.map { handlers =>
-      handlers.foreach(root.addHandler(_))
-    }
-  }
 
   Play.start(application)
 
