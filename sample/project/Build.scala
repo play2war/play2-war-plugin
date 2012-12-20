@@ -26,7 +26,7 @@ object ApplicationBuild extends Build {
   )
     
   lazy val commonAppDependencies = Seq(
-    // Nothing
+    javaCore
   )
 
   lazy val common = play.Project(appName + "common", appVersion, commonAppDependencies, path = file("common"), settings = commonSettings ++ playProjectSettings)
