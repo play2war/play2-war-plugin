@@ -91,7 +91,7 @@ object Application extends Controller {
           val iMaxRange = maxRange.head.toInt
           var counter = 0
 
-          Enumerator.fromCallback(() => {
+          Enumerator.generateM({
 
             if (counter >= iMaxRange) {
               Promise.pure(None)
@@ -170,9 +170,7 @@ object Application extends Controller {
     
     val dateFormat = new SimpleDateFormat("HH mm ss")
     
-    Enumerator.fromCallback { () =>
-      Promise.timeout(Some(dateFormat.format(new Date)), 100 milliseconds)
-    }
+    Enumerator.generateM(Promise.timeout(Some(dateFormat.format(new Date)), 100 milliseconds))
   }
   
   def liveClock = Action {
