@@ -1,6 +1,6 @@
 import sbt._
 import Keys._
-import PlayProject._
+import play.Project._
 import com.github.play2war.plugin._
 
 object ApplicationBuild extends Build {
@@ -26,17 +26,17 @@ object ApplicationBuild extends Build {
   )
     
   lazy val appDependencies = Seq(
-    // Add your project dependencies here
+    // Nothing
   )
 
-  lazy val common = PlayProject(appName + "common", appVersion, appDependencies, mainLang = SCALA, path = file("common"), settings = commonSettings ++ playProjectSettings)
+  lazy val common = play.Project(appName + "common", appVersion, appDependencies, path = file("common"), settings = commonSettings ++ playProjectSettings)
 
   lazy val warProjectSettings = playProjectSettings ++ Play2WarPlugin.play2WarSettings ++ Seq(
     publishArtifact in (Compile, packageBin) := false
   )
 
-  lazy val servlet25 = PlayProject(appName + "servlet25", appVersion, appDependencies, mainLang = SCALA, path = file("servlet25"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "2.5")) dependsOn (common)
+  lazy val servlet25 = play.Project(appName + "servlet25", appVersion, appDependencies, path = file("servlet25"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "2.5")) dependsOn (common)
 
-  lazy val servlet30 = PlayProject(appName + "servlet30", appVersion, appDependencies, mainLang = SCALA, path = file("servlet30"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "3.0")) dependsOn (common)
+  lazy val servlet30 = play.Project(appName + "servlet30", appVersion, appDependencies, path = file("servlet30"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "3.0")) dependsOn (common)
 
 }
