@@ -25,11 +25,15 @@ object ApplicationBuild extends Build {
     //
   )
     
-  lazy val appDependencies = Seq(
+  lazy val commonAppDependencies = Seq(
     // Nothing
   )
 
-  lazy val common = play.Project(appName + "common", appVersion, appDependencies, path = file("common"), settings = commonSettings ++ playProjectSettings)
+  lazy val common = play.Project(appName + "common", appVersion, commonAppDependencies, path = file("common"), settings = commonSettings ++ playProjectSettings)
+
+  lazy val appDependencies = commonAppDependencies ++ Seq(
+    "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.0"
+  )
 
   lazy val warProjectSettings = playProjectSettings ++ Play2WarPlugin.play2WarSettings ++ Seq(
     publishArtifact in (Compile, packageBin) := false
