@@ -251,7 +251,7 @@ or with
 
     sbt package
 
-Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>_<YOUR_VERSION>.war``
+Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>-<YOUR_VERSION>.war``
 
 ## How to deploy in my favorite application server ?
 
