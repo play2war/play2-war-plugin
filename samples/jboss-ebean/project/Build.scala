@@ -12,7 +12,7 @@ object ApplicationBuild extends Build {
       javaCore,
       javaJdbc,
       javaEbean,
-      "com.dlecan.reflections" % "jboss7-vfs-integration" % "1.0.2",
+      "com.dlecan.reflections" % "jboss7-vfs-integration" % "1.0.3",
       "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.0"
     )
 
