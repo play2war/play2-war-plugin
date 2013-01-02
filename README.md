@@ -280,7 +280,7 @@ In your `APP_HOME/project/Build.scala` file, add:
 ```scala
 val appDependencies = Seq(
   // ... Actual dependencies
-  "com.dlecan.reflections" % "jboss7-vfs-integration" % "1.0.1" // add this after your others dependencies
+  "com.dlecan.reflections" % "jboss7-vfs-integration" % "1.0.3" // add this after your others dependencies
 )
 ```
 
