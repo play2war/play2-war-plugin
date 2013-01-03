@@ -12,13 +12,14 @@ object ApplicationBuild extends Build {
       javaCore,
       javaJdbc,
       javaEbean,
-      "com.dlecan.reflections" % "jboss7-vfs-integration" % "1.0.3",
-      "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.0"
+      "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.1",
+      "com.github.play2war.ext" %% "jboss7-reflections-vfs-integration-play2" % "1.0.0"
     )
 
     val main = play.Project(appName, appVersion, appDependencies).settings(
       Play2WarKeys.servletVersion := "3.0",
-      resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath+"/.ivy2/local"))(Resolver.ivyStylePatterns)
+      resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath+"/.ivy2/local"))(Resolver.ivyStylePatterns),
+      resolvers += "OSS staging" at "http://oss.sonatype.org/content/groups/staging"
     ).settings(Play2WarPlugin.play2WarSettings: _*)
 
 }
