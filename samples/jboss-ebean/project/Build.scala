@@ -18,8 +18,7 @@ object ApplicationBuild extends Build {
 
     val main = play.Project(appName, appVersion, appDependencies).settings(
       Play2WarKeys.servletVersion := "3.0",
-      resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath+"/.ivy2/local"))(Resolver.ivyStylePatterns),
-      resolvers += "OSS staging" at "http://oss.sonatype.org/content/groups/staging"
+      resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath+"/.ivy2/local"))(Resolver.ivyStylePatterns)
     ).settings(Play2WarPlugin.play2WarSettings: _*)
 
 }
