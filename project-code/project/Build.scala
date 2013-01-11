@@ -73,7 +73,7 @@ object Build extends Build {
       publishArtifact := false,
       scalaBinaryVersion := buildScalaVersion,
 
-      libraryDependencies += "org.scalatest" %% "scalatest" % "1.8-B1" % "test",
+      libraryDependencies += "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
       libraryDependencies += "junit" % "junit" % "4.10" % "test",
       libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.3.1" % "test",
       libraryDependencies += "net.sourceforge.htmlunit" % "htmlunit" % "2.10" % "test",
