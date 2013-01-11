@@ -8,7 +8,7 @@ object Build extends Build {
   import BuildSettings._
   import Generators._
 
-  val cloudbees = "https://repository-play-war.forge.cloudbees.com/"
+  val nexus = "https://oss.sonatype.org/"
 
   val curDir = new File(".")
   val servlet30SampleProjectTargetDir = new File(curDir, "../sample/servlet30/target")
@@ -87,7 +87,7 @@ object Build extends Build {
   //
   // Settings
   //
-  def commonSettings = buildSettings ++
+  def commonSettings = buildSettings ++ mavenSettings ++
     Seq(
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
       EclipseKeys.withSource := true,
@@ -102,30 +102,16 @@ object Build extends Build {
       // Releases : Maven style
 
       publishTo <<= (version) {
-        version: String =>
-          val repo = {
+        version: String => {
       	    if (version.trim.endsWith("SNAPSHOT")) {
-              // Cloudbees repo
-              Resolver.url("snapshot",  url(cloudbees + "snapshot/"))(Resolver.ivyStylePatterns)
-
-              // To deploy locally with Ivy style
-              // Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish"))(Resolver.ivyStylePatterns)
+              Some("snapshots" at nexus + "content/repositories/snapshots")
             } else {
-              // Cloudbees repo
-              Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish"))
+              Some("releases"  at nexus + "service/local/staging/deploy/maven2")
             }
           }
-          Some(repo)
       },
       
-      credentials += Credentials(file("/private/play-war/.credentials")),
-      credentials += Credentials(file(Path.userHome.absolutePath + "/.ivy2/.credentials")),
-      
-      publishMavenStyle <<= (version) {
-        version: String =>
-          if (version.trim.endsWith("SNAPSHOT")) false
-          else                                   true
-      })
+      credentials += Credentials(file("/private/play-war/.credentials")))
 
   object BuildSettings {
 
@@ -146,6 +132,25 @@ object Build extends Build {
       checksums in update := Nil)
 
   }
+
+
+  def mavenSettings = Seq(
+      publishMavenStyle := true,
+      pomIncludeRepository := { _ => false },
+      licenses := Seq("The Apache Software License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
+      homepage := Some(url("https://github.com/dlecan/play2-war-plugin")),
+      pomExtra := (
+  <scm>
+    <url>git@github.com:dlecan/play2-war-plugin.git</url>
+    <connection>scm:git:git@github.com:dlecan/play2-war-plugin.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>dlecan</id>
+      <name>Damien Lecan</name>
+      <email>dev@dlecan.com</email>
+    </developer>
+  </developers>))
 
   object Generators {
 
