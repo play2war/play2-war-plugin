@@ -130,12 +130,12 @@ object Build extends Build {
   object BuildSettings {
 
     val buildOrganization = "com.github.play2war"
-    val defaultPlay2Version = "2.1-RC1"
+    val defaultPlay2Version = "2.1-RC2"
     val play2Version = Option(System.getProperty("play2.version")).filterNot(_.isEmpty).getOrElse(defaultPlay2Version)
     val buildVersion = "0.9-SNAPSHOT"
-    val buildScalaVersion = "2.10.0-RC3"
+    val buildScalaVersion = "2.10.0"
     val buildScalaVersionForSbt = "2.9.2"
-    val buildSbtVersion   = "0.12.1"
+    val buildSbtVersion   = "0.12.2-RC2"
     val buildSbtVersionBinaryCompatible = "0.12"
 
     val buildSettings = Defaults.defaultSettings ++ Seq(
