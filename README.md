@@ -157,162 +157,17 @@ See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
 
 The plugin may work on others containers, such as Weblogic or Websphere (not tested yet).
 
+## Configuration
+
+See [Configuration](/dlecan/play2-war-plugin/wiki/Configuration).
+
 ## Usage
 
-In the next descriptions, `APP_HOME` is the root of your Play 2.0 application you want to package as a WAR file.
+See [Usage](/dlecan/play2-war-plugin/wiki/Usage).
 
-### Add play2war plugin
+## Deployment
 
-In ``APP_HOME/project/plugins.sbt``, add:
-
-```scala
-resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
-
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.9-RC1")
-```
-### Import Play2War SBT settings
-
-In ``APP_HOME/project/Build.scala``, add:
-
-```scala
-...
-import PlayProject._
-import com.github.play2war.plugin._
-```
-
-### Configure servlet container version and add all Play2war settings in your project configuration
-
-```scala
-val appVersion      = "1.0-SNAPSHOT"
-...
-val main = PlayProject(appName, appVersion, appDependencies, mainLang = JAVA).settings(
-  // ... Your own settings here
-  Play2WarKeys.servletVersion := "3.0"
-  // Or Play2WarKeys.servletVersion := "2.5"
-).settings(Play2WarPlugin.play2WarSettings: _*)
-```
-
-### Configure logging
-
-You probably need to override default Play 2.0 logging configuration because:
-
-- An external file will be written in ``$USER_HOME/logs/...``
-
-- STDOUT appender pattern can be improved
-
-Create a file ``APP_HOME/conf/logger.xml`` with the following content :
-
-```xml
-<configuration>
-    
-  <conversionRule conversionWord="coloredLevel" converterClass="play.api.Logger$ColoredLevel" />
-
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-      <pattern>%date - [%level] - from %logger in %thread %n%message%n%xException%n</pattern>
-    </encoder>
-  </appender>
-  
-  <logger name="play" level="INFO" />
-  <logger name="application" level="INFO" />
-  
-  <!-- Off these ones as they are annoying, and anyway we manage configuration ourself -->
-  <logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF" />
-  <logger name="com.avaje.ebeaninternal.server.core.XmlConfigLoader" level="OFF" />
-  <logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread" level="OFF" />
-
-  <root level="ERROR">
-    <appender-ref ref="STDOUT" />
-  </root>
-  
-</configuration>
-```
-
-</configuration>
-
-### Embed custom WAR configuration files
-
-You can embed custom WAR configuration files, such as `MANIFEST.MF`, `web.xml`, ...
-For this, copy then in your `APP_HOME/war` folder. Don't forget to add subfolders !
-
-Samples:
-
-- `APP_HOME/war/myfile.txt` will result in `app_home.war!/myfile`
-- `APP_HOME/war/META-INF/MANIFEST.MF` will result in `app_home.war!/META-INF/MANIFEST.MF`
-- `APP_HOME/war/WEB-INF/web.xml` will result in `app_home.war!/WEB-INF/web.xml`
-
-## Packaging
-
-Package with:
-
-    play package
-
-or with
-
-    sbt package
-
-Your WAR package will be available in ``APP_HOME/target/<MY_PROJECT>-<YOUR_VERSION>.war``
-
-## How to deploy in my favorite application server ?
-
-**Play framework 2.0.x applications must be deployed at root context.**
-Deployment in a sub-context is a known limitation which is fixed for Play 2.1 (still in development).
-
-The best way to deploy at root context is to include a configuration file into the WAR file to indicate to your application server where to deploy the application.
-But Play2War doesn't support file inclusion yet (see [#4](/dlecan/play2-war-plugin/issues/4)).
-
-### Tomcat 7 : how to deploy at root context ?
-
-Rename the generated war *ROOT.war* before deployment.
-
-### Jetty 8/9 : how to deploy at root context ?
-
-Rename the generated war *ROOT.war* before deployment.
-
-### JBoss 7.0.x
-
-#### Extra configuration
-
-If you plan to use Java and EBean persistence model (not JPA), you must add extra configuration below to integrate Play runtime with JBoss VFS (Virtual File Sytem).
-
-In your `APP_HOME/project/Build.scala` file, add:
-
-```scala
-val appDependencies = Seq(
-  // ... Actual dependencies
-  "com.dlecan.reflections" % "jboss7-vfs-integration" % "1.0.3" // add this after your others dependencies
-)
-```
-
-#### How to deploy at root context ?
-
-In ``standalone/configuration/standalone.xml``, comment the ``subsystem`` named ``urn:jboss:domain:pojo:1.0``.
-
-Then follow explanations for JBoss 7.1.x below.
-
-### JBoss 7.1.x : how to deploy at root context ?
-
-First, disable default welcome page in ``standalone/configuration/standalone.xml`` by changing ``enable-welcome-root="true"`` to ``enable-welcome-root="false"``:
-
-```xml
-<subsystem xmlns="urn:jboss:domain:web:1.0" default-virtual-server="default-host">
-  <connector name="http" scheme="http" protocol="HTTP/1.1" socket-binding="http"/>
-  <virtual-server name="default-host" enable-welcome-root="true">
-    <alias name="localhost" />
-    <alias name="example.com" />
-  </virtual-server>
-</subsystem>
-```
-
-Then rename the generated war *ROOT.war* before deployment.
-
-## Upload or deploy your WAR file
-
-Upload or deploy your WAR file to your favorite Application Server if compatible (see <a href="#server-compatibility">Compatibility matrix above</a>).
-
-## WAR publishing (Artifactory, Nexus, ...)
-
-Play2war follows SBT rules, so built WAR can be published in a standard way (see [SBT Publish](https://github.com/harrah/xsbt/wiki/Publishing)).
+See [Deployment](/dlecan/play2-war-plugin/wiki/Deployment).
 
 ## FAQ
 
