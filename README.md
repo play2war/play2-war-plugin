@@ -20,9 +20,6 @@ Live demo: JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
 Other references built with Play 2 and Play2War:
  - [Factile](http://factile.net/) (Survey platform)
 
-## Known limitations
-* With Play 2.0.x, **your WAR must be deployed at root context** (no limitation with Play 2.1.x)
-
 ## What's new ?
 
 See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
