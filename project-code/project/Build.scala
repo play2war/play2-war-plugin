@@ -94,7 +94,6 @@ object Build extends Build {
 
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
 
-      publishArtifact in (Compile, packageDoc) := false,
       publishArtifact in Test := false,
 
       // Publishing settings
