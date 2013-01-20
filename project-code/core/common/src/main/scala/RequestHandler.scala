@@ -5,24 +5,23 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import play.api.mvc.Cookies
 import play.api.mvc.Headers
-import play.api.libs.iteratee.Enumeratee
 import java.util.concurrent.atomic.AtomicBoolean
 import play.api.mvc.SimpleResult
 import play.api.mvc.ChunkedResult
 import play.api.mvc.RequestHeader
 import play.api.mvc.AsyncResult
+import play.api.mvc.EssentialAction
 import play.api.libs.iteratee.Enumerator
 import play.api.Logger
 import play.api.mvc.WebSocket
-import play.api.libs.iteratee.Iteratee
 import play.api.mvc.Results
 import play.api.mvc.Response
 import play.api.mvc.Result
 import play.api.mvc.Action
-import play.api.libs.concurrent.Promise
-import play.api.libs.concurrent.Thrown
+import play.api.libs.concurrent._
+import play.api.libs.iteratee._
+import scala.concurrent.Future
 import play.api.mvc.ResponseHeader
-import play.api.libs.concurrent.Redeemed
 import play.api.mvc.Request
 import play.api.http.HeaderNames.CONTENT_LENGTH
 import play.api.http.HeaderNames.X_FORWARDED_FOR
@@ -73,13 +72,17 @@ trait HttpServletRequestHandler extends RequestHandler {
 abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServletRequest, val servletResponse: Option[HttpServletResponse])
   extends HttpServletRequestHandler {
 
+  implicit val internalExecutionContext = play.core.Execution.internalContext
+
+  private val requestIDs = new java.util.concurrent.atomic.AtomicLong(0)
+  
   override def apply(server: Play2WarServer) = {
 
     val server = Play2WarServer.playServer
 
     //    val keepAlive -> non-sens
     //    val websocketableRequest -> non-sens
-    val version = servletRequest.getProtocol.substring("HTTP/".length, servletRequest.getProtocol.length)
+    val httpVersion = servletRequest.getProtocol.substring("HTTP/".length, servletRequest.getProtocol.length)
     val servletPath = servletRequest.getRequestURI
     val servletUri = servletPath + Option(servletRequest.getQueryString).filterNot(_.isEmpty).map { "?" + _ }.getOrElse { "" }
     val parameters = getHttpParameters(servletRequest)
@@ -98,6 +101,9 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
     }
 
     val requestHeader = new RequestHeader {
+      val version = httpVersion
+      val id = requestIDs.incrementAndGet
+      val tags = Map.empty[String,String]
       def uri = servletUri
       def path = servletPath
       def method = httpMethod
@@ -152,7 +158,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
                 var hasError: AtomicBoolean = new AtomicBoolean(false)
 
-                val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
+                val writer: Function1[r.BODY_CONTENT, Future[Unit]] = x => {
                   Promise.pure(
                     {
                       if (hasError.get) {
@@ -223,7 +229,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
               var hasError: AtomicBoolean = new AtomicBoolean(false)
 
-              val writer: Function1[r.BODY_CONTENT, Promise[Unit]] = x => {
+              val writer: Function1[r.BODY_CONTENT, Future[Unit]] = x => {
                 Promise.pure(
                   {
                     if (hasError.get) {
@@ -279,71 +285,49 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       handler match {
 
         //execute normal action
-        case Right((action: Action[_], app)) => {
+        case Right((action: EssentialAction, app)) => {
+          val a = EssentialAction{ rh =>
+            Iteratee.flatten(action(rh).unflatten.extend1{
+              case Redeemed(it) => it.it
+              case Thrown(e) => Done(app.handleError(requestHeader, e),Input.Empty)
+            })
+          }
 
-          Logger("play").trace("Serving this request with: " + action)
+          Logger("play").trace("Serving this request with: " + a)
 
-          val bodyParser = action.parser
+          val filteredAction = app.global.doFilter(a)
 
-          val eventuallyBodyParser = server.getBodyParser[action.BODY_CONTENT](requestHeader, bodyParser)
+          val eventuallyBodyParser = scala.concurrent.Future(filteredAction(requestHeader))(play.api.libs.concurrent.Execution.defaultContext)
 
-          val _ =
-            eventuallyBodyParser.flatMap { bodyParser =>
-
-              requestHeader.headers.get("Expect") match {
-                case Some("100-continue") => {
-                  bodyParser.pureFold(
-                    (_, _) => (),
-                    k => {
-                      //                        val continue = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE)
-                      //                        e.getChannel.write(continue)
-                      ()
-                    },
-                    (_, _) => ())
-                }
-
-                case _ => Promise.pure()
-              }
+          // copied from latest PlayDefaultUpstreamHandler
+          requestHeader.headers.get("Expect").filter(_ == "100-continue").foreach { _ =>
+            eventuallyBodyParser.flatMap(_.unflatten).map {
+              // case Step.Cont(k) =>
+              //   val continue = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE)
+              // //TODO wait for the promise of the write
+              // e.getChannel.write(continue)
+              case _ =>
             }
+          }
 
-          lazy val bodyEnumerator = getHttpRequest().getRichInputStream.map { is =>
+          val bodyEnumerator = getHttpRequest().getRichInputStream.map { is =>
             Enumerator.fromStream(is).andThen(Enumerator.eof)
           }.getOrElse(Enumerator.eof)
 
-          val eventuallyResultOrBody = eventuallyBodyParser.flatMap(it =>
-            bodyEnumerator |>> it): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
+          val eventuallyResultIteratee = eventuallyBodyParser.flatMap(it => bodyEnumerator |>> it): scala.concurrent.Future[Iteratee[Array[Byte], Result]]
 
-          val eventuallyResultOrRequest =
-            eventuallyResultOrBody
-              .flatMap(it => it.run)
-              .map {
-                _.right.map(b =>
-                  new Request[action.BODY_CONTENT] {
-                    def uri = servletUri
-                    def path = servletPath
-                    def method = httpMethod
-                    def queryString = parameters
-                    def headers = rHeaders
-                    lazy val remoteAddress = rRemoteAddress
-                    def username = None
-                    val body = b
-                  })
-              }
+          val eventuallyResult = eventuallyResultIteratee.flatMap(it => it.run)
 
-          eventuallyResultOrRequest.extend(_.value match {
-            case Redeemed(Left(result)) => {
+          eventuallyResult.extend1 {
+            case Redeemed(result) => {
               Logger("play").trace("Got direct result from the BodyParser: " + result)
               response.handle(result)
-            }
-            case Redeemed(Right(request)) => {
-              Logger("play").trace("Invoking action with request: " + request)
-              server.invoke(request, response, action.asInstanceOf[Action[action.BODY_CONTENT]], app)
             }
             case error => {
               Logger("play").error("Cannot invoke the action, eventually got an error: " + error)
               response.handle(Results.InternalServerError)
             }
-          })
+          }
 
           None
         }

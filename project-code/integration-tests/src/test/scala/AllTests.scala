@@ -32,7 +32,7 @@ object AbstractPlay2WarTests {
 
 }
 
-abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with CargoContainerManager with BeforeAndAfter {
+abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with CargoContainerManager with BeforeAndAfter with WarContext {
 
   import AbstractPlay2WarTests._
 
@@ -63,7 +63,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     onBefore
 
     // Warm up application
-    sendRequest(pageUrl = ROOT_URL + "/")
+    sendRequest(pageUrl = rootUrl)
 
     onAfter
   }
@@ -80,6 +80,8 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   def onAfter {
     webClient.closeAllWindows
   }
+
+  def rootUrl = ROOT_URL + context
 
   def sendRequest(pageUrl: String, method: String = "GET", parameters: Map[String, String] = Map.empty, howManyTimes: Int = 1): Option[Page] = {
 
@@ -106,18 +108,18 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     result
   }
 
-  def givenWhenGet(given: String, path: String, when: String = "page is loaded with %s method", root: String = ROOT_URL, method: String = "GET", parameters: Map[String, String] = Map.empty, howManyTimes: Int = 1): Option[Page] = {
+  def givenWhenGet(given: String, path: String, when: String = "page is loaded with %s method", root: String = rootUrl, method: String = "GET", parameters: Map[String, String] = Map.empty, howManyTimes: Int = 1): Option[Page] = {
 
-    this.given(given)
+    this.Given(given)
     val pageUrl = root + path
 
-    this.when(when.format(method))
+    this.When(when.format(method))
 
     sendRequest(pageUrl, method, parameters, howManyTimes)
   }
 
   def thenCheckStatusCode(p: Option[Page], s: Int) {
-    then("status code should be " + s)
+    Then("status code should be " + s)
     p.map {
       _.getWebResponse.getStatusCode should be(s)
     }.getOrElse {
@@ -209,7 +211,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
       val page = givenWhenGet("a page", "/echoGetParameters", parameters = Map("param1" -> "value1", "param2" -> "value2"))
 
-      then("page body should contain parameters values")
+      Then("page body should contain parameters values")
       page.map { p =>
         p.getWebResponse.getContentAsString should (
           include("param1") and include("value1")
@@ -224,7 +226,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
       val page = givenWhenGet("a page", "/echoPostParameters", method = "POST", parameters = Map("param1" -> "value1", "param2" -> "value2"))
 
-      then("page body should contain parameters values")
+      Then("page body should contain parameters values")
       page.map { p =>
         p.getWebResponse.getContentAsString should (
           include("param1") and include("value1")
@@ -248,7 +250,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
       givenWhenGet("a page", "/setCookies")
 
-      then("response should contain cookies")
+      Then("response should contain cookies")
 
       val cookies = webClient.getCookieManager.getCookies.asScala
       cookies should have size (2)
@@ -263,11 +265,11 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     scenario("Container gets cookies") {
 
       // Load cookies
-      webClient.getPage(ROOT_URL + "/setCookies")
+      webClient.getPage(rootUrl + "/setCookies")
 
       val page = givenWhenGet("a page", "/getCookies", "client sends cookies")
 
-      then("page body should contain cookies values")
+      Then("page body should contain cookies values")
       page.map { p =>
         p.getWebResponse.getContentAsString should (
           include("cookie1") and include("value1")
@@ -290,7 +292,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
       val page = givenWhenGet("a page which will redirect", "/redirect")
 
-      then("response page should be a redirected page")
+      Then("response page should be a redirected page")
 
       page.map { p =>
         p.getWebResponse.getContentAsString should include("redirect landing")
@@ -308,13 +310,13 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   def downloadBigContent(name: String, url: String, maxRange: Int, header: String, expectedHeaderValue: String, expectedSize: Int, howManyTimes: Int = 1) = {
     val page = givenWhenGet("a page which sends " + name, url, parameters = Map("maxRange" -> maxRange.toString), howManyTimes = howManyTimes)
 
-    then("response page should be downloaded")
+    Then("response page should be downloaded")
 
     page.map { p =>
 
       p.getWebResponse.getStatusCode should be(200)
 
-      and("have a specified " + header)
+      And("have a specified " + header)
       info("Detected " + header + ": " + p.getWebResponse.getResponseHeaderValue(header))
       if (expectedHeaderValue.isEmpty) {
         p.getWebResponse.getResponseHeaderValue(header) should be(expectedSize.toString)
@@ -322,7 +324,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
         p.getWebResponse.getResponseHeaderValue(header) should be(expectedHeaderValue)
       }
 
-      and("have a specified size")
+      And("have a specified size")
       p.getWebResponse.getContentAsStream.available should be(expectedSize)
 
     }.getOrElse {
@@ -392,10 +394,10 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
         scenario("container sends an image to " + route) {
 
-          this.given("a form which sends a image to " + route)
-          val pageUrl = ROOT_URL + route
+          this.Given("a form which sends a image to " + route)
+          val pageUrl = rootUrl + route
 
-          this.when("image is uploaded")
+          this.When("image is uploaded")
           info("Load page " + pageUrl)
 
           val strictMethod = HttpMethod.valueOf("POST")
@@ -413,7 +415,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
           val page: Some[Page] = Some(webClient.getPage(requestSettings))
 
-          then("response page should contains image name")
+          Then("response page should contains image name")
 
           page.map { p =>
             p.getWebResponse.getContentAsString should include(imageName)
@@ -438,7 +440,7 @@ class Tomcat7027Tests extends AbstractTomcat7x {
 }*/
 
 @RunWith(classOf[JUnitRunner])
-class Tomcat6xTests extends AbstractPlay2WarTests with Servlet25Container {
+class Tomcat6xTests extends AbstractPlay2WarTests with Servlet25Container with Java6 {
   override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-6/v6.0.35/bin/apache-tomcat-6.0.35.tar.gz"
   override def containerFileNameInCloudbeesCache = Option("apache-tomcat-6.0.35.tar.gz")
   override def containerName = "tomcat6x"
@@ -450,36 +452,31 @@ class Tomcat7027Tests extends AbstractTomcat7x {
 }*/
 
 @RunWith(classOf[JUnitRunner])
-class Jetty7xTests extends AbstractPlay2WarTests with Servlet25Container {
+class Jetty7xTests extends AbstractPlay2WarTests with Servlet25Container with Java6 {
   override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/7.6.5.v20120716/jetty-distribution-7.6.5.v20120716.tar.gz"
   override def containerFileNameInCloudbeesCache = Option("jetty-distribution-7.6.5.v20120716.tar.gz")
   override def containerName = "jetty7x"
 }
 
-// @RunWith(classOf[JUnitRunner])
-// class Tomcat7029Tests extends AbstractTomcat7x {
-//   override def tomcatVersion = "7.0.29"
-//   override def containerFileNameInCloudbeesCache = Option("apache-tomcat-7.0.29.zip")
-// }
-
 @RunWith(classOf[JUnitRunner])
-class Tomcat7029Tests extends AbstractTomcat7x {
+class Tomcat70xTests extends AbstractTomcat7x with Java6 {
   override def tomcatVersion = "7.0.32"
   override def containerFileNameInCloudbeesCache = Option("apache-tomcat-7.0.32.zip")
 }
 
 @RunWith(classOf[JUnitRunner])
-class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container {
+class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container with Java6 {
   override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
   override def containerFileNameInCloudbeesCache = Option("jetty-distribution-8.1.3.v20120416.tar.gz")
   override def containerName = "jetty8x"
 }
 
-//@RunWith(classOf[JUnitRunner])
-//class Jetty9xTests extends AbstractPlay2WarTests with Servlet30Container {
-//  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.0.0.M0/jetty-distribution-9.0.0.M0.tar.gz"
-//  override def containerName = "jetty9x"
-//}
+@RunWith(classOf[JUnitRunner])
+class Jetty9xTests extends AbstractPlay2WarTests with Servlet30Container with Java7 {
+  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.0.0.M2/jetty-distribution-9.0.0.M2.tar.gz"
+  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-9.0.0.M2.tar.gz")
+  override def containerName = "jetty9x"
+}
 
 // Doesn't work yet : deployment of sample war fails : Command deploy requires an operand of type class java.io.File
 //@RunWith(classOf[JUnitRunner])

@@ -1,6 +1,6 @@
 import sbt._
 import Keys._
-import PlayProject._
+import play.Project._
 import com.github.play2war.plugin._
 
 object ApplicationBuild extends Build {
@@ -11,7 +11,7 @@ object ApplicationBuild extends Build {
   lazy val commonSettings = Defaults.defaultSettings ++ Seq(
     //      resolvers += "Local Repository" at "http://localhost:8090/publish",
     resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns),
-    resolvers += Resolver.url("Play2war plugin snapshot", url("http://repository-play-war.forge.cloudbees.com/snapshot/"))(Resolver.ivyStylePatterns),
+    resolvers += "snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
 
     publishArtifact in (Compile, packageDoc) := false,
     publishArtifact in (Compile, packageSrc) := false,
@@ -25,18 +25,22 @@ object ApplicationBuild extends Build {
     //
   )
     
-  lazy val appDependencies = Seq(
-    // Add your project dependencies here
+  lazy val commonAppDependencies = Seq(
+    javaCore
   )
 
-  lazy val common = PlayProject(appName + "common", appVersion, appDependencies, mainLang = SCALA, path = file("common"), settings = commonSettings ++ playProjectSettings)
+  lazy val common = play.Project(appName + "common", appVersion, commonAppDependencies, path = file("common"), settings = commonSettings ++ playProjectSettings)
+
+  lazy val appDependencies = commonAppDependencies ++ Seq(
+    "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.1"
+  )
 
   lazy val warProjectSettings = playProjectSettings ++ Play2WarPlugin.play2WarSettings ++ Seq(
     publishArtifact in (Compile, packageBin) := false
   )
 
-  lazy val servlet25 = PlayProject(appName + "servlet25", appVersion, appDependencies, mainLang = SCALA, path = file("servlet25"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "2.5")) dependsOn (common)
+  lazy val servlet25 = play.Project(appName + "servlet25", appVersion, appDependencies, path = file("servlet25"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "2.5")) dependsOn (common)
 
-  lazy val servlet30 = PlayProject(appName + "servlet30", appVersion, appDependencies, mainLang = SCALA, path = file("servlet30"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "3.0")) dependsOn (common)
+  lazy val servlet30 = play.Project(appName + "servlet30", appVersion, appDependencies, path = file("servlet30"), settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "3.0")) dependsOn (common)
 
 }

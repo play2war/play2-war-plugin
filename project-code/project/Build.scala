@@ -8,7 +8,7 @@ object Build extends Build {
   import BuildSettings._
   import Generators._
 
-  val cloudbees = "https://repository-play-war.forge.cloudbees.com/"
+  val nexus = "https://oss.sonatype.org/"
 
   val curDir = new File(".")
   val servlet30SampleProjectTargetDir = new File(curDir, "../sample/servlet30/target")
@@ -54,13 +54,15 @@ object Build extends Build {
   lazy val play2WarPlugin = Project(id = "play2-war-plugin",
     base = file("plugin"),
     settings = commonSettings ++ Seq(
+      scalaVersion := buildScalaVersionForSbt,
+      scalaBinaryVersion  := CrossVersion.binaryScalaVersion(buildScalaVersionForSbt),
       sbtPlugin := true,
 
       sourceGenerators in Compile <+= sourceManaged in Compile map Play2WarVersion,
 
       libraryDependencies <++= (scalaVersion, sbtVersion) { (scalaVersion, sbtVersion) =>
         Seq(
-          "play" % "sbt-plugin" % play2Version % "provided->default(compile)" extra ("scalaVersion" -> scalaVersion, "sbtVersion" -> sbtVersion))
+          "play" % "sbt-plugin" % play2Version % "provided->default(compile)" extra ("scalaVersion" -> buildScalaVersionForSbt, "sbtVersion" -> buildSbtVersionBinaryCompatible))
       }))
 
   //
@@ -71,10 +73,11 @@ object Build extends Build {
     settings = commonSettings ++ Seq(
       sbtPlugin := false,
       publishArtifact := false,
+      scalaBinaryVersion := buildScalaVersion,
 
-      libraryDependencies += "org.scalatest" %% "scalatest" % "1.8" % "test",
+      libraryDependencies += "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
       libraryDependencies += "junit" % "junit" % "4.10" % "test",
-      libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.3.0" % "test",
+      libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.3.1" % "test",
       libraryDependencies += "net.sourceforge.htmlunit" % "htmlunit" % "2.10" % "test",
 
       parallelExecution in Test := false,
@@ -104,14 +107,13 @@ object Build extends Build {
   //
   // Settings
   //
-  def commonSettings = buildSettings ++
+  def commonSettings = buildSettings ++ mavenSettings ++
     Seq(
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
       EclipseKeys.withSource := true,
 
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
 
-      publishArtifact in (Compile, packageDoc) := false,
       publishArtifact in Test := false,
 
       // Publishing settings
@@ -119,43 +121,55 @@ object Build extends Build {
       // Releases : Maven style
 
       publishTo <<= (version) {
-        version: String =>
-          val repo = {
+        version: String => {
       	    if (version.trim.endsWith("SNAPSHOT")) {
-              // Cloudbees repo
-              Resolver.url("snapshot",  url(cloudbees + "snapshot/"))(Resolver.ivyStylePatterns)
-
-              // To deploy locally with Ivy style
-              // Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish"))(Resolver.ivyStylePatterns)
+              Some("snapshots" at nexus + "content/repositories/snapshots")
             } else {
-              // Cloudbees repo
-              Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish"))
+              Some("releases"  at nexus + "service/local/staging/deploy/maven2")
             }
           }
-          Some(repo)
       },
       
-      credentials += Credentials(file("/private/play-war/.credentials")),
-      credentials += Credentials(file(Path.userHome.absolutePath + "/.ivy2/.credentials")),
-      
-      publishMavenStyle <<= (version) {
-        version: String =>
-          if (version.trim.endsWith("SNAPSHOT")) false
-          else                                   true
-      })
+      credentials += Credentials(file("/private/play-war/.credentials")))
 
   object BuildSettings {
 
     val buildOrganization = "com.github.play2war"
-    val defaultPlay2Version = "2.0.2"
+    val defaultPlay2Version = "2.1-RC2"
     val play2Version = Option(System.getProperty("play2.version")).filterNot(_.isEmpty).getOrElse(defaultPlay2Version)
     val buildVersion = "0.9-SNAPSHOT"
+    val buildScalaVersion = "2.10.0"
+    val buildScalaVersionForSbt = "2.9.2"
+    val buildSbtVersion   = "0.12.2-RC2"
+    val buildSbtVersionBinaryCompatible = "0.12"
 
     val buildSettings = Defaults.defaultSettings ++ Seq(
-      organization := buildOrganization,
-      version := buildVersion)
+      organization        := buildOrganization,
+      version             := buildVersion,
+      scalaVersion        := buildScalaVersion,
+      scalaBinaryVersion  := CrossVersion.binaryScalaVersion(buildScalaVersion),
+      checksums in update := Nil)
 
   }
+
+
+  def mavenSettings = Seq(
+      publishMavenStyle := true,
+      pomIncludeRepository := { _ => false },
+      licenses := Seq("The Apache Software License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
+      homepage := Some(url("https://github.com/dlecan/play2-war-plugin")),
+      pomExtra := (
+  <scm>
+    <url>git@github.com:dlecan/play2-war-plugin.git</url>
+    <connection>scm:git:git@github.com:dlecan/play2-war-plugin.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>dlecan</id>
+      <name>Damien Lecan</name>
+      <email>dev@dlecan.com</email>
+    </developer>
+  </developers>))
 
   object Generators {
 
