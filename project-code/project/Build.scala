@@ -95,8 +95,7 @@ object Build extends Build {
 
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
 
-      publishArtifact in Test := false,
-      credentials += Credentials(file("/private/play-war/.credentials")))
+      publishArtifact in Test := false)
 
   object BuildSettings {
 
