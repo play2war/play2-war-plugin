@@ -9,6 +9,7 @@ object Build extends Build {
   import Generators._
 
   val nexus = "https://oss.sonatype.org/"
+  val scalasbt = "http://repo.scala-sbt.org/scalasbt/"
 
   val curDir = new File(".")
   val servlet30SampleProjectTargetDir = new File(curDir, "../sample/servlet30/target")
@@ -22,7 +23,7 @@ object Build extends Build {
   //
   lazy val root = Project(id = "play2-war",
     base = file("."),
-    settings = commonSettings ++ Seq(
+    settings = commonSettings ++ mavenSettings ++ Seq(
       publishArtifact := false)) aggregate (play2WarCoreCommon, play2WarCoreservlet30, play2WarCoreservlet25, play2WarPlugin, play2WarIntegrationTests)
 
   //
@@ -30,19 +31,19 @@ object Build extends Build {
   //
   lazy val play2WarCoreCommon = Project(id = "play2-war-core-common",
     base = file("core/common"),
-    settings = commonSettings ++ Seq(
+    settings = commonSettings ++ mavenSettings ++ Seq(
       libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api"),
       libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default"))
 
   lazy val play2WarCoreservlet30 = Project(id = "play2-war-core-servlet30",
     base = file("core/servlet30"),
-    settings = commonSettings ++ Seq(
+    settings = commonSettings ++ mavenSettings ++ Seq(
       libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api"),
       libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "provided->default")) dependsOn (play2WarCoreCommon)
 
   lazy val play2WarCoreservlet25 = Project(id = "play2-war-core-servlet25",
     base = file("core/servlet25"),
-    settings = commonSettings ++ Seq(
+    settings = commonSettings ++ mavenSettings ++ Seq(
       libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api"),
       libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default")) dependsOn (play2WarCoreCommon)
 
@@ -51,7 +52,7 @@ object Build extends Build {
   //
   lazy val play2WarPlugin = Project(id = "play2-war-plugin",
     base = file("plugin"),
-    settings = commonSettings ++ Seq(
+    settings = commonSettings ++ ivySettings ++ Seq(
       scalaVersion := buildScalaVersionForSbt,
       scalaBinaryVersion  := CrossVersion.binaryScalaVersion(buildScalaVersionForSbt),
       sbtPlugin := true,
@@ -68,7 +69,7 @@ object Build extends Build {
   //
   lazy val play2WarIntegrationTests = Project(id = "integration-tests",
     base = file("integration-tests"),
-    settings = commonSettings ++ Seq(
+    settings = commonSettings ++ mavenSettings ++ Seq(
       sbtPlugin := false,
       publishArtifact := false,
       scalaBinaryVersion := buildScalaVersion,
@@ -87,7 +88,7 @@ object Build extends Build {
   //
   // Settings
   //
-  def commonSettings = buildSettings ++ mavenSettings ++
+  def commonSettings = buildSettings ++
     Seq(
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
       EclipseKeys.withSource := true,
@@ -95,21 +96,6 @@ object Build extends Build {
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
 
       publishArtifact in Test := false,
-
-      // Publishing settings
-      // Snapshots : Ivy style
-      // Releases : Maven style
-
-      publishTo <<= (version) {
-        version: String => {
-      	    if (version.trim.endsWith("SNAPSHOT")) {
-              Some("snapshots" at nexus + "content/repositories/snapshots")
-            } else {
-              Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-            }
-          }
-      },
-      
       credentials += Credentials(file("/private/play-war/.credentials")))
 
   object BuildSettings {
@@ -132,13 +118,38 @@ object Build extends Build {
 
   }
 
+  def commonIvyMavenSettings: Seq[Setting[_]] = Seq(
+    licenses := Seq("The Apache Software License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
+    homepage := Some(url("https://github.com/dlecan/play2-war-plugin"))
+  )
 
-  def mavenSettings = Seq(
-      publishMavenStyle := true,
-      pomIncludeRepository := { _ => false },
-      licenses := Seq("The Apache Software License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
-      homepage := Some(url("https://github.com/dlecan/play2-war-plugin")),
-      pomExtra := (
+  def ivySettings = commonIvyMavenSettings ++ Seq(
+    publishMavenStyle := false,
+    publishTo <<= (version) {
+      version: String => {
+        val (name, url) = if (version.contains("-SNAPSHOT")) {
+          ("sbt-plugin-snapshots", scalasbt+"sbt-plugin-snapshots")
+        } else {
+          ("sbt-plugin-releases", scalasbt+"sbt-plugin-releases")
+        }
+        Some(Resolver.url(name, new URL(url))(Resolver.ivyStylePatterns))
+      }
+    }
+  )
+
+  def mavenSettings = commonIvyMavenSettings ++ Seq(
+    publishMavenStyle := true,
+    pomIncludeRepository := { _ => false },
+    publishTo <<= (version) {
+      version: String => {
+          if (version.trim.endsWith("SNAPSHOT")) {
+            Some("snapshots" at nexus + "content/repositories/snapshots")
+          } else {
+            Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+          }
+        }
+    },
+    pomExtra := (
   <scm>
     <url>git@github.com:dlecan/play2-war-plugin.git</url>
     <connection>scm:git:git@github.com:dlecan/play2-war-plugin.git</connection>
