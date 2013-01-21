@@ -23,6 +23,12 @@ import scala.collection.JavaConverters._
 import org.apache.commons.io.FileUtils
 import java.io.File
 
+trait WarContext {
+  
+  def context = "/p2wsample"
+
+}
+
 trait ServletContainer {
 
   protected val WAR_KEY = "war.servlet"
@@ -41,7 +47,7 @@ trait Servlet25Container extends ServletContainer {
   def keyServletContainer = "25"
 }
 
-trait CargoContainerManager extends BeforeAndAfterAll {
+trait CargoContainerManager extends BeforeAndAfterAll with WarContext {
   self: Suite =>
 
   def getContainer: InstalledLocalContainer
@@ -54,9 +60,9 @@ trait CargoContainerManager extends BeforeAndAfterAll {
 
   def containerName: String
 
-  def context = "/"
-
   def keyWarPath: String
+
+  def getJavaVersion: String
 
   abstract override def beforeAll(configMap: Map[String, Any]) {
 
@@ -65,9 +71,14 @@ trait CargoContainerManager extends BeforeAndAfterAll {
     println("WAR file to deploy: " + warPath)
 
     val containerUrlToDownload: String = containerFileNameInCloudbeesCache.flatMap { c =>
-      val path = "file:///private/play-war/cargo-containers/" + c
-      if (new File(path).exists) Option(path)
-      else None
+      val path = "/private/play-war/cargo-containers/" + c
+      if (new File(path).exists) {
+        println("Local container found: " + path)
+        Option("file://" + path)
+      } else {
+        println("Local container not found: " + path)
+        None
+      }
     }.getOrElse(containerUrl)
 
     println("Download container " + containerName + " from " + containerUrlToDownload + " ...")
@@ -83,6 +94,14 @@ trait CargoContainerManager extends BeforeAndAfterAll {
 
     configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.MEDIUM.getLevel);
 
+    getJavaVersion match {
+      case "java6" => // Nothing, use current JVM
+      case "java7" => {
+        val java7Home = Option(System.getProperty("java7.home")).map(p => p).getOrElse(throw new RuntimeException("-Djava7.home not defined"))
+        configuration.setProperty(GeneralPropertySet.JAVA_HOME, java7Home)
+      }
+    }
+    
     val container =
       new DefaultContainerFactory().createContainer(
         containerName, ContainerType.INSTALLED, configuration).asInstanceOf[InstalledLocalContainer]
@@ -106,4 +125,22 @@ trait CargoContainerManager extends BeforeAndAfterAll {
       _.stop
     }
   }
+}
+
+trait JavaVersion {
+
+  def getJavaVersion: String
+
+}
+
+trait Java6 extends JavaVersion {
+
+  override def getJavaVersion = "java6"
+
+}
+
+trait Java7 extends JavaVersion {
+
+  override def getJavaVersion = "java7"
+
 }
