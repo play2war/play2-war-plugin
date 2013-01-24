@@ -23,7 +23,7 @@ object Play2WarServer {
 
   Logger.configure(Map.empty, Map.empty, Mode.Prod)
 
-  private val classLoader = getClass.getClassLoader;
+  private val classLoader = Thread.currentThread.getContextClassLoader
 
   private val application = new WarApplication(classLoader, Mode.Prod)
 
