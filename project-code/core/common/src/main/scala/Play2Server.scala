@@ -15,17 +15,17 @@ import play.api.Logger
 import play.api.Logger.apply
 import play.api.Mode
 import play.api.Play
+import play.api._
 import play.core.ApplicationProvider
 import play.core.server.Server
 import play.core.server.ServerWithStop
+import play.core._
 
 object Play2WarServer {
 
   Logger.configure(Map.empty, Map.empty, Mode.Prod)
 
-  private val classLoader = Thread.currentThread.getContextClassLoader
-
-  private val application = new WarApplication(classLoader, Mode.Prod)
+  private val application = new WarApplication(Mode.Prod)
 
   val configuration = application.get.right.map { _.configuration }.right.getOrElse(Configuration.empty)
 
@@ -76,11 +76,11 @@ private[servlet] class Play2WarServer(appProvider: WarApplication) extends Serve
   }
 }
 
-private[servlet]class WarApplication(val classLoader: ClassLoader, val mode: Mode.Mode) extends ApplicationProvider {
+private[servlet] class WarApplication(val mode: Mode.Mode) extends ApplicationProvider {
 
   val applicationPath = Option(System.getProperty("user.home")).map(new File(_)).getOrElse(new File(""))
 
-  val application = new DefaultApplication(applicationPath, classLoader, None, mode)
+  val application = new DefaultWarApplication(applicationPath, mode)
 
   // Because of https://play.lighthouseapp.com/projects/82401-play-20/tickets/275, reconfigure Logger
   // without substitutions
@@ -91,4 +91,12 @@ private[servlet]class WarApplication(val classLoader: ClassLoader, val mode: Mod
 
   def get = Right(application)
   def path = applicationPath
+}
+
+private[servlet] class DefaultWarApplication(
+  override val path: File,
+  override val mode: Mode.Mode
+) extends Application with WithDefaultConfiguration with WithDefaultGlobal with WithDefaultPlugins {
+  override def classloader = Thread.currentThread.getContextClassLoader
+  override def sources = None
 }
