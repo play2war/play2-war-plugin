@@ -1,12 +1,10 @@
 package play.api.i18n
 
 import scala.language.postfixOps
-
+import play.api.i18n._
 import play.api._
 import play.core._
-
 import java.io._
-
 import scala.util.parsing.input._
 import scala.util.parsing.combinator._
 import scala.util.matching._
@@ -29,7 +27,7 @@ object Messages {
    *
    * @param key the message key
    * @param args the message arguments
-   * @return the formatted message or a default rendering if the key wasn’t defined
+   * @return the formatted message or a default rendering if the key wasn�t defined
    */
   def apply(key: String, args: Any*)(implicit lang: Lang): String = {
     Play.maybeApplication.flatMap { app =>
@@ -115,34 +113,6 @@ object Messages {
 }
 
 /**
- * The internationalisation API.
- */
-case class MessagesApi(messages: Map[String, Map[String, String]]) {
-
-  import java.text._
-
-  /**
-   * Translates a message.
-   *
-   * Uses `java.text.MessageFormat` internally to format the message.
-   *
-   * @param key the message key
-   * @param args the message arguments
-   * @return the formatted message, if this key was defined
-   */
-  def translate(key: String, args: Seq[Any])(implicit lang: Lang): Option[String] = {
-    val langsToTry: List[Lang] =
-      List(lang, Lang(lang.language, ""), Lang("default", ""))
-    val pattern: Option[String] =
-      langsToTry.foldLeft[Option[String]](None)((res, lang) =>
-        res.orElse(messages.get(lang.code).flatMap(_.get(key))))
-    pattern.map(pattern =>
-      new MessageFormat(pattern, lang.toLocale).format(args.map(_.asInstanceOf[java.lang.Object]).toArray))
-  }
-
-}
-
-/**
  * Play Plugin for internationalisation.
  */
 class MessagesPlugin(app: Application) extends Plugin {
@@ -153,8 +123,21 @@ class MessagesPlugin(app: Application) extends Plugin {
   import scalax.io.JavaConverters._
 
   private def loadMessages(file: String): Map[String, String] = {
-    app.classloader.getResources(file).asScala.toList.reverse.map { messageFile =>
-      new Messages.MessagesParser(messageFile.asInput, messageFile.toString).parse.map { message =>
+    Logger("play").info(s"[Override] MessagesPlugin:loadMessages: $file")
+    
+    Logger("play").info(s"[Override] MessagesPlugin:MessagesPlugin:loadMessages: classloader: $app.classloader")
+    
+    val resourceFiles = app.classloader.getResources(file).asScala
+    
+    Logger("play").info("[Override] MessagesPlugin:MessagesPlugin:loadMessages: resource files found: " + resourceFiles.mkString(", "))
+    
+    resourceFiles.toList.reverse.map { messageFile =>
+      
+      val input = messageFile.asInput
+      val url = messageFile.toString
+      Logger("play").info(s"[Override] MessagesPlugin:loadMessages: will parse file $url")
+      
+      new Messages.MessagesParser(input, url).parse.map { message =>
         message.key -> message.pattern
       }.toMap
     }.foldLeft(Map.empty[String, String]) { _ ++ _ }
