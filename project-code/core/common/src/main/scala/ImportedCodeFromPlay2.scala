@@ -123,19 +123,19 @@ class MessagesPlugin(app: Application) extends Plugin {
   import scalax.io.JavaConverters._
 
   private def loadMessages(file: String): Map[String, String] = {
-    Logger("play").info(s"[Override] MessagesPlugin:loadMessages: $file")
+    println(s"[Override] MessagesPlugin:loadMessages: $file")
     
-    Logger("play").info(s"[Override] MessagesPlugin:MessagesPlugin:loadMessages: classloader: $app.classloader")
+    println(s"[Override] MessagesPlugin:MessagesPlugin:loadMessages: classloader: $app.classloader")
     
     val resourceFiles = app.classloader.getResources(file).asScala
     
-    Logger("play").info("[Override] MessagesPlugin:MessagesPlugin:loadMessages: resource files found: " + resourceFiles.mkString(", "))
+    println("[Override] MessagesPlugin:MessagesPlugin:loadMessages: resource files found: " + resourceFiles.mkString(", "))
     
     resourceFiles.toList.reverse.map { messageFile =>
       
       val input = messageFile.asInput
       val url = messageFile.toString
-      Logger("play").info(s"[Override] MessagesPlugin:loadMessages: will parse file $url")
+      println(s"[Override] MessagesPlugin:loadMessages: will parse file $url")
       
       new Messages.MessagesParser(input, url).parse.map { message =>
         message.key -> message.pattern
