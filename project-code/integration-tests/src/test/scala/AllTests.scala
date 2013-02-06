@@ -330,12 +330,13 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     }
   }
 
-  val mapOfMaxRangeExpectedSize: Map[Int, Int] = Map(
-    100000 -> 588890 //
-    , 300000 -> 1988890 //
-    , 500000 -> 3388890 //
-    , 900000 -> 6188890 //
-    , 2000000 -> 14888890 //
+  val mapOfMaxRangeExpectedSize: Seq[(Int, Int, Boolean)] = Seq(
+    // GET parameter, expected file size, test to be ignored ?
+    (100000, 588890, false) //
+    , (300000, 1988890, false) //
+    , (500000, 3388890, false) //
+    , (900000, 6188890, false) //
+    , (2000000, 14888890, false) //
     )
 
   val seqTupleBigContent = Seq(
@@ -349,12 +350,19 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
       case (name, url, header, expectedHeaderValue) => {
 
         mapOfMaxRangeExpectedSize.foreach {
-          case (maxRange, expectedSize) => {
+          case (maxRange, expectedSize, ignoreTest) => {
 
-            scenario("container sends big files (" + expectedSize + " bytes expected with " + header + " header") {
+            val scenarioName = "container sends big files (" + expectedSize + " bytes expected with " + header + " header"
 
-              downloadBigContent(name, url, maxRange, header, expectedHeaderValue, expectedSize)
+            if (ignoreTest) {
+              // Nothing, just for logging
+              ignore(scenarioName) {}
+            } else {
+              scenario(scenarioName) {
 
+                downloadBigContent(name, url, maxRange, header, expectedHeaderValue, expectedSize)
+
+              }
             }
           }
         }
@@ -369,12 +377,19 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     seqTupleBigContent.foreach {
       case (name, url, header, expectedHeaderValue) => {
 
-        val (maxRange, expectedSize) = mapOfMaxRangeExpectedSize.head
+        val (maxRange, expectedSize, ignoreTest) = mapOfMaxRangeExpectedSize.head
 
-        scenario("container sends big files (" + expectedSize + " bytes expected with " + header + " header") {
+        val scenarioName = "container sends big files (" + expectedSize + " bytes expected with " + header + " header"
 
-          downloadBigContent(name, url, maxRange, header, expectedHeaderValue, expectedSize, howManyTimes)
+        if (ignoreTest) {
+          // Nothing, just for logging
+          ignore(scenarioName) {}
+        } else {
+          scenario(scenarioName) {
 
+            downloadBigContent(name, url, maxRange, header, expectedHeaderValue, expectedSize, howManyTimes)
+
+          }
         }
       }
     }
