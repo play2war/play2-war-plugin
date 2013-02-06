@@ -335,8 +335,9 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   val mapOfMaxRangeExpectedSize: Map[Int, Int] = Map(
     100000 -> 588890 //
     , 300000 -> 1988890 //
-    , 500000 -> 3388890 // Ca craque avec content-length, mais ca a l'air de passer avec Transfert-encoding
-    //, 900000 -> 
+    , 500000 -> 3388890 //
+    , 900000 -> 6188890 //
+    , 2000000 -> 14888890 //
     )
 
   val seqTupleBigContent = Seq(
