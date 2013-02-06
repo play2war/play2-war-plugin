@@ -15,6 +15,10 @@ Why choosing WAR packaging when native Play 2 is a better deployment model (feat
 - SSL is available, easy to configure and well documented on JBoss, Tomcat, ... when SSL is newer on Play 2.1
 - You need to add extra Servlet filters specific to your company (to handle SSO, ...)
 
+You can trust this plugin because it is [heavily tested](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_204_Play_runtime/lastCompletedBuild/testReport/), with hundreds of integration tests run on :
+- several open-source application servers (Tomcat 6/7, Jetty 7/8/9, JBoss AS 7.x)
+- *all versions* of Play Framework 2.x
+
 Live demo: JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
 
 Other references built with Play 2 and Play2War:
