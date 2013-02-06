@@ -89,7 +89,10 @@ object Build extends Build {
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
       EclipseKeys.withSource := true,
 
-      resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
+      resolvers ++= Seq(
+        DefaultMavenRepository,
+        "Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"
+      ),
 
       publishArtifact in (Compile, packageDoc) := false,
       publishArtifact in Test := false,
