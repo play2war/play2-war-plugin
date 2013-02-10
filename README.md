@@ -26,7 +26,7 @@ Other references built with Play 2 and Play2War:
 
 ## What's new ?
 
-See [Changelog](/dlecan/play2-war-plugin/wiki/Changelog).
+See [Changelog](https://github.com/dlecan/play2-war-plugin/wiki/Changelog).
 
 ## Features
 <table>
@@ -160,19 +160,19 @@ The plugin may work on others containers, such as Weblogic or Websphere (not tes
 
 ## Configuration
 
-See [Configuration](/dlecan/play2-war-plugin/wiki/Configuration).
+See [Configuration](https://github.com/dlecan/play2-war-plugin/wiki/Configuration).
 
 ## Usage
 
-See [Usage](/dlecan/play2-war-plugin/wiki/Usage).
+See [Usage](https://github.com/dlecan/play2-war-plugin/wiki/Usage).
 
 ## Deployment
 
-See [Deployment](/dlecan/play2-war-plugin/wiki/Deployment).
+See [Deployment](https://github.com/dlecan/play2-war-plugin/wiki/Deployment).
 
 ## FAQ
 
-See [FAQ](/dlecan/play2-war-plugin/wiki/FAQ).
+See [FAQ](https://github.com/dlecan/play2-war-plugin/wiki/FAQ).
 
 ## Issues
 
@@ -184,7 +184,7 @@ Watch it in action here : [https://play-war.ci.cloudbees.com/](https://play-war.
 
 ## How to help ?
 
-Discover [how you can help the project](/dlecan/play2-war-plugin/wiki/How-to-help).
+Discover [how you can help the project](https://github.com/dlecan/play2-war-plugin/wiki/How-to-help).
 
 ## Licence
 
