@@ -9,7 +9,7 @@ trait Play2WarSettings {
   this: Play2WarCommands =>
 
   lazy val play2WarSettings = Seq[Setting[_]](
-    
+
     libraryDependencies <++= (servletVersion) { (v) =>
       val servletVersionString = v match {
         case "2.5" => "25"
@@ -20,8 +20,10 @@ trait Play2WarSettings {
     
     webappResource <<= baseDirectory / "war",
 
-    // War attifact
+    // War artifact
     artifact in war <<= moduleName(n => Artifact(n, "war", "war")),
+
+    targetName := None,
 
     // Bind war building to "war" task
     war <<= warTask,
