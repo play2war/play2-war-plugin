@@ -17,7 +17,6 @@ import sbt.Keys.normalizedName
 import sbt.Keys.streams
 import sbt.Keys.target
 import sbt.Keys.version
-import sbt.Scoped.t8ToTable8
 import sbt.Runtime
 import sbt.richFile
 import sbt.Artifact
@@ -51,8 +50,6 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
         throw new IllegalArgumentException("play2-war-core-common not found in dependencies!")
       }
     
-      import sbt.NameFilter._
-
       val warDir = target
       val packageName = id + "-" + version
       val war = warDir / (packageName + ".war")
@@ -145,7 +142,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
       val metaInfFolder = webappResource / "META-INF"
       val manifest  = if (metaInfFolder.exists()) {
         val option = metaInfFolder.listFiles.find(f => 
-          manifestRegex.r.pattern.matcher(f.getAbsolutePath()).matches());
+          manifestRegex.r.pattern.matcher(f.getAbsolutePath()).matches())
         if (option.isDefined){
           new Manifest(new FileInputStream(option.get))
         }
@@ -158,7 +155,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
       } 
       
       // Package final jar
-      val jarContent = libs ++ additionnalResources;
+      val jarContent = libs ++ additionnalResources
 
       IO.jar(jarContent, war, manifest)
 
