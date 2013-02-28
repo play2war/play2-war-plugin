@@ -23,6 +23,8 @@ trait Play2WarSettings {
     // War artifact
     artifact in war <<= moduleName(n => Artifact(n, "war", "war")),
 
+    targetName := None,
+
     // Bind war building to "war" task
     war <<= warTask,
 

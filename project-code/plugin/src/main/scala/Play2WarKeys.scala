@@ -13,5 +13,6 @@ trait Play2WarKeys {
       
   lazy val webappResource = SettingKey[File]("webapp-resources")
 
+  lazy val targetName = SettingKey[Option[String]]("targetName", "The name of the WAR file generated")
 }
 object Play2WarKeys extends Play2WarKeys
