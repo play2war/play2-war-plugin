@@ -1,6 +1,7 @@
 package controllers;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import play.mvc.*;
 import play.mvc.Http.*;
@@ -28,6 +29,15 @@ public class JavaApplication extends Controller {
   @BodyParser.Of(BodyParser.MultipartFormData.class)
   public static Result upload2() {
     return upload();
+  }
+
+  public static Result longRequest(Long duration) {
+    try {
+      Thread.sleep(TimeUnit.SECONDS.toMillis(duration));
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+    return ok();
   }
 }
             
