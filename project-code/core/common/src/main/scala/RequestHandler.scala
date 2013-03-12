@@ -242,18 +242,39 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
                 val byteBuffer = new ByteArrayOutputStream
                 val writer: Function2[ByteArrayOutputStream, r.BODY_CONTENT, Unit] = (b, x) => b.write(r.writeable.transform(x))
                 val stringIteratee = Iteratee.fold(byteBuffer)((b, e: r.BODY_CONTENT) => { writer(b, e); b })
-                val p = body |>> stringIteratee
-
-                p.flatMap(i => i.run)
-                  .onRedeem { buffer =>
+                //                val p = body |>> stringIteratee
+                //
+                //                p.flatMap(i => i.run)
+                //                  .onRedeem { buffer =>
+                //                    Logger("play").trace("Buffer size to send: " + buffer.size)
+                //                    getHttpResponse().getRichOutputStream.map { os =>
+                //                      getHttpResponse().getHttpServletResponse.map(_.setContentLength(buffer.size))
+                //                      os.flush
+                //                      buffer.writeTo(os)
+                //                    }
+                //                    onHttpResponseComplete()
+                //                  }
+                val p = (body |>>> Enumeratee.grouped(stringIteratee) &>> Cont {
+                  case Input.El(buffer) =>
                     Logger("play").trace("Buffer size to send: " + buffer.size)
                     getHttpResponse().getRichOutputStream.map { os =>
                       getHttpResponse().getHttpServletResponse.map(_.setContentLength(buffer.size))
                       os.flush
                       buffer.writeTo(os)
                     }
-                    onHttpResponseComplete()
-                  }
+                    val p = Promise.pure()
+                    Iteratee.flatten(p.map(_ => Done(1, Input.Empty: Input[ByteArrayOutputStream])))
+
+                  case other => Error("unexepected input", other)
+                })
+                p.extend1 {
+                  case Redeemed(_) =>
+                    cleanup()
+                    onHttpResponseComplete
+                  case Thrown(ex) =>
+                    Logger("play").debug(ex.toString)
+                    onHttpResponseComplete
+                }
               }
             }
 
