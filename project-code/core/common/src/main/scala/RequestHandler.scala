@@ -75,7 +75,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
   implicit val internalExecutionContext = play.core.Execution.internalContext
 
   private val requestIDs = new java.util.concurrent.atomic.AtomicLong(0)
-  
+
   override def apply(server: Play2WarServer) = {
 
     val server = Play2WarServer.playServer
@@ -102,7 +102,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
     val untaggedRequestHeader = new RequestHeader {
       val id = requestIDs.incrementAndGet
-      val tags = Map.empty[String,String]
+      val tags = Map.empty[String, String]
       def uri = servletUri
       def path = servletPath
       def method = httpMethod
@@ -132,7 +132,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
     val alreadyClean = new java.util.concurrent.atomic.AtomicBoolean(false)
     def cleanup() {
       if (!alreadyClean.getAndSet(true)) {
-        play.api.Play.maybeApplication.foreach(_.global.onRequestCompletion(requestHeader))            
+        play.api.Play.maybeApplication.foreach(_.global.onRequestCompletion(requestHeader))
       }
     }
 
@@ -148,10 +148,10 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
             case AsyncResult(p) => p.extend1 {
               case Redeemed(v) => handle(v)
               case Thrown(e) => {
-                  server.applicationProvider.get match {
-                    case Right(app) => handle(app.handleError(requestHeader, e))
-                    case Left(_) => handle(Results.InternalServerError)
-                  }
+                server.applicationProvider.get match {
+                  case Right(app) => handle(app.handleError(requestHeader, e))
+                  case Left(_) => handle(Results.InternalServerError)
+                }
               }
             }
 
@@ -177,37 +177,64 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
                 Logger("play").trace("Result with Content-length: " + contentLength)
 
                 var hasError: AtomicBoolean = new AtomicBoolean(false)
-
-                val writer: Function1[r.BODY_CONTENT, Future[Unit]] = x => {
-                  Promise.pure(
-                    {
-                      if (hasError.get) {
-                        ()
-                      } else {
-                        getHttpResponse().getRichOutputStream.foreach { os =>
-                          os.write(r.writeable.transform(x))
-                          os.flush
-                        }
-                      }
-                    }).extend1 {
-                      case Redeemed(()) => ()
-                      case Thrown(ex) => {
-                        hasError.set(true)
-                        Logger("play").debug("Exception received while writing to client: " + ex.toString)
-                      }
-                    }
-                }
-
+                //
+                //                val writer: Function1[r.BODY_CONTENT, Future[Unit]] = x => {
+                //                  Promise.pure(
+                //                    {
+                //                      if (hasError.get) {
+                //                        ()
+                //                      } else {
+                //                        getHttpResponse().getRichOutputStream.foreach { os =>
+                //                          os.write(r.writeable.transform(x))
+                //                          os.flush
+                //                        }
+                //                      }
+                //                    }).extend1 {
+                //                      case Redeemed(()) => ()
+                //                      case Thrown(ex) => {
+                //                        hasError.set(true)
+                //                        Logger("play").debug("Exception received while writing to client: " + ex.toString)
+                //                      }
+                //                    }
+                //                }
+                //
+                //                val bodyIteratee = {
+                //                  val writeIteratee = Iteratee.fold1(
+                //                    Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
+                //
+                //                  Enumeratee.breakE[r.BODY_CONTENT](_ => hasError.get)(writeIteratee).mapDone { _ =>
+                //                    onHttpResponseComplete()
+                //                  }
                 val bodyIteratee = {
-                  val writeIteratee = Iteratee.fold1(
-                    Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
-
-                  Enumeratee.breakE[r.BODY_CONTENT](_ => hasError.get)(writeIteratee).mapDone { _ =>
-                    onHttpResponseComplete()
+                  def step(in: Input[r.BODY_CONTENT]): Iteratee[r.BODY_CONTENT, Unit] = (!hasError.get, in) match {
+                    case (true, Input.El(x)) =>
+                      Iteratee.flatten(
+                        Promise.pure(
+                          if (hasError.get) {
+                            ()
+                          } else {
+                            getHttpResponse().getRichOutputStream.foreach { os =>
+                              os.write(r.writeable.transform(x))
+                              os.flush
+                            }
+                          })
+                          .map(_ => if (!hasError.get) Cont(step) else Done((), Input.Empty)))
+                    case (true, Input.Empty) => Cont(step)
+                    case (_, in) => Done((), in)
                   }
+                  Iteratee.flatten(
+                    Promise.pure(())
+                      .map(_ => if (!hasError.get) Cont(step) else Done((), Input.Empty: Input[r.BODY_CONTENT])))
                 }
 
-                body(bodyIteratee)
+                (body |>>> bodyIteratee).extend1 {
+                  case Redeemed(_) =>
+                    cleanup()
+                    onHttpResponseComplete
+                  case Thrown(ex) =>
+                    Logger("play").debug(ex.toString)
+                    onHttpResponseComplete
+                }
               }.getOrElse {
                 Logger("play").trace("Result without Content-length")
 
@@ -301,10 +328,10 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
       //execute normal action
       case Right((action: EssentialAction, app)) => {
-        val a = EssentialAction{ rh =>
-          Iteratee.flatten(action(rh).unflatten.extend1{
+        val a = EssentialAction { rh =>
+          Iteratee.flatten(action(rh).unflatten.extend1 {
             case Redeemed(it) => it.it
-            case Thrown(e) => Done(app.handleError(requestHeader, e),Input.Empty)
+            case Thrown(e) => Done(app.handleError(requestHeader, e), Input.Empty)
           })
         }
 
