@@ -408,43 +408,9 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
               case Thrown(e) => Done(app.handleError(requestHeader, e), Input.Empty)
             })
         }
+        handleAction(a, Some(app))
 
-        Logger("play").trace("Serving this request with: " + a)
-
-        val filteredAction = app.global.doFilter(a)
-
-        val eventuallyBodyParser = scala.concurrent.Future(filteredAction(requestHeader))(play.api.libs.concurrent.Execution.defaultContext)
-
-        // copied from latest PlayDefaultUpstreamHandler
-        requestHeader.headers.get("Expect").filter(_ == "100-continue").foreach { _ =>
-          eventuallyBodyParser.flatMap(_.unflatten).map {
-            // case Step.Cont(k) =>
-            //   val continue = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE)
-            // //TODO wait for the promise of the write
-            // e.getChannel.write(continue)
-            case _ =>
-          }
-        }
-
-        val bodyEnumerator = getHttpRequest().getRichInputStream.map { is =>
-          Enumerator.fromStream(is).andThen(Enumerator.eof)
-        }.getOrElse(Enumerator.eof)
-
-        val eventuallyResultIteratee = eventuallyBodyParser.flatMap(it => bodyEnumerator |>> it): scala.concurrent.Future[Iteratee[Array[Byte], Result]]
-
-        val eventuallyResult = eventuallyResultIteratee.flatMap(it => it.run)
-
-        eventuallyResult.extend1 {
-          case Redeemed(result) => {
-            Logger("play").trace("Got direct result from the BodyParser: " + result)
-            response.handle(result)
-          }
-          case error => {
-            Logger("play").error("Cannot invoke the action, eventually got an error: " + error)
-            response.handle(Results.InternalServerError)
-          }
-        }
-
+      //handle all websocket request as bad, since websocket are not handled
       //handle bad websocket request
       case Right((WebSocket(_), app)) =>
         Logger("play").trace("Bad websocket request")
@@ -460,9 +426,43 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
         Logger("play").error("Oops, unexpected message received in Play server (please report this problem): " + unexpected)
         response.handle(Results.InternalServerError)
     }
-    
-    def handleAction(a:EssentialAction,app:Option[Application]){
-      
+
+    def handleAction(a: EssentialAction, app: Option[Application]) {
+      Logger("play").trace("Serving this request with: " + a)
+
+      val filteredAction = app.map(_.global).getOrElse(DefaultGlobal).doFilter(a)
+
+      val eventuallyBodyParser = scala.concurrent.Future(filteredAction(requestHeader))(play.api.libs.concurrent.Execution.defaultContext)
+
+      // copied from latest PlayDefaultUpstreamHandler
+      requestHeader.headers.get("Expect").filter(_ == "100-continue").foreach { _ =>
+        eventuallyBodyParser.flatMap(_.unflatten).map {
+          // case Step.Cont(k) =>
+          //   val continue = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE)
+          // //TODO wait for the promise of the write
+          // e.getChannel.write(continue)
+          case _ =>
+        }
+      }
+
+      val bodyEnumerator = getHttpRequest().getRichInputStream.map { is =>
+        Enumerator.fromStream(is).andThen(Enumerator.eof)
+      }.getOrElse(Enumerator.eof)
+
+      val eventuallyResultIteratee = eventuallyBodyParser.flatMap(it => bodyEnumerator |>> it): scala.concurrent.Future[Iteratee[Array[Byte], Result]]
+
+      val eventuallyResult = eventuallyResultIteratee.flatMap(it => it.run)
+
+      eventuallyResult.extend1 {
+        case Redeemed(result) => {
+          Logger("play").trace("Got direct result from the BodyParser: " + result)
+          response.handle(result)
+        }
+        case error => {
+          Logger("play").error("Cannot invoke the action, eventually got an error: " + error)
+          response.handle(Results.InternalServerError)
+        }
+      }
     }
 
     onFinishService()
