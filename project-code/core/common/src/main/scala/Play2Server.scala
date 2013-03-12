@@ -89,7 +89,7 @@ private[servlet] class WarApplication(val mode: Mode.Mode) extends ApplicationPr
 
   Play.start(application)
 
-  def get = Right(application)
+  def get: Either[Throwable, Application] = Right(application)
   def path = applicationPath
 }
 

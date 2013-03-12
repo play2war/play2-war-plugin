@@ -27,6 +27,7 @@ import play.api.http.HeaderNames.CONTENT_LENGTH
 import play.api.http.HeaderNames.X_FORWARDED_FOR
 import java.io.ByteArrayOutputStream
 import java.net.URLDecoder
+import play.api.mvc.RequestTaggingHandler
 
 trait RequestHandler {
 
@@ -99,13 +100,13 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       } yield xff).getOrElse(remoteAddress)
     }
 
-    val requestHeader = new RequestHeader {
-      val version = httpVersion
+    val untaggedRequestHeader = new RequestHeader {
       val id = requestIDs.incrementAndGet
       val tags = Map.empty[String,String]
       def uri = servletUri
       def path = servletPath
       def method = httpMethod
+      val version = httpVersion
       def queryString = parameters
       def headers = rHeaders
       lazy val remoteAddress = rRemoteAddress
@@ -115,7 +116,25 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
         super.toString + "\nURI: " + uri + "\nMethod: " + method + "\nPath: " + path + "\nParameters: " + queryString + "\nHeaders: " + headers + "\nCookies: " + rCookies
       }
     }
-    Logger("play").trace("HTTP request content: " + requestHeader)
+
+    // get handler for request
+    val handler = server.getHandlerFor(untaggedRequestHeader)
+
+    // tag request if necessary
+    val requestHeader = handler.right.toOption.map({
+      case (h: RequestTaggingHandler, _) => h.tagRequest(untaggedRequestHeader)
+      case _ => untaggedRequestHeader
+    }).getOrElse(untaggedRequestHeader)
+
+    Logger("play").trace("HTTP request headers: " + requestHeader)
+
+    // Call onRequestCompletion after all request processing is done. Protected with an AtomicBoolean to ensure can't be executed more than once.
+    val alreadyClean = new java.util.concurrent.atomic.AtomicBoolean(false)
+    def cleanup() {
+      if (!alreadyClean.getAndSet(true)) {
+        play.api.Play.maybeApplication.foreach(_.global.onRequestCompletion(requestHeader))            
+      }
+    }
 
     // converting servlet response to play's
     val response = new Response {
@@ -129,8 +148,10 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
             case AsyncResult(p) => p.extend1 {
               case Redeemed(v) => handle(v)
               case Thrown(e) => {
-                Logger("play").error("Waiting for a promise, but got an error: " + e.getMessage, e)
-                handle(Results.InternalServerError)
+                  server.applicationProvider.get match {
+                    case Right(app) => handle(app.handleError(requestHeader, e))
+                    case Left(_) => handle(Results.InternalServerError)
+                  }
               }
             }
 
@@ -275,9 +296,6 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       } // end handle method
 
     }
-
-    // get handler for request
-    val handler = server.getHandlerFor(requestHeader)
 
     handler match {
 
