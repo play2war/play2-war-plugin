@@ -218,7 +218,14 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
                               os.flush
                             }
                           })
-                          .map(_ => if (!hasError.get) Cont(step) else Done((), Input.Empty)))
+                          //                          .map(_ => if (!hasError.get) Cont(step) else Done((), Input.Empty)))
+                          .extend1 {
+                            case Redeemed(_) => if (!hasError.get) Cont(step) else Done((), Input.Empty)
+                            case Thrown(ex) =>
+                              hasError.set(true)
+                              Logger("play").debug(ex.toString)
+                              throw ex
+                          })
                     case (true, Input.Empty) => Cont(step)
                     case (_, in) => Done((), in)
                   }
@@ -233,6 +240,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
                     onHttpResponseComplete
                   case Thrown(ex) =>
                     Logger("play").debug(ex.toString)
+                    hasError.set(true)
                     onHttpResponseComplete
                 }
               }.getOrElse {
@@ -297,36 +305,73 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
               var hasError: AtomicBoolean = new AtomicBoolean(false)
 
-              val writer: Function1[r.BODY_CONTENT, Future[Unit]] = x => {
-                Promise.pure(
-                  {
-                    if (hasError.get) {
-                      ()
-                    } else {
-                      getHttpResponse().getRichOutputStream.foreach { os =>
-                        os.write(r.writeable.transform(x))
-                        os.flush
-                      }
-                    }
-                  }).extend1 {
-                    case Redeemed(()) => ()
-                    case Thrown(ex) => {
-                      hasError.set(true)
-                      Logger("play").debug("Exception received while writing to client: " + ex.toString)
-                    }
-                  }
-              }
-
-              val chunksIteratee = {
-                val writeIteratee = Iteratee.fold1(
-                  Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
-
-                Enumeratee.breakE[r.BODY_CONTENT](_ => hasError.get)(writeIteratee).mapDone { _ =>
-                  onHttpResponseComplete()
+              //              val writer: Function1[r.BODY_CONTENT, Future[Unit]] = x => {
+              //                Promise.pure(
+              //                  {
+              //                    if (hasError.get) {
+              //                      ()
+              //                    } else {
+              //                      getHttpResponse().getRichOutputStream.foreach { os =>
+              //                        os.write(r.writeable.transform(x))
+              //                        os.flush
+              //                      }
+              //                    }
+              //                  }).extend1 {
+              //                    case Redeemed(()) => ()
+              //                    case Thrown(ex) => {
+              //                      hasError.set(true)
+              //                      Logger("play").debug("Exception received while writing to client: " + ex.toString)
+              //                    }
+              //                  }
+              //              }
+              //
+              //              val chunksIteratee = {
+              //                val writeIteratee = Iteratee.fold1(
+              //                  Promise.pure(()))((_, e: r.BODY_CONTENT) => writer(e))
+              //
+              //                Enumeratee.breakE[r.BODY_CONTENT](_ => hasError.get)(writeIteratee).mapDone { _ =>
+              //                  onHttpResponseComplete()
+              //                }
+              //              }
+              //
+              //              chunks(chunksIteratee)
+              val bodyIteratee = {
+                def step(in: Input[r.BODY_CONTENT]): Iteratee[r.BODY_CONTENT, Unit] = (!hasError.get, in) match {
+                  case (true, Input.El(x)) =>
+                    Iteratee.flatten(
+                      Promise.pure(
+                        if (hasError.get) {
+                          ()
+                        } else {
+                          getHttpResponse().getRichOutputStream.foreach { os =>
+                            os.write(r.writeable.transform(x))
+                            os.flush
+                          }
+                        })
+                        .extend1 {
+                          case Redeemed(_) => if (!hasError.get) Cont(step) else Done((), Input.Empty)
+                          case Thrown(ex) =>
+                            Logger("play").debug(ex.toString)
+                            hasError.set(true)
+                            throw ex
+                        })
+                  case (true, Input.Empty) => Cont(step)
+                  case (_, in) => Done((), in)
                 }
+                Iteratee.flatten(Promise.pure()
+                    .extend1 {
+                      case Redeemed(_) => if (!hasError.get) Cont(step) else Done((), Input.Empty: Input[r.BODY_CONTENT])
+                      case Thrown(ex) =>
+                        Logger("play").debug(ex.toString)
+                        hasError.set(true)
+                        throw ex
+                    })
               }
 
-              chunks(chunksIteratee)
+              chunks apply bodyIteratee.map { _ =>
+                cleanup()
+                onHttpResponseComplete
+              }
             }
 
             case unknownResponse =>
