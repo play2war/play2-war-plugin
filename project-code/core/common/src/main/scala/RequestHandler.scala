@@ -329,9 +329,8 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
               chunks(chunksIteratee)
             }
 
-            case defaultResponse @ _ =>
-              Logger("play").trace("Default response: " + defaultResponse)
-              Logger("play").error("Unhandle default response: " + defaultResponse)
+            case unknownResponse =>
+              Logger("play").error("Unhandle default response: " + unknownResponse)
 
               httpResponse.setContentLength(0);
               httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
