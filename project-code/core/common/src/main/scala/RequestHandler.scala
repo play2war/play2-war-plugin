@@ -434,16 +434,8 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
       val eventuallyBodyParser = scala.concurrent.Future(filteredAction(requestHeader))(play.api.libs.concurrent.Execution.defaultContext)
 
-      // copied from latest PlayDefaultUpstreamHandler
-      requestHeader.headers.get("Expect").filter(_ == "100-continue").foreach { _ =>
-        eventuallyBodyParser.flatMap(_.unflatten).map {
-          // case Step.Cont(k) =>
-          //   val continue = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE)
-          // //TODO wait for the promise of the write
-          // e.getChannel.write(continue)
-          case _ =>
-        }
-      }
+      // Remove Except: 100-continue handling, since it's impossible to handle it
+      // requestHeader.headers.get("Expect").filter(_ == "100-continue")
 
       val bodyEnumerator = getHttpRequest().getRichInputStream.map { is =>
         Enumerator.fromStream(is).andThen(Enumerator.eof)
@@ -452,16 +444,12 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       val eventuallyResultIteratee = eventuallyBodyParser.flatMap(it => bodyEnumerator |>> it): scala.concurrent.Future[Iteratee[Array[Byte], Result]]
 
       val eventuallyResult = eventuallyResultIteratee.flatMap(it => it.run)
-
       eventuallyResult.extend1 {
-        case Redeemed(result) => {
-          Logger("play").trace("Got direct result from the BodyParser: " + result)
-          response.handle(result)
-        }
-        case error => {
+        case Redeemed(result) => response.handle(result)
+
+        case Thrown(error) =>
           Logger("play").error("Cannot invoke the action, eventually got an error: " + error)
-          response.handle(Results.InternalServerError)
-        }
+          response.handle( app.map(_.handleError(requestHeader, error)).getOrElse(DefaultGlobal.onError(requestHeader, error)))
       }
     }
 
