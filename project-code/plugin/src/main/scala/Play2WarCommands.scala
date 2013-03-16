@@ -9,6 +9,7 @@ import scala.collection.immutable.Stream.consWrapper
 
 import com.github.play2war.plugin.Play2WarKeys.servletVersion
 import com.github.play2war.plugin.Play2WarKeys.webappResource
+import com.github.play2war.plugin.Play2WarKeys.targetName
 
 import sbt.ConfigKey.configurationToKey
 import sbt.Keys.TaskStreams
@@ -17,7 +18,6 @@ import sbt.Keys.normalizedName
 import sbt.Keys.streams
 import sbt.Keys.target
 import sbt.Keys.version
-import sbt.Scoped.t8ToTable8
 import sbt.Runtime
 import sbt.richFile
 import sbt.Artifact
@@ -39,8 +39,8 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
           case files => files.toStream.flatMap(getFiles(_, skipHidden)) 
       })
 
-  val warTask = (playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version, webappResource, streams, servletVersion) map {
-    (packaged, dependencies, target, id, version, webappResource, s, servletVersion) =>
+  val warTask = (playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version, webappResource, streams, servletVersion, targetName) map {
+    (packaged, dependencies, target, id, version, webappResource, s, servletVersion, targetName) =>
 
       s.log.info("Build WAR package for servlet container: " + servletVersion)
 
@@ -51,10 +51,8 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
         throw new IllegalArgumentException("play2-war-core-common not found in dependencies!")
       }
     
-      import sbt.NameFilter._
-
       val warDir = target
-      val packageName = id + "-" + version
+      val packageName = targetName.getOrElse(id + "-" + version)
       val war = warDir / (packageName + ".war")
       val manifestString = "Manifest-Version: 1.0\n"
         
@@ -145,7 +143,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
       val metaInfFolder = webappResource / "META-INF"
       val manifest  = if (metaInfFolder.exists()) {
         val option = metaInfFolder.listFiles.find(f => 
-          manifestRegex.r.pattern.matcher(f.getAbsolutePath()).matches());
+          manifestRegex.r.pattern.matcher(f.getAbsolutePath()).matches())
         if (option.isDefined){
           new Manifest(new FileInputStream(option.get))
         }
@@ -158,7 +156,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
       } 
       
       // Package final jar
-      val jarContent = libs ++ additionnalResources;
+      val jarContent = libs ++ additionnalResources
 
       IO.jar(jarContent, war, manifest)
 
