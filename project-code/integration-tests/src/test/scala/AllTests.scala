@@ -22,11 +22,12 @@ import scala.collection.immutable.{ Page => _, _ }
 import scala.collection.JavaConverters._
 import org.apache.commons.io.FileUtils
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 object AbstractPlay2WarTests {
 
   private val ROOT_URL = "http://localhost:8080"
-  
+
   // Milliseconds
   private val HTTP_TIMEOUT = 15000
 
@@ -69,16 +70,21 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   }
 
   def onBefore {
-    webClient = new WebClient
-    webClient.setJavaScriptEnabled(false)
-    webClient.setThrowExceptionOnFailingStatusCode(false)
-    webClient.getCookieManager.setCookiesEnabled(true)
-    webClient.setTimeout(HTTP_TIMEOUT)
-    new SkipClockiFrameWrapper(webClient)
+    webClient = getAWebClient
   }
 
   def onAfter {
     webClient.closeAllWindows
+  }
+
+  def getAWebClient = {
+    val aWebClient = new WebClient
+    aWebClient.setJavaScriptEnabled(false)
+    aWebClient.setThrowExceptionOnFailingStatusCode(false)
+    aWebClient.getCookieManager.setCookiesEnabled(true)
+    aWebClient.setTimeout(HTTP_TIMEOUT)
+    new SkipClockiFrameWrapper(aWebClient)
+    aWebClient
   }
 
   def rootUrl = ROOT_URL + context
@@ -332,11 +338,13 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     }
   }
 
-  val mapOfMaxRangeExpectedSize: Map[Int, Int] = Map(
-    100000 -> 588890 //
-    , 300000 -> 1988890 //
-    //, 500000 -> 3388890 // Ca craque avec content-length, mais ca a l'air de passer avec Transfert-encoding
-    //, 900000 -> 
+  val mapOfMaxRangeExpectedSize: Seq[(Int, Int, Boolean)] = Seq(
+    // GET parameter, expected file size, test to be ignored ?
+    (100000, 588890, false) //
+    , (300000, 1988890, false) //
+    , (500000, 3388890, false) //
+    , (900000, 6188890, false) //
+    , (2000000, 14888890, false) //
     )
 
   val seqTupleBigContent = Seq(
@@ -350,12 +358,19 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
       case (name, url, header, expectedHeaderValue) => {
 
         mapOfMaxRangeExpectedSize.foreach {
-          case (maxRange, expectedSize) => {
+          case (maxRange, expectedSize, ignoreTest) => {
 
-            scenario("container sends big files (" + expectedSize + " bytes expected with " + header + " header") {
+            val scenarioName = "container sends big files (" + expectedSize + " bytes expected with " + header + " header"
 
-              downloadBigContent(name, url, maxRange, header, expectedHeaderValue, expectedSize)
+            if (ignoreTest) {
+              // Nothing, just for logging
+              ignore(scenarioName) {}
+            } else {
+              scenario(scenarioName) {
 
+                downloadBigContent(name, url, maxRange, header, expectedHeaderValue, expectedSize)
+
+              }
             }
           }
         }
@@ -370,12 +385,19 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     seqTupleBigContent.foreach {
       case (name, url, header, expectedHeaderValue) => {
 
-        val (maxRange, expectedSize) = mapOfMaxRangeExpectedSize.head
+        val (maxRange, expectedSize, ignoreTest) = mapOfMaxRangeExpectedSize.head
 
-        scenario("container sends big files (" + expectedSize + " bytes expected with " + header + " header") {
+        val scenarioName = "container sends big files (" + expectedSize + " bytes expected with " + header + " header"
 
-          downloadBigContent(name, url, maxRange, header, expectedHeaderValue, expectedSize, howManyTimes)
+        if (ignoreTest) {
+          // Nothing, just for logging
+          ignore(scenarioName) {}
+        } else {
+          scenario(scenarioName) {
 
+            downloadBigContent(name, url, maxRange, header, expectedHeaderValue, expectedSize, howManyTimes)
+
+          }
         }
       }
     }
@@ -387,7 +409,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
    */
 
   feature("The container must handle POST requests with 'multipart/form-data' enctype") {
-    
+
     // routes where to test file upload
     List("/upload", "/upload2", "/uploadJava", "/uploadJava2").foreach {
       case (route) => {
@@ -426,11 +448,51 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
       }
     }
   }
+
+  /*
+   ******************
+   ******************
+   */
+
+  feature("The container must allow concurrency") {
+
+    scenario("Parallel requests") {
+
+      // second
+      val duration = 1
+
+      val route = s"/longRequest/$duration"
+      Given(s"a route $route")
+      val pageUrl = rootUrl + route
+
+      When(s"a long request for $duration s")
+      info("Load page " + pageUrl)
+
+      val strictMethod = HttpMethod.GET
+      val requestSettings = new WebRequest(new URL(pageUrl))
+      val aWebClient = getAWebClient
+      
+      val begin = System.nanoTime
+      aWebClient.getPage(requestSettings)
+      val end = System.nanoTime
+      
+      aWebClient.closeAllWindows
+
+      Then(s"request duration is no more $duration s + 10%")
+
+      val realDuration = TimeUnit.NANOSECONDS.toMillis(end - begin)
+      val maxExpectedDuration = TimeUnit.SECONDS.toMillis(duration) * 1.1
+      
+      assert(realDuration <= maxExpectedDuration, s"Real duration $realDuration ms is higher than max excepted duration $maxExpectedDuration ms")
+    }
+
+  }
+
 }
 
 abstract class AbstractTomcat7x extends AbstractPlay2WarTests with Servlet30Container {
   def tomcatVersion() = "Version to override"
-  override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-7/v" + tomcatVersion + "/bin/apache-tomcat-"+ tomcatVersion + ".tar.gz"
+  override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-7/v" + tomcatVersion + "/bin/apache-tomcat-" + tomcatVersion + ".tar.gz"
   override def containerName = "tomcat7x"
 }
 
