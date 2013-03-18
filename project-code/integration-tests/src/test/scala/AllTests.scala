@@ -22,7 +22,7 @@ import scala.collection.immutable.{ Page => _, _ }
 import scala.collection.JavaConverters._
 import org.apache.commons.io.FileUtils
 import java.io.File
-import java.util.concurrent.TimeUnit
+import java.util.concurrent._
 
 object AbstractPlay2WarTests {
 
@@ -458,35 +458,63 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
     scenario("Parallel requests") {
 
-      // second
-      val duration = 1
-      val margin = 1.5
+      val nbThreads = 10
+      val pool = Executors.newFixedThreadPool(nbThreads)
 
-      val route = s"/longRequest/$duration"
-      Given(s"a route $route")
-      val pageUrl = rootUrl + route
+      try {
 
-      When(s"a long request for $duration s")
-      info("Load page " + pageUrl)
+        // second
+        val paramDuration = 1
+        val margin = 1.5
 
-      val strictMethod = HttpMethod.GET
-      val requestSettings = new WebRequest(new URL(pageUrl))
-      val aWebClient = getAWebClient
-      
-      val begin = System.nanoTime
-      aWebClient.getPage(requestSettings)
-      val end = System.nanoTime
-      
-      aWebClient.closeAllWindows
+        val route = s"/longRequest/$paramDuration"
+        Given(s"a route $route")
+        val pageUrl = rootUrl + route
 
-      Then(s"request duration is no more $duration s * $margin")
+        val concurrentRequests = 5
 
-      val realDuration = TimeUnit.NANOSECONDS.toMillis(end - begin)
-      val maxExpectedDuration = TimeUnit.SECONDS.toMillis(duration) * margin
+        When(s"$concurrentRequests concurrent requests for $paramDuration s")
+        info("Load page " + pageUrl)
 
-      info(s"Real duration of request: $realDuration s")
-      
-      assert(realDuration <= maxExpectedDuration, s"Real duration $realDuration ms is higher than max excepted duration $maxExpectedDuration ms")
+        val futures = (1 to concurrentRequests).map { i =>
+          val call = new Callable[Long]() {
+            def call(): Long = {
+              val strictMethod = HttpMethod.GET
+              val requestSettings = new WebRequest(new URL(pageUrl))
+              val aWebClient = getAWebClient
+
+              val begin = System.nanoTime
+              aWebClient.getPage(requestSettings)
+              val end = System.nanoTime
+
+              aWebClient.closeAllWindows
+
+              val requestDuration = TimeUnit.NANOSECONDS.toMillis(end - begin)
+              info(s"Real duration of request: $requestDuration s")
+
+              requestDuration
+            }
+          }
+          pool.submit(call)
+        }
+
+        val results = futures.map { result =>
+          result.get
+        }
+
+        results.foreach(r => println(s"Request duration: $r ms"))
+
+        val maxDuration = results.max
+
+        Then(s"each request duration is no more than $paramDuration s * $margin")
+
+        val maxExpectedDuration = TimeUnit.SECONDS.toMillis(paramDuration) * margin
+
+        assert(maxDuration <= maxExpectedDuration, s"Max duration $maxDuration ms is higher than max excepted duration $maxExpectedDuration ms")
+      } finally {
+        pool.shutdown
+        pool.awaitTermination(2, TimeUnit.SECONDS)
+      }
     }
 
   }
