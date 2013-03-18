@@ -460,6 +460,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
       // second
       val duration = 1
+      val margin = 1.5
 
       val route = s"/longRequest/$duration"
       Given(s"a route $route")
@@ -478,10 +479,12 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
       
       aWebClient.closeAllWindows
 
-      Then(s"request duration is no more $duration s + 10%")
+      Then(s"request duration is no more $duration s * $margin")
 
       val realDuration = TimeUnit.NANOSECONDS.toMillis(end - begin)
-      val maxExpectedDuration = TimeUnit.SECONDS.toMillis(duration) * 1.1
+      val maxExpectedDuration = TimeUnit.SECONDS.toMillis(duration) * margin
+
+      info(s"Real duration of request: $realDuration s")
       
       assert(realDuration <= maxExpectedDuration, s"Real duration $realDuration ms is higher than max excepted duration $maxExpectedDuration ms")
     }
