@@ -467,13 +467,13 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
         val paramDuration = 1
         val margin = 1.5
 
-        val route = s"/longRequest/$paramDuration"
-        Given(s"a route $route")
+        val route = "/longRequest/" + paramDuration
+        given("a route " + route)
         val pageUrl = rootUrl + route
 
         val concurrentRequests = 5
 
-        When(s"$concurrentRequests concurrent requests for $paramDuration s")
+        when(concurrentRequests + " concurrent requests for " + paramDuration + " s")
         info("Load page " + pageUrl)
 
         val futures = (1 to concurrentRequests).map { i =>
@@ -490,7 +490,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
               aWebClient.closeAllWindows
 
               val requestDuration = TimeUnit.NANOSECONDS.toMillis(end - begin)
-              info(s"Real duration of request: $requestDuration s")
+              info("Real duration of request: " + requestDuration + " s")
 
               requestDuration
             }
@@ -502,15 +502,15 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
           result.get
         }
 
-        results.foreach(r => println(s"Request duration: $r ms"))
+        results.foreach(r => println("Request duration: " + r + " ms"))
 
         val maxDuration = results.max
 
-        Then(s"each request duration is no more than $paramDuration s * $margin")
+        then("each request duration is no more than " + paramDuration + " s * " + margin)
 
         val maxExpectedDuration = TimeUnit.SECONDS.toMillis(paramDuration) * margin
 
-        assert(maxDuration <= maxExpectedDuration, s"Max duration $maxDuration ms is higher than max excepted duration $maxExpectedDuration ms")
+        assert(maxDuration <= maxExpectedDuration, "Max duration " + maxDuration + " ms is higher than max excepted duration " + maxExpectedDuration + " ms")
       } finally {
         pool.shutdown
         pool.awaitTermination(2, TimeUnit.SECONDS)
