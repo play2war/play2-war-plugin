@@ -31,12 +31,8 @@ public class JavaApplication extends Controller {
     return upload();
   }
 
-  public static Result longRequest(Long duration) {
-    try {
-      Thread.sleep(TimeUnit.SECONDS.toMillis(duration));
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e.getMessage(), e);
-    }
+  public static Result longRequest(Long duration) throws Exception {
+    Thread.sleep(TimeUnit.SECONDS.toMillis(duration));
     return ok();
   }
 }
