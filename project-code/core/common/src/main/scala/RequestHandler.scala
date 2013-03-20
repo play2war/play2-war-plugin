@@ -58,11 +58,15 @@ trait HttpServletRequestHandler extends RequestHandler {
 
 }
 
+/**
+ * Generic implementation of HttpServletRequestHandler.
+ * One instance per incoming HTTP request.
+ *
+ * <strong>/!\ Warning: this class and its subclasses are intended to thread-safe.</strong>
+ */
 abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServletRequest, val servletResponse: Option[HttpServletResponse]) extends HttpServletRequestHandler {
 
   implicit val internalExecutionContext = play.core.Execution.internalContext
-
-  private val requestIDs = new java.util.concurrent.atomic.AtomicLong(0)
 
   override def apply(server: Play2WarServer) = {
 
@@ -89,7 +93,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
     }
 
     val untaggedRequestHeader = new RequestHeader {
-      val id = requestIDs.incrementAndGet
+      val id = server.newRequestId
       val tags = Map.empty[String, String]
       def uri = servletUri
       def path = servletPath
