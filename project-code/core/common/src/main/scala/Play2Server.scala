@@ -20,6 +20,7 @@ import play.core.ApplicationProvider
 import play.core.server.Server
 import play.core.server.ServerWithStop
 import play.core._
+import scala.util.control.NonFatal
 
 object Play2WarServer {
 
@@ -52,6 +53,8 @@ object Play2WarServer {
 
 private[servlet] class Play2WarServer(appProvider: WarApplication) extends Server with ServerWithStop {
 
+  private val requestIDs = new java.util.concurrent.atomic.AtomicLong(0)
+
   def mode = appProvider.mode
 
   def applicationProvider = appProvider
@@ -59,19 +62,21 @@ private[servlet] class Play2WarServer(appProvider: WarApplication) extends Serve
   // This isn't currently used for anything except local dev mode, so just stub this out for now
   lazy val mainAddress = ???
 
+  def newRequestId = requestIDs.incrementAndGet
+
   override def stop() = {
     Logger("play").info("Stopping play server...")
 
     try {
       Play.stop()
     } catch {
-      case e: Throwable => Logger("play").error("Error while stopping the application", e)
+      case NonFatal(e) => Logger("play").error("Error while stopping the application", e)
     }
 
     try {
       super.stop()
     } catch {
-      case e: Throwable => Logger("play").error("Error while stopping akka", e)
+      case NonFatal(e) => Logger("play").error("Error while stopping akka", e)
     }
   }
 }
@@ -89,7 +94,7 @@ private[servlet] class WarApplication(val mode: Mode.Mode) extends ApplicationPr
 
   Play.start(application)
 
-  def get = Right(application)
+  def get: Either[Throwable, Application] = Right(application)
   def path = applicationPath
 }
 

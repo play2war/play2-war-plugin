@@ -22,11 +22,12 @@ import scala.collection.immutable.{ Page => _, _ }
 import scala.collection.JavaConverters._
 import org.apache.commons.io.FileUtils
 import java.io.File
+import java.util.concurrent._
 
 object AbstractPlay2WarTests {
 
   private val ROOT_URL = "http://localhost:8080"
-  
+
   // Milliseconds
   private val HTTP_TIMEOUT = 15000
 
@@ -69,16 +70,21 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   }
 
   def onBefore {
-    webClient = new WebClient
-    webClient.setJavaScriptEnabled(false)
-    webClient.setThrowExceptionOnFailingStatusCode(false)
-    webClient.getCookieManager.setCookiesEnabled(true)
-    webClient.setTimeout(HTTP_TIMEOUT)
-    new SkipClockiFrameWrapper(webClient)
+    webClient = getAWebClient()
   }
 
   def onAfter {
     webClient.closeAllWindows
+  }
+
+  def getAWebClient(timeout: Int = HTTP_TIMEOUT) = {
+    val aWebClient = new WebClient
+    aWebClient.setJavaScriptEnabled(false)
+    aWebClient.setThrowExceptionOnFailingStatusCode(false)
+    aWebClient.getCookieManager.setCookiesEnabled(true)
+    aWebClient.setTimeout(timeout)
+    new SkipClockiFrameWrapper(aWebClient)
+    aWebClient
   }
 
   def rootUrl = ROOT_URL + context
@@ -403,7 +409,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
    */
 
   feature("The container must handle POST requests with 'multipart/form-data' enctype") {
-    
+
     // routes where to test file upload
     List("/upload", "/upload2", "/uploadJava", "/uploadJava2").foreach {
       case (route) => {
@@ -442,11 +448,97 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
       }
     }
   }
+
+  /*
+   ******************
+   ******************
+   */
+
+  feature("The container must allow concurrency on Action") {
+
+    val pathsAndLanguages = Seq(
+      ("Scala", "slongRequest"),
+      ("Java", "longRequest")
+    )
+
+    pathsAndLanguages.foreach { elt =>
+
+      val path = elt._2
+      val language = elt._1
+
+      scenario(s"Parallel requests on a $language action") {
+
+        val nbThreads = 10
+        // second
+        val paramDuration = 20
+
+        val margin = 1.5
+
+        val pool = Executors.newFixedThreadPool(nbThreads)
+
+        try {
+
+          // second
+          val paramDuration = 1
+          val margin = 1.5
+
+          val route = s"/$path/$paramDuration"
+          Given(s"a route $route")
+          val pageUrl = rootUrl + route
+
+          val concurrentRequests = 5
+
+          When(s"$concurrentRequests concurrent requests of $paramDuration s")
+          info("Load page " + pageUrl)
+
+          val futures = (1 to concurrentRequests).map { i =>
+            val call = new Callable[Long]() {
+              def call(): Long = {
+                val strictMethod = HttpMethod.GET
+                val requestSettings = new WebRequest(new URL(pageUrl))
+                val aWebClient = getAWebClient(120000)
+
+                val begin = System.nanoTime
+                aWebClient.getPage(requestSettings)
+                val end = System.nanoTime
+
+                aWebClient.closeAllWindows
+
+                val requestDuration = TimeUnit.NANOSECONDS.toMillis(end - begin)
+
+                requestDuration
+              }
+            }
+            pool.submit(call)
+          }
+
+          val results = futures.map { result =>
+            result.get
+          }
+
+          results.foreach(r => info(s"Request duration: $r ms"))
+
+          val maxDuration = results.max
+
+          Then(s"each request duration is no more than $paramDuration s * $margin")
+
+          val maxExpectedDuration = TimeUnit.SECONDS.toMillis(paramDuration) * margin
+
+          assert(maxDuration <= maxExpectedDuration, s"Max duration $maxDuration ms is higher than max excepted duration $maxExpectedDuration ms")
+        } finally {
+          pool.shutdown
+          pool.awaitTermination(2, TimeUnit.SECONDS)
+        }
+      }
+    }
+
+  }
+
 }
 
 abstract class AbstractTomcat7x extends AbstractPlay2WarTests with Servlet30Container {
   def tomcatVersion() = "Version to override"
-  override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-7/v" + tomcatVersion + "/bin/apache-tomcat-"+ tomcatVersion + ".tar.gz"
+  override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-7/v" + tomcatVersion + "/bin/apache-tomcat-" + tomcatVersion + ".tar.gz"
   override def containerName = "tomcat7x"
 }
 

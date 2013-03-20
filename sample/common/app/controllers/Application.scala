@@ -176,4 +176,9 @@ object Application extends Controller {
   def liveClock = Action {
     Ok.stream(clock &> Comet(callback = "parent.clockChanged"))
   }
+  
+  def longRequest(duration: Long) = Action {
+    Thread.sleep(java.util.concurrent.TimeUnit.SECONDS.toMillis(duration))
+    Ok("")
+  }
 }
