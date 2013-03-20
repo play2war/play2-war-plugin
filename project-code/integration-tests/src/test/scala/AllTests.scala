@@ -70,19 +70,19 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   }
 
   def onBefore {
-    webClient = getAWebClient
+    webClient = getAWebClient()
   }
 
   def onAfter {
     webClient.closeAllWindows
   }
 
-  def getAWebClient = {
+  def getAWebClient(timeout: Int = HTTP_TIMEOUT) = {
     val aWebClient = new WebClient
     aWebClient.setJavaScriptEnabled(false)
     aWebClient.setThrowExceptionOnFailingStatusCode(false)
     aWebClient.getCookieManager.setCookiesEnabled(true)
-    aWebClient.setTimeout(HTTP_TIMEOUT)
+    aWebClient.setTimeout(timeout)
     new SkipClockiFrameWrapper(aWebClient)
     aWebClient
   }
@@ -459,6 +459,11 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     scenario("Parallel requests") {
 
       val nbThreads = 10
+      // second
+      val paramDuration = 20
+
+      val margin = 1.5
+
       val pool = Executors.newFixedThreadPool(nbThreads)
 
       try {
@@ -481,7 +486,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
             def call(): Long = {
               val strictMethod = HttpMethod.GET
               val requestSettings = new WebRequest(new URL(pageUrl))
-              val aWebClient = getAWebClient
+              val aWebClient = getAWebClient(120000)
 
               val begin = System.nanoTime
               aWebClient.getPage(requestSettings)

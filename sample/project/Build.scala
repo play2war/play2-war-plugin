@@ -2,6 +2,7 @@ import sbt._
 import Keys._
 import play.Project._
 import com.github.play2war.plugin._
+import com.typesafe.sbteclipse.plugin.EclipsePlugin._
 
 object ApplicationBuild extends Build {
 
@@ -11,7 +12,12 @@ object ApplicationBuild extends Build {
   lazy val commonSettings = Defaults.defaultSettings ++ Seq(
     //      resolvers += "Local Repository" at "http://localhost:8090/publish",
     resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns),
-    resolvers += "snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+//    resolvers += "snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+
+    EclipseKeys.withSource := true,
+    EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16),
+
+    javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
 
     publishArtifact in (Compile, packageDoc) := false,
     publishArtifact in (Compile, packageSrc) := false,

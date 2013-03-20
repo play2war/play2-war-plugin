@@ -1,7 +1,7 @@
 import sbt._
 import Keys._
 import java.io.File
-import com.typesafe.sbteclipse.plugin.EclipsePlugin.EclipseKeys
+import com.typesafe.sbteclipse.plugin.EclipsePlugin._
 
 object Build extends Build {
 
@@ -90,8 +90,10 @@ object Build extends Build {
   //
   def commonSettings = buildSettings ++
     Seq(
+      javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
       EclipseKeys.withSource := true,
+      EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16),
 
       resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
 

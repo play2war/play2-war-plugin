@@ -20,6 +20,7 @@ import play.core.ApplicationProvider
 import play.core.server.Server
 import play.core.server.ServerWithStop
 import play.core._
+import scala.util.control.NonFatal
 
 object Play2WarServer {
 
@@ -65,13 +66,13 @@ private[servlet] class Play2WarServer(appProvider: WarApplication) extends Serve
     try {
       Play.stop()
     } catch {
-      case e: Throwable => Logger("play").error("Error while stopping the application", e)
+      case NonFatal(e) => Logger("play").error("Error while stopping the application", e)
     }
 
     try {
       super.stop()
     } catch {
-      case e: Throwable => Logger("play").error("Error while stopping akka", e)
+      case NonFatal(e) => Logger("play").error("Error while stopping akka", e)
     }
   }
 }
