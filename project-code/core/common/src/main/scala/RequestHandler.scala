@@ -412,13 +412,13 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       //execute normal action
       case Right((action: EssentialAction, app)) =>
         val a = EssentialAction { rh =>
-          Iteratee.flatten(action(rh).unflatten. /*map {
+          Iteratee.flatten(action(rh).map {
             case r: PlainResult => cleanFlashCookie(r)
             case a: AsyncResult => a.transform(cleanFlashCookie)
-          }.*/ extend1 {
-              case Redeemed(it) => it.it
-              case Thrown(e) => Done(app.handleError(requestHeader, e), Input.Empty)
-            })
+          }.unflatten.extend1 {
+            case Redeemed(it) => it.it
+            case Thrown(e) => Done(app.handleError(requestHeader, e), Input.Empty)
+          })
         }
         handleAction(a, Some(app))
 
