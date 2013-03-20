@@ -466,7 +466,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
     // second
     val paramDuration = 1
-    val margin = 1.5
+    val margin = 2
 
     pathsAndLanguages.foreach { elt =>
 
