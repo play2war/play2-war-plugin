@@ -486,7 +486,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
           When(s"$concurrentRequests concurrent requests of $paramDuration s")
           info("Load page " + pageUrl)
 
-          val futures = (1 to concurrentRequests).map { i =>
+          val results =(1 to concurrentRequests).map { i =>
             val call = new Callable[Long]() {
               def call(): Long = {
                 val strictMethod = HttpMethod.GET
@@ -504,13 +504,13 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
                 requestDuration
               }
             }
-            pool.submit(call)
+            call
           }
-
-          val results = futures.map { result =>
-            result.get
-          }
-
+          // Submit each call to the pool, return a Future
+          .map(pool.submit(_))
+          // Get each result from Future
+          .map(_.get)
+          
           results.foreach(r => info(s"Request duration: $r ms"))
 
           val maxDuration = results.max
