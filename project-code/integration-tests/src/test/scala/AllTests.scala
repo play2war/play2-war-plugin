@@ -461,6 +461,13 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
       ("Java", "longRequest")
     )
 
+    val concurrentRequests = 5
+    val nbThreads = concurrentRequests
+
+    // second
+    val paramDuration = 1
+    val margin = 1.5
+
     pathsAndLanguages.foreach { elt =>
 
       val path = elt._2
@@ -468,25 +475,13 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
       scenario(s"Parallel requests on a $language action") {
 
-        val nbThreads = 10
-        // second
-        val paramDuration = 20
-
-        val margin = 1.5
-
         val pool = Executors.newFixedThreadPool(nbThreads)
 
         try {
 
-          // second
-          val paramDuration = 1
-          val margin = 1.5
-
           val route = s"/$path/$paramDuration"
           Given(s"a route $route")
           val pageUrl = rootUrl + route
-
-          val concurrentRequests = 5
 
           When(s"$concurrentRequests concurrent requests of $paramDuration s")
           info("Load page " + pageUrl)
