@@ -454,71 +454,81 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
    ******************
    */
 
-  feature("The container must allow concurrency") {
+  feature("The container must allow concurrency on Action") {
 
-    scenario("Parallel requests") {
+    val pathsAndLanguages = Seq(
+      ("Scala", "slongRequest"),
+      ("Java", "longRequest")
+    )
 
-      val nbThreads = 10
-      // second
-      val paramDuration = 20
+    pathsAndLanguages.foreach { elt =>
 
-      val margin = 1.5
+      val path = elt._2
+      val language = elt._1
 
-      val pool = Executors.newFixedThreadPool(nbThreads)
+      scenario(s"Parallel requests on a $language action") {
 
-      try {
-
+        val nbThreads = 10
         // second
-        val paramDuration = 1
+        val paramDuration = 20
+
         val margin = 1.5
 
-        val route = s"/longRequest/$paramDuration"
-        Given(s"a route $route")
-        val pageUrl = rootUrl + route
+        val pool = Executors.newFixedThreadPool(nbThreads)
 
-        val concurrentRequests = 5
+        try {
 
-        When(s"$concurrentRequests concurrent requests for $paramDuration s")
-        info("Load page " + pageUrl)
+          // second
+          val paramDuration = 1
+          val margin = 1.5
 
-        val futures = (1 to concurrentRequests).map { i =>
-          val call = new Callable[Long]() {
-            def call(): Long = {
-              val strictMethod = HttpMethod.GET
-              val requestSettings = new WebRequest(new URL(pageUrl))
-              val aWebClient = getAWebClient(120000)
+          val route = s"/$path/$paramDuration"
+          Given(s"a route $route")
+          val pageUrl = rootUrl + route
 
-              val begin = System.nanoTime
-              aWebClient.getPage(requestSettings)
-              val end = System.nanoTime
+          val concurrentRequests = 5
 
-              aWebClient.closeAllWindows
+          When(s"$concurrentRequests concurrent requests of $paramDuration s")
+          info("Load page " + pageUrl)
 
-              val requestDuration = TimeUnit.NANOSECONDS.toMillis(end - begin)
-              info(s"Real duration of request: $requestDuration s")
+          val futures = (1 to concurrentRequests).map { i =>
+            val call = new Callable[Long]() {
+              def call(): Long = {
+                val strictMethod = HttpMethod.GET
+                val requestSettings = new WebRequest(new URL(pageUrl))
+                val aWebClient = getAWebClient(120000)
 
-              requestDuration
+                val begin = System.nanoTime
+                aWebClient.getPage(requestSettings)
+                val end = System.nanoTime
+
+                aWebClient.closeAllWindows
+
+                val requestDuration = TimeUnit.NANOSECONDS.toMillis(end - begin)
+
+                requestDuration
+              }
             }
+            pool.submit(call)
           }
-          pool.submit(call)
+
+          val results = futures.map { result =>
+            result.get
+          }
+
+          results.foreach(r => info(s"Request duration: $r ms"))
+
+          val maxDuration = results.max
+
+          Then(s"each request duration is no more than $paramDuration s * $margin")
+
+          val maxExpectedDuration = TimeUnit.SECONDS.toMillis(paramDuration) * margin
+
+          assert(maxDuration <= maxExpectedDuration, s"Max duration $maxDuration ms is higher than max excepted duration $maxExpectedDuration ms")
+        } finally {
+          pool.shutdown
+          pool.awaitTermination(2, TimeUnit.SECONDS)
         }
-
-        val results = futures.map { result =>
-          result.get
-        }
-
-        results.foreach(r => println(s"Request duration: $r ms"))
-
-        val maxDuration = results.max
-
-        Then(s"each request duration is no more than $paramDuration s * $margin")
-
-        val maxExpectedDuration = TimeUnit.SECONDS.toMillis(paramDuration) * margin
-
-        assert(maxDuration <= maxExpectedDuration, s"Max duration $maxDuration ms is higher than max excepted duration $maxExpectedDuration ms")
-      } finally {
-        pool.shutdown
-        pool.awaitTermination(2, TimeUnit.SECONDS)
       }
     }
 
