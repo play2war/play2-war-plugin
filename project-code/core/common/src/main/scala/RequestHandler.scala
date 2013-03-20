@@ -101,7 +101,15 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       def username = None
 
       override def toString = {
-        super.toString + "\nURI: " + uri + "\nMethod: " + method + "\nPath: " + path + "\nParameters: " + queryString + "\nHeaders: " + headers + "\nCookies: " + rCookies
+        s"""|URI: $uri
+            |Method: $method
+            |Version: $version
+            |Path: $path
+            |Id: $id
+            |Tags: $tags
+            |Parameters: $queryString
+            |Headers: $headers
+            |Cookies: $rCookies""".stripMargin
       }
     }
 
