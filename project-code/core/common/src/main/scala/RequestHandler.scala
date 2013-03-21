@@ -16,6 +16,7 @@ import play.api.http.HeaderNames.X_FORWARDED_FOR
 import java.io.ByteArrayOutputStream
 import java.net.URLDecoder
 import play.api.http.HeaderNames
+import scala.io._
 
 trait RequestHandler {
 
@@ -382,7 +383,14 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       // requestHeader.headers.get("Expect").filter(_ == "100-continue")
 
       val bodyEnumerator = getHttpRequest().getRichInputStream.map { is =>
-        Enumerator.fromStream(is).andThen(Enumerator.eof)
+          val output = new java.io.ByteArrayOutputStream()
+          val buffer = new Array[Byte](1024 * 8)
+          var length = is.read(buffer)
+          while(length != -1){
+            output.write(buffer, 0, length)
+            length = is.read(buffer)
+          }
+          Enumerator(output.toByteArray)andThen(Enumerator.eof)
       }.getOrElse(Enumerator.eof)
 
       val eventuallyResultIteratee = eventuallyBodyParser.flatMap(it => bodyEnumerator |>> it): scala.concurrent.Future[Iteratee[Array[Byte], Result]]
