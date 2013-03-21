@@ -1,1 +1,3 @@
 alias itt = ;project integration-tests;test;project play2-war
+alias itt-tomcat7 = ;project integration-tests;test-only com.github.play2war.plugin.it.Tomcat70xTests;project play2-war
+alias itt-quick-tomcat7 = ;project integration-tests;test-quick com.github.play2war.plugin.it.Tomcat70xTests;project play2-war
