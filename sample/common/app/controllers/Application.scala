@@ -46,8 +46,9 @@ object Application extends Controller {
     Ok(views.html.getCookies(mapCookies))
   }
 
-  def redirectLanding = Action {
-    Ok(views.html.redirectLanding())
+  def redirectLanding = Action { implicit request =>
+    val flashResult = flash.get("success").getOrElse("not found")
+    Ok(views.html.redirectLanding(flashResult))
   }
 
   def redirect = Action {
@@ -181,4 +182,11 @@ object Application extends Controller {
     Thread.sleep(java.util.concurrent.TimeUnit.SECONDS.toMillis(duration))
     Ok("")
   }
+
+  def flashing = Action {
+    Redirect(routes.Application.redirectLanding).flashing(
+      "success" -> "found"
+    )
+  }
+
 }

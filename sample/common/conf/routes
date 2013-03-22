@@ -34,5 +34,7 @@ GET     /clock                      controllers.Application.liveClock
 GET     /longRequest/:duration      controllers.JavaApplication.longRequest(duration: Long)
 GET     /slongRequest/:duration     controllers.Application.longRequest(duration: Long)
 
+GET     /flashing                   controllers.Application.flashing
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

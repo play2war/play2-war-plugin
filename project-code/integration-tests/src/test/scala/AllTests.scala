@@ -285,6 +285,33 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
         fail("Page not found")
       }
     }
+
+    scenario("Container set and remove flash cookie") {
+
+      // no flash cookie before test :)
+      var maybeFlashCookie = Option(webClient.getCookieManager.getCookie("PLAY_FLASH"))
+      maybeFlashCookie should be (None)
+
+      // still no flash cookie after this request
+      webClient.getPage(rootUrl + "/redirectLanding")
+      maybeFlashCookie = Option(webClient.getCookieManager.getCookie("PLAY_FLASH"))
+      maybeFlashCookie should be (None)
+
+      // Call page which sets Flash cookie, then redirect to redirectLanding page which removes cookie
+      val page = givenWhenGet("a page", "/flashing", "load a page which sets flash cookie")
+
+      Then("page body should contain 'Flash cookie: found'")
+      page.map { p =>
+        p.getWebResponse.getContentAsString should include("Flash cookie: found")
+      }.getOrElse {
+        fail("Page not found")
+      }
+
+      // no flash cookie after redirecting
+      maybeFlashCookie = Option(webClient.getCookieManager.getCookie("PLAY_FLASH"))
+      maybeFlashCookie should be (None)
+
+    }
   }
 
   /*
