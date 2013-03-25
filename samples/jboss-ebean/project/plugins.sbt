@@ -14,4 +14,4 @@ addSbtPlugin("play" % "sbt-plugin" % "2.1-RC2")
 // Older URL
 resolvers += Resolver.url("sbt-plugin-snapshots", url("http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-snapshots"))(Resolver.ivyStylePatterns)
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.9-SNAPSHOT")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.9")
