@@ -105,7 +105,7 @@ See [Changelog](https://github.com/dlecan/play2-war-plugin/wiki/Changelog).
   <th>Public PaaS</th>
   </tr>
   <tr>
-  <td rowspan="78">Servlet 3.0</td>
+  <td rowspan="8">Servlet 3.0</td>
   <td>Tomcat 7</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
