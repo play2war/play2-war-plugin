@@ -15,7 +15,7 @@ Why choosing WAR packaging when native Play 2 is a better deployment model (feat
 - SSL is available, easy to configure and well documented on JBoss, Tomcat, ... when SSL is newer on Play 2.1
 - You need to add extra Servlet filters specific to your company (to handle SSO, ...)
 
-You can trust this plugin because it is [heavily tested](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_204_Play_runtime/lastCompletedBuild/testReport/), with hundreds of integration tests run on :
+You can trust this plugin because it is [heavily tested](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_210_Play_runtime/lastCompletedBuild/testReport/), with hundreds of integration tests run on :
 - several open-source application servers (Tomcat 6/7, Jetty 7/8/9, JBoss AS 7.x)
 - *all versions* of Play Framework 2.x
 
@@ -102,10 +102,10 @@ See [Changelog](https://github.com/dlecan/play2-war-plugin/wiki/Changelog).
   <th>Servlet engine</th>
         <th>Server</th>
   <th>In your company</th>
-  <th>PaaS</th>
+  <th>Public PaaS</th>
   </tr>
   <tr>
-  <td rowspan="7">Servlet 3.0</td>
+  <td rowspan="78">Servlet 3.0</td>
   <td>Tomcat 7</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
@@ -142,6 +142,11 @@ See [Changelog](https://github.com/dlecan/play2-war-plugin/wiki/Changelog).
   <td>Glassfish 4</td>
   <td>TBD</td>
   <td>TBD</td>
+  </tr>
+  <tr>
+  <td>Websphere Community Edition 3.0</td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td>-</td>
   </tr>
   <tr>
   <td rowspan="2">Servlet 2.5</td>
