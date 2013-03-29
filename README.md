@@ -167,7 +167,7 @@ See [Changelog](https://github.com/dlecan/play2-war-plugin/wiki/Changelog).
   </tr>
 </table>
 
-The plugin may work on others containers, such as Weblogic or Websphere (not tested yet).
+The plugin may work on others containers, such as Weblogic or other versions of Websphere (not tested yet).
 
 ## Configuration
 
