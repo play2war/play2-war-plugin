@@ -2,6 +2,7 @@ package play.core.server.servlet
 
 import java.io.File
 import java.util.logging.Handler
+import java.util.concurrent.atomic.AtomicBoolean
 import java.net.InetSocketAddress
 
 import scala.Option.apply
@@ -24,22 +25,25 @@ import scala.util.control.NonFatal
 
 object Play2WarServer {
 
+  var playServer:Play2WarServer = null
+
+  def apply(contextPath: Option[String] = None) = {
+
+    playServer = new Play2WarServer(new WarApplication(Mode.Prod, contextPath))
+
+  }
+
   Logger.configure(Map.empty, Map.empty, Mode.Prod)
 
-  private val application = new WarApplication(Mode.Prod)
+  lazy val configuration = Play.current.configuration
 
-  val configuration = application.get.right.map { _.configuration }.right.getOrElse(Configuration.empty)
-
-  val playServer = new Play2WarServer(application)
-
-  private var started = true
+  private val started = new AtomicBoolean(true)
 
   def stop(sc: ServletContext) = {
     synchronized {
-      if (started) {
+      if (started.getAndSet(false)) {
         playServer.stop()
         sc.log("Play server stopped")
-        started = false
       }
     }
   }
@@ -81,11 +85,11 @@ private[servlet] class Play2WarServer(appProvider: WarApplication) extends Serve
   }
 }
 
-private[servlet] class WarApplication(val mode: Mode.Mode) extends ApplicationProvider {
+private[servlet] class WarApplication(val mode: Mode.Mode, contextPath: Option[String]) extends ApplicationProvider {
 
   val applicationPath = Option(System.getProperty("user.home")).map(new File(_)).getOrElse(new File(""))
 
-  val application = new DefaultWarApplication(applicationPath, mode)
+  val application = new DefaultWarApplication(applicationPath, mode, contextPath)
 
   // Because of https://play.lighthouseapp.com/projects/82401-play-20/tickets/275, reconfigure Logger
   // without substitutions
@@ -100,8 +104,18 @@ private[servlet] class WarApplication(val mode: Mode.Mode) extends ApplicationPr
 
 private[servlet] class DefaultWarApplication(
   override val path: File,
-  override val mode: Mode.Mode
+  override val mode: Mode.Mode,
+  private val contextPath: Option[String]
 ) extends Application with WithDefaultConfiguration with WithDefaultGlobal with WithDefaultPlugins {
+
+  private lazy val warConfiguration = contextPath.filterNot(_.isEmpty)
+                                        .map(cp => cp + (if (cp.endsWith("/")) "" else "/"))
+                                        .map(cp => {
+                                          Logger("play").info(s"Force Play 'application.context' to '$cp'")
+                                          Configuration.from(Map("application.context" -> cp))
+                                        }).getOrElse(Configuration.empty) ++ super.configuration
+
   override def classloader = Thread.currentThread.getContextClassLoader
   override def sources = None
+  override def configuration = warConfiguration
 }
