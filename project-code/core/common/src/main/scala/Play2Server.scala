@@ -1,27 +1,22 @@
 package play.core.server.servlet
 
 import java.io.File
-import java.util.logging.Handler
 import java.util.concurrent.atomic.AtomicBoolean
-import java.net.InetSocketAddress
 
-import scala.Option.apply
-import scala.Predef.Map.apply
-import scala.Right.apply
+import scala.util.control.NonFatal
 
 import javax.servlet.ServletContext
+import play.api.Application
 import play.api.Configuration
-import play.api.DefaultApplication
 import play.api.Logger
-import play.api.Logger.apply
 import play.api.Mode
 import play.api.Play
-import play.api._
+import play.api.WithDefaultConfiguration
+import play.api.WithDefaultGlobal
+import play.api.WithDefaultPlugins
 import play.core.ApplicationProvider
 import play.core.server.Server
 import play.core.server.ServerWithStop
-import play.core._
-import scala.util.control.NonFatal
 
 object Play2WarServer {
 

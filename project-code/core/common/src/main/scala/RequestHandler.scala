@@ -1,22 +1,22 @@
 package play.core.server.servlet
+import java.io.ByteArrayOutputStream
+import java.net.URLDecoder
+import java.util.concurrent.atomic.AtomicBoolean
+
+import scala.io._
 
 import javax.servlet.http.{ Cookie => ServletCookie }
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import play.api._
-import play.api.mvc._
-import java.util.concurrent.atomic.AtomicBoolean
-import play.api.libs.iteratee.Enumerator
 import play.api.Logger
-import play.api.libs.concurrent._
-import play.api.libs.iteratee._
-import scala.concurrent.Future
+import play.api.http.HeaderNames
 import play.api.http.HeaderNames.CONTENT_LENGTH
 import play.api.http.HeaderNames.X_FORWARDED_FOR
-import java.io.ByteArrayOutputStream
-import java.net.URLDecoder
-import play.api.http.HeaderNames
-import scala.io._
+import play.api.libs.concurrent._
+import play.api.libs.iteratee._
+import play.api.libs.iteratee.Enumerator
+import play.api.mvc._
 
 trait RequestHandler {
 

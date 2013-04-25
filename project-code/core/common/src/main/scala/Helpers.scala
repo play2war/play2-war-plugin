@@ -3,7 +3,6 @@ package play.core.server.servlet
 import java.util.Arrays
 import java.util.Collections
 
-import scala.Option.option2Iterable
 import scala.collection.JavaConverters.asScalaBufferConverter
 import scala.collection.JavaConverters.enumerationAsScalaIteratorConverter
 
