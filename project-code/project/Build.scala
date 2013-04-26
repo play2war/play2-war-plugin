@@ -2,6 +2,7 @@ import sbt._
 import Keys._
 import java.io.File
 import com.typesafe.sbteclipse.plugin.EclipsePlugin._
+import org.scalastyle.sbt.ScalastylePlugin
 
 object Build extends Build {
 
@@ -88,7 +89,7 @@ object Build extends Build {
   //
   // Settings
   //
-  def commonSettings = buildSettings ++
+  def commonSettings = buildSettings ++ Seq(ScalastylePlugin.Settings: _*)
     Seq(
       javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
