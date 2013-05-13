@@ -628,6 +628,13 @@ class Jetty9xTests extends AbstractPlay2WarTests with Servlet30Container with Ja
   override def containerName = "jetty9x"
 }
 
+@RunWith(classOf[JUnitRunner])
+class Resin40xTests extends AbstractPlay2WarTests with Servlet30Container with Java7 {
+  override def containerUrl = "http://www.caucho.com/download/resin-4.0.36.tar.gz"
+  override def containerFileNameInCloudbeesCache = Option("resin-4.0.36.tar.gz")
+  override def containerName = "resin4x"
+}
+
 // Doesn't work yet : deployment of sample war fails : Command deploy requires an operand of type class java.io.File
 //@RunWith(classOf[JUnitRunner])
 //class Glassfish3xTests extends AbstractPlay2WarTests {
