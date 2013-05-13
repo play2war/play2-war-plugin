@@ -73,7 +73,6 @@ object Build extends Build {
     settings = commonSettings ++ mavenSettings ++ Seq(
       sbtPlugin := false,
       publishArtifact := false,
-      scalaBinaryVersion := buildScalaVersion,
 
       libraryDependencies += "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
       libraryDependencies += "junit" % "junit" % "4.10" % "test",
@@ -96,8 +95,6 @@ object Build extends Build {
       EclipseKeys.withSource := true,
       EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16),
 
-      resolvers += ("Typsafe releases" at "http://repo.typesafe.com/typesafe/releases/"),
-
       publishArtifact in Test := false)
 
   object BuildSettings {
@@ -113,6 +110,7 @@ object Build extends Build {
     val buildSbtVersionBinaryCompatible = "0.12"
 
     val buildSettings = Defaults.defaultSettings ++ Seq(
+      resolvers           += Resolver.typesafeRepo("releases"),
       organization        := buildOrganization,
       version             := buildVersion,
       scalaVersion        := buildScalaVersion,
