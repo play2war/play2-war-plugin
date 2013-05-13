@@ -103,7 +103,7 @@ object Build extends Build {
   object BuildSettings {
 
     val buildOrganization = "com.github.play2war"
-    val defaultPlay2Version = "2.1.0"
+    val defaultPlay2Version = "2.1.1"
     val play2Version = Option(System.getProperty("play2.version")).filterNot(_.isEmpty).getOrElse(defaultPlay2Version)
     val defaultBuildVersion = "1.0-SNAPSHOT"
     val buildVersion = Option(System.getProperty("play2war.version")).filterNot(_.isEmpty).getOrElse(defaultBuildVersion)
