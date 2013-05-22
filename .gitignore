@@ -8,3 +8,5 @@ project/target
 .settings
 .target
 bin
+.idea
+.idea_modules
