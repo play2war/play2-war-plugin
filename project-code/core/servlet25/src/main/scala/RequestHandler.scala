@@ -6,26 +6,21 @@ import play.core.server.servlet.Play2GenericServletRequestHandler
 import play.core.server.servlet.RichHttpServletRequest
 import play.core.server.servlet.RichHttpServletResponse
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.TimeUnit
 
 class Play2Servlet25RequestHandler(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse)
   extends Play2GenericServletRequestHandler(servletRequest, Option(servletResponse))
   with Helpers {
 
-  val lock = new AtomicBoolean(false);
+  val queue = new ArrayBlockingQueue[Boolean](1)
 
   protected override def onFinishService() = {
-    lock.synchronized {
-      if (!lock.get) {
-        lock.wait(Play2Servlet.syncTimeout)
-      }
-    }
+    queue.poll(Play2Servlet.syncTimeout, TimeUnit.MILLISECONDS)
   }
 
   protected override def onHttpResponseComplete() = {
-    lock.synchronized {
-      lock.set(true)
-      lock.notify()
-    }
+    queue.put(true)
   }
 
   protected override def getHttpRequest(): RichHttpServletRequest = {
