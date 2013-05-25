@@ -5,9 +5,7 @@ import javax.servlet.http.HttpServletResponse
 import play.core.server.servlet.Play2GenericServletRequestHandler
 import play.core.server.servlet.RichHttpServletRequest
 import play.core.server.servlet.RichHttpServletResponse
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.{TimeoutException, ArrayBlockingQueue, TimeUnit}
 
 class Play2Servlet25RequestHandler(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse)
   extends Play2GenericServletRequestHandler(servletRequest, Option(servletResponse))
@@ -16,11 +14,15 @@ class Play2Servlet25RequestHandler(servletRequest: HttpServletRequest, servletRe
   val queue = new ArrayBlockingQueue[Boolean](1)
 
   protected override def onFinishService() = {
-    queue.poll(Play2Servlet.syncTimeout, TimeUnit.MILLISECONDS)
+    val hasBeenComplete = queue.poll(Play2Servlet.syncTimeout, TimeUnit.MILLISECONDS)
+
+    if (hasBeenComplete == null) {
+      throw new TimeoutException("This request was timed out after " + Play2Servlet.syncTimeout + " ms")
+    }
   }
 
   protected override def onHttpResponseComplete() = {
-    queue.put(true)
+    queue.put(Boolean.TRUE)
   }
 
   protected override def getHttpRequest(): RichHttpServletRequest = {
