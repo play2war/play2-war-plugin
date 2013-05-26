@@ -16,13 +16,14 @@ class Play2Servlet25RequestHandler(servletRequest: HttpServletRequest, servletRe
   protected override def onFinishService() = {
     val hasBeenComplete = queue.poll(Play2Servlet.syncTimeout, TimeUnit.MILLISECONDS)
 
-    if (hasBeenComplete == null) {
+    // Scala magic: will get 'false' even if queue returns null in Java
+    if (!hasBeenComplete) {
       throw new TimeoutException("This request was timed out after " + Play2Servlet.syncTimeout + " ms")
     }
   }
 
   protected override def onHttpResponseComplete() = {
-    queue.put(Boolean.TRUE)
+    queue.put(true)
   }
 
   protected override def getHttpRequest(): RichHttpServletRequest = {
