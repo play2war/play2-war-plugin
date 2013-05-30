@@ -43,6 +43,10 @@ trait Play2WarSettings {
 
     disableWarningWhenWebxmlFileFound := false,
 
+    defaultFilteredArtifacts := Seq(("javax.servlet", "servlet-api")),
+
+    filteredArtifacts := Seq(),
+
     // Bind war building to "war" task
     war <<= warTask,
 
