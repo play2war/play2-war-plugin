@@ -1,3 +1,4 @@
+package com.github.play2war.plugin.it
 
 import java.net._
 import com.gargoylesoftware.htmlunit._

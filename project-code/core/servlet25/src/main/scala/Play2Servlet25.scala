@@ -1,56 +1,38 @@
+/*
+ * Copyright 2013 Damien Lecan
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package play.core.server.servlet25
 
-import javax.servlet._
-import javax.servlet.http._
-import java.io._
-import java.util.Arrays
-
-import play.api._
-import play.api.mvc._
-import play.api.http._
-import play.api.http.HeaderNames._
-import play.api.libs.iteratee._
-import play.api.libs.iteratee.Input._
-import play.api.libs.concurrent._
-import play.core._
-import play.core.server.servlet._
-import play.core.server.servlet25.Play2Servlet._
-import server.Server
-
-import scala.collection.JavaConverters._
+import play.api.Logger
+import play.core.server.servlet.GenericPlay2Servlet
+import play.core.server.servlet.Play2WarServer
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 object Play2Servlet {
 
-  // 30 minutes in milliseconds
-  // val WAIT_TIMEOUT = 30 * 60 * 1000
-  val WAIT_TIMEOUT = 10 * 1000
+  val DEFAULT_TIMEOUT = 60 * 1000
+
+  val syncTimeout = Play2WarServer.configuration.getInt("servlet25.synctimeout").getOrElse(DEFAULT_TIMEOUT)
+  Logger("play").debug("Sync timeout for HTTP requests: " + syncTimeout + " ms")
 }
 
-class Play2Servlet extends play.core.server.servlet.Play2Servlet[Tuple3[HttpServletRequest, HttpServletResponse, Object]] with Helpers {
+class Play2Servlet extends GenericPlay2Servlet with Helpers {
 
-  protected override def onBeginService(request: HttpServletRequest, response: HttpServletResponse): Tuple3[HttpServletRequest, HttpServletResponse, Object] = {
-     (request, response, new Object())
+  override protected def getRequestHandler(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
+    new Play2Servlet25RequestHandler(servletRequest, servletResponse)
   }
-
-  protected override def onFinishService(execContext: Tuple3[HttpServletRequest, HttpServletResponse, Object]) = {
-    execContext._3.synchronized {
-      execContext._3.wait(WAIT_TIMEOUT)
-    }
-  }
-  
-  protected override def onHttpResponseComplete(execContext: Tuple3[HttpServletRequest, HttpServletResponse, Object]) = {
-    execContext._3.synchronized {
-      execContext._3.notify()
-    }
-  }
-  
-  protected override def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
-    val parameterMap = request.getParameterMap.asInstanceOf[java.util.Map[String, Array[String]]].asScala
-	Map.empty[String, Seq[String]] ++ parameterMap.mapValues(Arrays.asList(_: _*).asScala)
-  }
-  
-  protected override def getHttpRequest(executionContext: Tuple3[HttpServletRequest, HttpServletResponse, Object]): HttpServletRequest = executionContext._1
-  
-  protected override def getHttpResponse(executionContext: Tuple3[HttpServletRequest, HttpServletResponse, Object]): HttpServletResponse = executionContext._2
 
 }

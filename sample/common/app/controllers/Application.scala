@@ -7,8 +7,9 @@ import play.api.mvc._
 import play.api.libs.{ Comet }
 import play.api.libs.iteratee._
 import play.api.libs.concurrent._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-import akka.util.duration._
+import scala.concurrent.duration._
 
 object Application extends Controller {
 
@@ -19,8 +20,8 @@ object Application extends Controller {
   def setCookies = Action {
     val result = Ok(views.html.index("Cookies have been set."))
 
-    val cookie1 = new Cookie("cookie1", "value1", 3600)
-    val cookie2 = new Cookie("cookie2", "value2", 3600)
+    val cookie1 = new Cookie("cookie1", "value1", Some(3600))
+    val cookie2 = new Cookie("cookie2", "value2", Some(3600))
 
     result.withCookies(cookie1).withCookies(cookie2)
   }
@@ -45,8 +46,9 @@ object Application extends Controller {
     Ok(views.html.getCookies(mapCookies))
   }
 
-  def redirectLanding = Action {
-    Ok(views.html.redirectLanding())
+  def redirectLanding = Action { implicit request =>
+    val flashResult = flash.get("success").getOrElse("not found")
+    Ok(views.html.redirectLanding(flashResult))
   }
 
   def redirect = Action {
@@ -90,7 +92,7 @@ object Application extends Controller {
           val iMaxRange = maxRange.head.toInt
           var counter = 0
 
-          Enumerator.fromCallback(() => {
+          Enumerator.generateM({
 
             if (counter >= iMaxRange) {
               Promise.pure(None)
@@ -120,8 +122,12 @@ object Application extends Controller {
     Ok.stream(dataContent >>> Enumerator.eof)
   }
 
-  def echo = Action { request =>
+  def echoGetParameters = Action { request =>
     Ok(views.html.echo(request.queryString))
+  }
+  
+  def echoPostParameters = Action { request =>
+    Ok(views.html.echo(request.body.asFormUrlEncoded.get))
   }
   
   def uploadForm = Action { 
@@ -165,12 +171,22 @@ object Application extends Controller {
     
     val dateFormat = new SimpleDateFormat("HH mm ss")
     
-    Enumerator.fromCallback { () =>
-      Promise.timeout(Some(dateFormat.format(new Date)), 100 milliseconds)
-    }
+    Enumerator.generateM(Promise.timeout(Some(dateFormat.format(new Date)), 100 milliseconds))
   }
   
   def liveClock = Action {
     Ok.stream(clock &> Comet(callback = "parent.clockChanged"))
   }
+  
+  def longRequest(duration: Long) = Action {
+    Thread.sleep(java.util.concurrent.TimeUnit.SECONDS.toMillis(duration))
+    Ok("")
+  }
+
+  def flashing = Action {
+    Redirect(routes.Application.redirectLanding).flashing(
+      "success" -> "found"
+    )
+  }
+
 }

@@ -1,46 +1,39 @@
+/*
+ * Copyright 2013 Damien Lecan
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package play.core.server.servlet30
 
-import javax.servlet._
-import javax.servlet.annotation._
-import javax.servlet.http._
-import java.io._
-import java.util.Arrays
+import javax.servlet.annotation.WebListener
+import javax.servlet.annotation.WebServlet
+import play.api.Logger
+import play.core.server.servlet.Play2WarServer
+import play.core.server.servlet.GenericPlay2Servlet
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
-import play.api._
-import play.api.mvc._
-import play.api.http._
-import play.api.http.HeaderNames._
-import play.api.libs.iteratee._
-import play.api.libs.iteratee.Input._
-import play.api.libs.concurrent._
-import play.core._
-import play.core.server.servlet._
-import server.Server
-
-import scala.collection.JavaConverters._
+object Play2Servlet {
+  val asyncTimeout = Play2WarServer.configuration.getInt("servlet30.asynctimeout").getOrElse(-1)
+  Logger("play").debug("Async timeout for HTTP requests: " + asyncTimeout + " ms")
+}
 
 @WebServlet(name = "Play", urlPatterns = Array { "/" }, asyncSupported = true)
 @WebListener
-class Play2Servlet extends play.core.server.servlet.Play2Servlet[AsyncContext] with Helpers {
+class Play2Servlet extends GenericPlay2Servlet {
 
-  protected override def onBeginService(request: HttpServletRequest, response: HttpServletResponse): AsyncContext = {
-     request.startAsync
+  override protected def getRequestHandler(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
+    new Play2Servlet30RequestHandler(servletRequest)
   }
-
-  protected override def onFinishService(aSyncContext: AsyncContext) = {
-    // Nothing to do
-  }
-  
-  protected override def onHttpResponseComplete(aSyncContext: AsyncContext) = {
-	aSyncContext.complete
-  }
-  
-  protected override def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
-	Map.empty[String, Seq[String]] ++ request.getParameterMap.asScala.mapValues(Arrays.asList(_: _*).asScala)
-  }
-  
-  protected override def getHttpRequest(aSyncContext: AsyncContext): HttpServletRequest = aSyncContext.getRequest.asInstanceOf[HttpServletRequest]
-  
-  protected override def getHttpResponse(aSyncContext: AsyncContext): HttpServletResponse = aSyncContext.getResponse.asInstanceOf[HttpServletResponse]
 
 }

@@ -7,3 +7,6 @@ project/target
 .cache
 .settings
 .target
+bin
+.idea
+.idea_modules
