@@ -31,6 +31,10 @@ trait Play2WarKeys {
   lazy val disableWarningWhenWebxmlFileFound = SettingKey[Boolean]("disable-warning-when-webxml-file-found")
 
   lazy val targetName = SettingKey[Option[String]]("targetName", "The name of the WAR file generated")
+
+  lazy val defaultFilteredArtifacts = SettingKey[Seq[(String, String)]]("defaultFilteredArtifacts", "Artifacts filtered from WAR by default")
+
+  lazy val filteredArtifacts = SettingKey[Seq[(String, String)]]("filteredArtifacts", "User's artifacts filtered from WAR")
 }
 
 object Play2WarKeys extends Play2WarKeys

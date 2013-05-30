@@ -50,8 +50,9 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
         })
     }
 
-  val warTask = (playPackageEverything, dependencyClasspath in Runtime, target, normalizedName, version, webappResource, streams, servletVersion, targetName, disableWarningWhenWebxmlFileFound) map {
-    (packaged, dependencies, target, id, version, webappResource, s, servletVersion, targetName, disableWarningWhenWebxmlFileFound) =>
+  val warTask = (playPackageEverything, dependencyClasspath in Runtime, target, normalizedName,
+      version, webappResource, streams, servletVersion, targetName, disableWarningWhenWebxmlFileFound, defaultFilteredArtifacts, filteredArtifacts) map {
+    (packaged, dependencies, target, id, version, webappResource, s, servletVersion, targetName, disableWarningWhenWebxmlFileFound, defaultFilteredArtifacts, filteredArtifacts) =>
 
       s.log.info("Build WAR package for servlet container: " + servletVersion)
 
@@ -71,6 +72,13 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
 
       IO.createDirectory(warDir)
 
+      val allFilteredArtifacts = defaultFilteredArtifacts ++ filteredArtifacts
+
+      allFilteredArtifacts.foreach {
+        case (groupId, artifactId) =>
+          s.log.debug("Ignoring dependency " + groupId + " -> " + artifactId)
+      }
+
       val libs = {
         // Much better: filter by scope (exclude 'provided')
         dependencies.filterNot(_.data.name.contains("servlet-api")).filter(_.data.ext == "jar").map {
@@ -78,6 +86,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
             val filename = for {
               module <- dependency.metadata.get(AttributeKey[ModuleID]("module-id"))
               artifact <- dependency.metadata.get(AttributeKey[Artifact]("artifact"))
+              if (!allFilteredArtifacts.contains((module.organization, module.name)))
             } yield {
               // groupId.artifactId-version[-classifier].extension
               module.organization + "." + module.name + "-" + module.revision + artifact.classifier.map("-" + _).getOrElse("") + "." + artifact.extension
