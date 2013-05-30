@@ -5,7 +5,7 @@ resolvers += Resolver.defaultLocal
 
 resolvers += Resolver.typesafeRepo("releases")
 
-resolvers += Resolver.sonatypeRepo("snapshots")
+resolvers += Resolver.sbtPluginRepo("snapshots")
 
 // Use the Play sbt plugin for Play projects
 addSbtPlugin("play" % "sbt-plugin" % Option(System.getProperty("play.version")).getOrElse("2.1.0"))
