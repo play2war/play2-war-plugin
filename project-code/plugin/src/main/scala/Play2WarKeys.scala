@@ -27,6 +27,8 @@ trait Play2WarKeys {
       "Servlet container version (2.5, 3.0)")
 
   lazy val webappResource = SettingKey[File]("webapp-resources")
+  
+  lazy val disableWarningWhenWebxmlFileFound = SettingKey[Boolean]("disable-warning-when-webxml-file-found")
 
   lazy val targetName = SettingKey[Option[String]]("targetName", "The name of the WAR file generated")
 }

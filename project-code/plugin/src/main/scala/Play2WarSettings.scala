@@ -41,6 +41,8 @@ trait Play2WarSettings {
 
     targetName := None,
 
+    disableWarningWhenWebxmlFileFound := false,
+
     // Bind war building to "war" task
     war <<= warTask,
 
