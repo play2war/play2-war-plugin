@@ -46,6 +46,8 @@ trait Play2WarSettings {
     defaultFilteredArtifacts := Seq(("javax.servlet", "servlet-api")),
 
     filteredArtifacts := Seq(),
+    
+    explodedJar := false,
 
     // Bind war building to "war" task
     war <<= warTask,

@@ -35,6 +35,8 @@ trait Play2WarKeys {
   lazy val defaultFilteredArtifacts = SettingKey[Seq[(String, String)]]("defaultFilteredArtifacts", "Artifacts filtered from WAR by default")
 
   lazy val filteredArtifacts = SettingKey[Seq[(String, String)]]("filteredArtifacts", "User's artifacts filtered from WAR")
+  
+  lazy val explodedJar = SettingKey[Boolean]("explodedJar", "Should this project's jar be exploded ?")
 }
 
 object Play2WarKeys extends Play2WarKeys
