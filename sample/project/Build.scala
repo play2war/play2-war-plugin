@@ -11,8 +11,9 @@ object ApplicationBuild extends Build {
 
   lazy val commonSettings = Defaults.defaultSettings ++ Seq(
     //      resolvers += "Local Repository" at "http://localhost:8090/publish",
-    // resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns),
-    resolvers += Resolver.defaultLocal,
+    resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns),
+    // Doesn't work
+    // resolvers += Resolver.defaultLocal,
     resolvers += Resolver.sonatypeRepo("snapshots"),
 
     EclipseKeys.withSource := true,
