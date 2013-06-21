@@ -51,8 +51,8 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
     }
 
   val warTask = (playPackageEverything, dependencyClasspath in Runtime, target, normalizedName,
-      version, webappResource, streams, servletVersion, targetName, disableWarningWhenWebxmlFileFound, defaultFilteredArtifacts, filteredArtifacts) map {
-    (packaged, dependencies, target, id, version, webappResource, s, servletVersion, targetName, disableWarningWhenWebxmlFileFound, defaultFilteredArtifacts, filteredArtifacts) =>
+      version, webappResource, streams, servletVersion, targetName, disableWarningWhenWebxmlFileFound, defaultFilteredArtifacts, filteredArtifacts, explodedJar) map {
+    (packaged, dependencies, target, id, version, webappResource, s, servletVersion, targetName, disableWarningWhenWebxmlFileFound, defaultFilteredArtifacts, filteredArtifacts, explodedJar) =>
 
       s.log.info("Build WAR package for servlet container: " + servletVersion)
 
@@ -79,26 +79,42 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
           s.log.debug("Ignoring dependency " + groupId + " -> " + artifactId)
       }
 
-      val libs = {
-        // Much better: filter by scope (exclude 'provided')
-        dependencies.filterNot(_.data.name.contains("servlet-api")).filter(_.data.ext == "jar").map {
-          dependency =>
-            val filename = for {
-              module <- dependency.metadata.get(AttributeKey[ModuleID]("module-id"))
-              artifact <- dependency.metadata.get(AttributeKey[Artifact]("artifact"))
-              if (!allFilteredArtifacts.contains((module.organization, module.name)))
-            } yield {
-              // groupId.artifactId-version[-classifier].extension
-              module.organization + "." + module.name + "-" + module.revision + artifact.classifier.map("-" + _).getOrElse("") + "." + artifact.extension
-            }
-            val path = ("WEB-INF/lib/" + filename.getOrElse(dependency.data.getName))
-            dependency.data -> path
-        } ++ packaged.map(jar => jar -> ("WEB-INF/lib/" + jar.getName))
-      }
+      // Much better: filter by scope (exclude 'provided')
+      val files: Traversable[(File, String)] = dependencies.
+        filterNot(_.data.name.contains("servlet-api")).
+        filter(_.data.ext == "jar").map { dependency =>
+          val filename = for {
+            module <- dependency.metadata.get(AttributeKey[ModuleID]("module-id"))
+            artifact <- dependency.metadata.get(AttributeKey[Artifact]("artifact"))
+            if (!allFilteredArtifacts.contains((module.organization, module.name)))
+          } yield {
+            // groupId.artifactId-version[-classifier].extension
+            module.organization + "." + module.name + "-" + module.revision + artifact.classifier.map("-" + _).getOrElse("") + "." + artifact.extension
+          }
+          val path = ("WEB-INF/lib/" + filename.getOrElse(dependency.data.getName))
+          dependency.data -> path
+      } ++ {
+        if (explodedJar) {
+           s.log.info("Main artifacts " + packaged.map(_.getName).mkString("'", " ", "'") + " will be packaged exploded")
 
-      libs.foreach {
-        l =>
-          s.log.debug("Embedding dependency " + l._1 + " -> " + l._2)
+          val explodedJarDir = target / "exploded"
+          
+          IO.delete(explodedJarDir)
+          IO.createDirectory(explodedJarDir)
+
+          packaged.flatMap { jar =>
+            IO.unzip(jar, explodedJarDir).map {
+              file =>
+                val partialPath = IO.relativize(explodedJarDir, file).getOrElse(file.getName)
+                
+                file -> ("WEB-INF/classes/" + partialPath)
+            }
+          }
+        } else packaged.map(jar => jar -> ("WEB-INF/lib/" + jar.getName))
+      }
+      
+      files.foreach { case (file, path) =>
+        s.log.debug("Embedding file " + file + " -> " + path)
       }
 
       val webxmlFolder = webappResource / "WEB-INF"
@@ -180,7 +196,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
       }
 
       // Package final jar
-      val jarContent = libs ++ additionnalResources
+      val jarContent = files ++ additionnalResources
 
       IO.jar(jarContent, war, manifest)
 
