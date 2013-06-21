@@ -80,8 +80,9 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
       }
 
       // Much better: filter by scope (exclude 'provided')
-      val files = dependencies.filterNot(_.data.name.contains("servlet-api")).filter(_.data.ext == "jar").map {
-        dependency =>
+      val files: Traversable[(File, String)] = dependencies.
+        filterNot(_.data.name.contains("servlet-api")).
+        filter(_.data.ext == "jar").map { dependency =>
           val filename = for {
             module <- dependency.metadata.get(AttributeKey[ModuleID]("module-id"))
             artifact <- dependency.metadata.get(AttributeKey[Artifact]("artifact"))
@@ -94,16 +95,26 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
           dependency.data -> path
       } ++ {
         if (explodedJar) {
-          // TODO
-          Seq()
-        } else {
-          packaged.map(jar => jar -> ("WEB-INF/lib/" + jar.getName))
-        }
+           s.log.info("Main artifacts " + packaged.map(_.getName).mkString("'", " ", "'") + " will be packaged exploded")
+
+          val explodedJarDir = target / "exploded"
+          
+          IO.delete(explodedJarDir)
+          IO.createDirectory(explodedJarDir)
+
+          packaged.flatMap { jar =>
+            IO.unzip(jar, explodedJarDir).map {
+              file =>
+                val partialPath = IO.relativize(explodedJarDir, file).getOrElse(file.getName)
+                
+                file -> ("WEB-INF/classes/" + partialPath)
+            }
+          }
+        } else packaged.map(jar => jar -> ("WEB-INF/lib/" + jar.getName))
       }
       
-      files.foreach {
-        l =>
-          s.log.debug("Embedding file " + l._1 + " -> " + l._2)
+      files.foreach { case (file, path) =>
+        s.log.debug("Embedding file " + file + " -> " + path)
       }
 
       val webxmlFolder = webappResource / "WEB-INF"
