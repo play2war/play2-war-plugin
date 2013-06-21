@@ -2,7 +2,8 @@
 logLevel := Level.Warn
 
 resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns)
-//resolvers += Resolver.defaultLocal
+// Doesn't work
+// resolvers += Resolver.defaultLocal
 
 resolvers += Resolver.typesafeRepo("releases")
 
