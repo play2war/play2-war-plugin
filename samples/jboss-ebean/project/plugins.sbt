@@ -14,4 +14,4 @@ resolvers += Resolver.url("sbt-plugin-snapshots", url("http://scalasbt.artifacto
 // Use the Play sbt plugin for Play projects
 addSbtPlugin("play" % "sbt-plugin" % "2.1.0")
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "0.9")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "1.0")
