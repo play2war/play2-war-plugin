@@ -2,7 +2,7 @@
 
     Current versions:
         Play 2.0.x : 0.8.1
-        Play 2.1.x : 0.9
+        Play 2.1.x : 1.0
 
     Project-status: STABLE
     
