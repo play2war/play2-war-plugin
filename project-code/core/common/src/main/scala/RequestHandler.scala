@@ -399,14 +399,16 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       // requestHeader.headers.get("Expect").filter(_ == "100-continue")
 
       val bodyEnumerator = getHttpRequest().getRichInputStream.map { is =>
-          val output = new java.io.ByteArrayOutputStream()
           val buffer = new Array[Byte](1024 * 8)
-          var length = is.read(buffer)
-          while(length != -1){
-            output.write(buffer, 0, length)
-            length = is.read(buffer)
-          }
-          Enumerator(output.toByteArray)andThen(Enumerator.eof)
+	  def doRead(push: Array[Byte] => Unit) {
+	    val len = is.read(buffer)
+	    if (len > 0) push(java.util.Arrays.copyOfRange(buffer, 0, len))
+	    if (len >= 0) doRead(push)
+	  }
+	  Concurrent.unicast[Array[Byte]] { channel =>
+	    try doRead(channel.push)
+	    finally channel.eofAndEnd()
+	  }
       }.getOrElse(Enumerator.eof)
 
       val eventuallyResultIteratee = eventuallyBodyParser.flatMap(it => bodyEnumerator |>> it): scala.concurrent.Future[Iteratee[Array[Byte], Result]]
