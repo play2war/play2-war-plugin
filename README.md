@@ -26,7 +26,7 @@ Other references built with Play 2 and Play2War:
 
 ## What's new ?
 
-See [Changelog](https://github.com/dlecan/play2-war-plugin/wiki/Changelog).
+See [releases and changelog](https://github.com/dlecan/play2-war-plugin/releases/).
 
 ## Features
 <table>
