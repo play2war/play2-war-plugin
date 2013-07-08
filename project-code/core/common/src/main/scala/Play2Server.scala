@@ -35,11 +35,11 @@ import play.core.server.ServerWithStop
 
 object Play2WarServer {
 
-  var playServer:Play2WarServer = null
+  var playServer: Option[Play2WarServer] = None
 
   def apply(contextPath: Option[String] = None) = {
 
-    playServer = new Play2WarServer(new WarApplication(Mode.Prod, contextPath))
+    playServer = Option(new Play2WarServer(new WarApplication(Mode.Prod, contextPath)))
 
   }
 
@@ -52,7 +52,7 @@ object Play2WarServer {
   def stop(sc: ServletContext) = {
     synchronized {
       if (started.getAndSet(false)) {
-        playServer.stop()
+        playServer.map(_.stop())
         sc.log("Play server stopped")
       }
     }
@@ -60,7 +60,9 @@ object Play2WarServer {
 
   def handleRequest(requestHandler: RequestHandler) = {
 
-    requestHandler(playServer)
+    playServer.map(requestHandler(_)).getOrElse {
+      Logger("play").error("Play server as not been initialized. Due to a previous error ?")
+    }
 
   }
 }

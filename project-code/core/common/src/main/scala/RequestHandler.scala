@@ -87,8 +87,6 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
   override def apply(server: Play2WarServer) = {
 
-    val server = Play2WarServer.playServer
-
     //    val keepAlive -> non-sens
     //    val websocketableRequest -> non-sens
     val httpVersion = servletRequest.getProtocol.substring("HTTP/".length, servletRequest.getProtocol.length)
