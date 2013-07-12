@@ -6,7 +6,7 @@
 
     Project-status: STABLE
     
-[![Build Status](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_211_Play_runtime/badge/icon)](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_211_Play_runtime/)
+[![Build Status](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_Play_21x/badge/icon)](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_Play_21x/)
 
 This project is a module for Play framework 2 to package your apps into standard WAR packages. It can be used with **Servlet 3.0 and 2.5 containers** (Tomcat 6/7, Jetty 7/8/9, JBoss 5/6/7, ...)
 
