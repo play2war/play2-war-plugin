@@ -1,8 +1,9 @@
 # WAR Plugin for Play framework 2.x
 
     Current versions:
-        Play 2.0.x : 0.8.1
-        Play 2.1.x : 1.0    (avoid Play v2.1.2, which has performance regressions)
+        Play 2.0 -> 2.0.4 : 0.8.1
+        Play 2.0.5+       : 0.8.2
+        Play 2.1.x        : 1.0
 
     Project-status: STABLE
     
