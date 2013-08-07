@@ -114,6 +114,8 @@ object Build extends Build {
   )
 
   def ivySettings = commonIvyMavenSettings ++ Seq(
+    // Local deployment
+    // publishMavenStyle := true,
     publishMavenStyle := false,
     publishTo <<= (version) {
       version: String => {
@@ -122,6 +124,8 @@ object Build extends Build {
         } else {
           ("sbt-plugin-releases", scalasbt+"sbt-plugin-releases")
         }
+        // Local deployment
+        // Some(Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish")))
         Some(Resolver.url(name, new URL(url))(Resolver.ivyStylePatterns))
       }
     }
@@ -132,11 +136,14 @@ object Build extends Build {
     pomIncludeRepository := { _ => false },
     publishTo <<= (version) {
       version: String => {
-          if (version.trim.endsWith("SNAPSHOT")) {
-            Some("snapshots" at nexus + "content/repositories/snapshots")
+          val repo = if (version.trim.endsWith("SNAPSHOT")) {
+            "snapshots" at nexus + "content/repositories/snapshots"
           } else {
-            Some("releases" at nexus + "service/local/staging/deploy/maven2")
+            "releases" at nexus + "service/local/staging/deploy/maven2"
           }
+          // Local deployment
+          // Some(Resolver.file("file",  file(Path.userHome.absolutePath + "/.ivy2/publish")))
+          Some(repo)
         }
     },
     pomExtra := (
