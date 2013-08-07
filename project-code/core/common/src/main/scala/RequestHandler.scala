@@ -114,7 +114,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
     // converting servlet response to play's
     val response = new Response {
 
-      def handle(result: Result) {
+      def handle(result: Result, closeConnection: Boolean) { 
 
         getHttpResponse().getHttpServletResponse.foreach { httpResponse =>
 
@@ -279,43 +279,22 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       case Right((action: Action[_], app)) => {
 
         Logger("play").trace("Serving this request with: " + action)
+        type BODY = action.BODY_CONTENT
 
-        val bodyParser = action.parser
+        val bodyParser = Iteratee.flatten(server.getBodyParser[BODY](requestHeader, action.parser))
 
-        val eventuallyBodyParser = server.getBodyParser[action.BODY_CONTENT](requestHeader, bodyParser)
+        val eventuallyResultOrBody: Promise[Either[Result, BODY]] = {
 
-        val _ =
-          eventuallyBodyParser.flatMap { bodyParser =>
+          lazy val bodyEnumerator = getHttpRequest().getRichInputStream.map { is =>
+            Enumerator.fromStream(is).andThen(Enumerator.eof)
+          }.getOrElse(Enumerator.eof)
 
-            requestHeader.headers.get("Expect") match {
-              case Some("100-continue") => {
-                bodyParser.pureFold(
-                  (_, _) => (),
-                  k => {
-                    //                        val continue = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE)
-                    //                        e.getChannel.write(continue)
-                    ()
-                  },
-                  (_, _) => ())
-              }
+          (bodyEnumerator |>> bodyParser).flatMap(_.run)
+        }
 
-              case _ => Promise.pure()
-            }
-          }
-
-        lazy val bodyEnumerator = getHttpRequest().getRichInputStream.map { is =>
-          Enumerator.fromStream(is).andThen(Enumerator.eof)
-        }.getOrElse(Enumerator.eof)
-
-        val eventuallyResultOrBody = eventuallyBodyParser.flatMap(it =>
-          bodyEnumerator |>> it): Promise[Iteratee[Array[Byte], Either[Result, action.BODY_CONTENT]]]
-
-        val eventuallyResultOrRequest =
-          eventuallyResultOrBody
-            .flatMap(it => it.run)
-            .map {
-              _.right.map(b =>
-                new Request[action.BODY_CONTENT] {
+        val eventuallyResultOrRequest = eventuallyResultOrBody.map {
+          _.right.map(b =>
+            new Request[BODY] {
                   def uri = servletUri
                   def path = servletPath
                   def method = httpMethod
@@ -324,8 +303,11 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
                   lazy val remoteAddress = rRemoteAddress
                   def username = None
                   val body = b
-                })
-            }
+            })
+        }
+
+        // true/false, same result:  connection is handled by the servlet container
+        val close = true
 
         eventuallyResultOrRequest.extend(_.value match {
           case Redeemed(Left(result)) => {
@@ -334,11 +316,11 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
           }
           case Redeemed(Right(request)) => {
             Logger("play").trace("Invoking action with request: " + request)
-            server.invoke(request, response, action.asInstanceOf[Action[action.BODY_CONTENT]], app)
+            server.invoke(request, response, action.asInstanceOf[Action[BODY]], app, close)
           }
           case error => {
             Logger("play").error("Cannot invoke the action, eventually got an error: " + error)
-            response.handle(Results.InternalServerError)
+            response.handle(Results.InternalServerError, true)
           }
         })
 
