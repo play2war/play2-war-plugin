@@ -91,7 +91,7 @@ object Build extends Build {
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
       EclipseKeys.withSource := true,
 
-      publishArtifact in (Compile, packageDoc) := false,
+      publishArtifact in (Compile, packageDoc) := true,
       publishArtifact in Test := false)
 
   object BuildSettings {
