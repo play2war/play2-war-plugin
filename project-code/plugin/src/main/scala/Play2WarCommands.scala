@@ -79,9 +79,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
           s.log.debug("Ignoring dependency " + groupId + " -> " + artifactId)
       }
 
-      // Much better: filter by scope (exclude 'provided')
       val files: Traversable[(File, String)] = dependencies.
-        filterNot(_.data.name.contains("servlet-api")).
         filter(_.data.ext == "jar").flatMap { dependency =>
           val filename = for {
             module <- dependency.metadata.get(AttributeKey[ModuleID]("module-id"))

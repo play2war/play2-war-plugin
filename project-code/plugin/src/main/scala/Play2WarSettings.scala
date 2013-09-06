@@ -43,7 +43,10 @@ trait Play2WarSettings {
 
     disableWarningWhenWebxmlFileFound := false,
 
-    defaultFilteredArtifacts := Seq(("javax.servlet", "servlet-api")),
+    defaultFilteredArtifacts := Seq(
+      ("javax.servlet", "servlet-api"),
+      ("javax.servlet", "javax.servlet-api")
+    ),
 
     filteredArtifacts := Seq(),
     
