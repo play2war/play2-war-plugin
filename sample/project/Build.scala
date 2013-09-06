@@ -45,7 +45,7 @@ object ApplicationBuild extends Build {
 
   lazy val warProjectSettings = playProjectSettings ++ Play2WarPlugin.play2WarSettings ++ Seq(
     publishArtifact in (Compile, packageBin) := false,
-    Play2WarKeys.filteredArtifacts := Seq(("io.netty", "netty"))
+    Play2WarKeys.filteredArtifacts := Seq()
   )
 
   lazy val servlet25 = play.Project(
