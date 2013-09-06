@@ -82,7 +82,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
       // Much better: filter by scope (exclude 'provided')
       val files: Traversable[(File, String)] = dependencies.
         filterNot(_.data.name.contains("servlet-api")).
-        filter(_.data.ext == "jar").map { dependency =>
+        filter(_.data.ext == "jar").flatMap { dependency =>
           val filename = for {
             module <- dependency.metadata.get(AttributeKey[ModuleID]("module-id"))
             artifact <- dependency.metadata.get(AttributeKey[Artifact]("artifact"))
@@ -91,8 +91,10 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
             // groupId.artifactId-version[-classifier].extension
             module.organization + "." + module.name + "-" + module.revision + artifact.classifier.map("-" + _).getOrElse("") + "." + artifact.extension
           }
-          val path = ("WEB-INF/lib/" + filename.getOrElse(dependency.data.getName))
-          dependency.data -> path
+          filename.map { fName =>
+            val path = ("WEB-INF/lib/" + fName)
+            Some(dependency.data -> path)
+          }.getOrElse(None)
       } ++ {
         if (explodedJar) {
            s.log.info("Main artifacts " + packaged.map(_.getName).mkString("'", " ", "'") + " will be packaged exploded")
