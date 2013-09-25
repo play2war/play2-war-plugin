@@ -50,9 +50,9 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
         })
     }
 
-  val warTask = (playPackageEverything, dependencyClasspath in Runtime, target, normalizedName,
+  val warTask = (playPackageEverything, dependencyClasspath in Runtime, unmanagedClasspath in Runtime, target, normalizedName,
       version, webappResource, streams, servletVersion, targetName, disableWarningWhenWebxmlFileFound, defaultFilteredArtifacts, filteredArtifacts, explodedJar) map {
-    (packaged, dependencies, target, id, version, webappResource, s, servletVersion, targetName, disableWarningWhenWebxmlFileFound, defaultFilteredArtifacts, filteredArtifacts, explodedJar) =>
+    (packaged, dependencies, unmanagedDependencies, target, id, version, webappResource, s, servletVersion, targetName, disableWarningWhenWebxmlFileFound, defaultFilteredArtifacts, filteredArtifacts, explodedJar) =>
 
       s.log.info("Build WAR package for servlet container: " + servletVersion)
 
@@ -93,6 +93,9 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
             val path = ("WEB-INF/lib/" + fName)
             Some(dependency.data -> path)
           }.getOrElse(None)
+      } ++ unmanagedDependencies.map { unmanaged =>
+        val path = "WEB-INF/lib/" + unmanaged.data.getName
+        unmanaged.data -> path
       } ++ {
         if (explodedJar) {
            s.log.info("Main artifacts " + packaged.map(_.getName).mkString("'", " ", "'") + " will be packaged exploded")
