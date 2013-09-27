@@ -19,6 +19,8 @@ object Build extends Build {
   val servlet25SampleProjectTargetDir = new File(curDir, "../sample/servlet25/target")
   val servlet25SampleWarPath = new File(servlet25SampleProjectTargetDir, "a-play2war-sample-servlet25-1.0-SNAPSHOT.war").getAbsolutePath
 
+  val playDependency = "com.typesafe.play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api")
+
   //
   // Root project
   //
@@ -33,19 +35,19 @@ object Build extends Build {
   lazy val play2WarCoreCommon = Project(id = "play2-war-core-common",
     base = file("core/common"),
     settings = commonSettings ++ mavenSettings ++ Seq(
-      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api"),
+      libraryDependencies += playDependency,
       libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default"))
 
   lazy val play2WarCoreservlet30 = Project(id = "play2-war-core-servlet30",
     base = file("core/servlet30"),
     settings = commonSettings ++ mavenSettings ++ Seq(
-      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api"),
+      libraryDependencies += playDependency,
       libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "provided->default")) dependsOn (play2WarCoreCommon)
 
   lazy val play2WarCoreservlet25 = Project(id = "play2-war-core-servlet25",
     base = file("core/servlet25"),
     settings = commonSettings ++ mavenSettings ++ Seq(
-      libraryDependencies += "play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api"),
+      libraryDependencies += playDependency,
       libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default")) dependsOn (play2WarCoreCommon)
 
   //
@@ -55,14 +57,14 @@ object Build extends Build {
     base = file("plugin"),
     settings = commonSettings ++ ivySettings ++ Seq(
       scalaVersion := buildScalaVersionForSbt,
-      scalaBinaryVersion  := CrossVersion.binaryScalaVersion(buildScalaVersionForSbt),
+      scalaBinaryVersion := buildScalaVersionForSbtBinaryCompatible,
       sbtPlugin := true,
 
       sourceGenerators in Compile <+= sourceManaged in Compile map Play2WarVersion,
 
       libraryDependencies <++= (scalaVersion, sbtVersion) { (scalaVersion, sbtVersion) =>
         Seq(
-          "play" % "sbt-plugin" % play2Version % "provided->default(compile)" extra ("scalaVersion" -> buildScalaVersionForSbt, "sbtVersion" -> buildSbtVersionBinaryCompatible))
+          "com.typesafe.play" % "sbt-plugin" % play2Version % "provided->default(compile)" extra ("scalaVersion" -> buildScalaVersionForSbtBinaryCompatible, "sbtVersion" -> buildSbtVersionBinaryCompatible))
       }))
 
   //
@@ -100,14 +102,15 @@ object Build extends Build {
   object BuildSettings {
 
     val buildOrganization = "com.github.play2war"
-    val defaultPlay2Version = "2.1.4"
+    val defaultPlay2Version = "2.2.0"
     val play2Version = Option(System.getProperty("play2.version")).filterNot(_.isEmpty).getOrElse(defaultPlay2Version)
     val defaultBuildVersion = "1.2-SNAPSHOT"
     val buildVersion = Option(System.getProperty("play2war.version")).filterNot(_.isEmpty).getOrElse(defaultBuildVersion)
-    val buildScalaVersion = "2.10.0"
-    val buildScalaVersionForSbt = "2.9.2"
-    val buildSbtVersion   = "0.12.2"
-    val buildSbtVersionBinaryCompatible = "0.12"
+    val buildScalaVersion = "2.10.2"
+    val buildScalaVersionForSbt = "2.10.2"
+    val buildScalaVersionForSbtBinaryCompatible = CrossVersion.binaryScalaVersion(buildScalaVersionForSbt)
+    val buildSbtVersion   = "0.13.0"
+    val buildSbtVersionBinaryCompatible = "0.13"
 
     val buildSettings = Defaults.defaultSettings ++ Seq(
       resolvers           += Resolver.typesafeRepo("releases"),
