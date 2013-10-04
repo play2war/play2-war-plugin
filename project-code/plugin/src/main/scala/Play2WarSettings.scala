@@ -17,7 +17,7 @@ package com.github.play2war.plugin
 
 import sbt.{`package` => _, _}
 import sbt.Keys._
-import PlayKeys._
+import play.Keys._
 import com.github.play2war.plugin.Play2WarKeys._
 
 trait Play2WarSettings {
