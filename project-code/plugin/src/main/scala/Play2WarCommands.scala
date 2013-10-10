@@ -16,7 +16,6 @@
 package com.github.play2war.plugin
 
 import java.io.ByteArrayInputStream
-import java.io.File
 import java.io.FileInputStream
 import java.util.jar.Manifest
 
@@ -26,13 +25,7 @@ import com.github.play2war.plugin.Play2WarKeys._
 
 import sbt.ConfigKey.configurationToKey
 import sbt.Keys._
-import sbt.Runtime
-import sbt.richFile
-import sbt.Artifact
-import sbt.AttributeKey
-import sbt.IO
-import sbt.ModuleID
-import sbt.Path
+import sbt._
 
 trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with play.PlayPositionMapper {
 
@@ -50,89 +43,94 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
         })
     }
 
-  val warTask = (playPackageEverything, dependencyClasspath in Runtime, unmanagedClasspath in Runtime, target, normalizedName,
-      version, webappResource, streams, servletVersion, targetName, disableWarningWhenWebxmlFileFound, defaultFilteredArtifacts, filteredArtifacts, explodedJar) map {
-    (packaged, dependencies, unmanagedDependencies, target, id, version, webappResource, s, servletVersion, targetName, disableWarningWhenWebxmlFileFound, defaultFilteredArtifacts, filteredArtifacts, explodedJar) =>
+  val warTask = Def.task[sbt.File] {
+    val s = streams.value
+    val dependencies = (dependencyClasspath in Runtime).toTask.value
+    val unmanagedDependencies = (unmanagedClasspath in Runtime).toTask.value
+    val id = normalizedName.toTask.value
+    val packaged = com.typesafe.sbt.packager.Keys.dist.toTask.value
+    s.log.info("Build WAR package for servlet container: " + servletVersion)
 
-      s.log.info("Build WAR package for servlet container: " + servletVersion)
+    if (dependencies.exists(_.data.name.contains("play2-war-core-common"))) {
+      s.log.debug("play2-war-core-common found in dependencies!")
+    } else {
+      s.log.error("play2-war-core-common not found in dependencies!")
+      throw new IllegalArgumentException("play2-war-core-common not found in dependencies!")
+    }
 
-      if (dependencies.exists(_.data.name.contains("play2-war-core-common"))) {
-        s.log.debug("play2-war-core-common found in dependencies!")
-      } else {
-        s.log.error("play2-war-core-common not found in dependencies!")
-        throw new IllegalArgumentException("play2-war-core-common not found in dependencies!")
+    val warDir = target.toTask.value
+    val packageName = targetName.toTask.value.getOrElse(id + "-" + version)
+    val war = warDir / (packageName + ".war")
+    val manifestString = "Manifest-Version: 1.0\n"
+
+    s.log.info("Packaging " + war.getCanonicalPath + " ...")
+
+    IO.createDirectory(warDir)
+
+    val allFilteredArtifacts = defaultFilteredArtifacts.toTask.value ++ filteredArtifacts.toTask.value
+
+    allFilteredArtifacts.foreach {
+      case (groupId, artifactId) =>
+        s.log.debug("Ignoring dependency " + groupId + " -> " + artifactId)
+    }
+
+    val files: Traversable[(File, String)] = dependencies.
+      filter(_.data.ext == "jar").flatMap { dependency =>
+      val filename = for {
+        module <- dependency.get(AttributeKey[ModuleID]("module-id"))
+        artifact <- dependency.get(AttributeKey[Artifact]("artifact"))
+        if (!allFilteredArtifacts.contains((module.organization, module.name)))
+      } yield {
+        // groupId.artifactId-version[-classifier].extension
+        module.organization + "." + module.name + "-" + module.revision + artifact.classifier.map("-" + _).getOrElse("") + "." + artifact.extension
       }
+      filename.map { fName =>
+        val path = "WEB-INF/lib/" + fName
+        Some(dependency.data -> path)
+      }.getOrElse(None)
+    } ++ unmanagedDependencies.map { unmanaged =>
+      val path = "WEB-INF/lib/" + unmanaged.data.getName
+      unmanaged.data -> path
+    } ++ {
+//      if (explodedJar) {
+//        s.log.info("Main artifacts " + packaged.map(_.getName).mkString("'", " ", "'") + " will be packaged exploded")
+//
+//        val explodedJarDir = target / "exploded"
+//
+//        IO.delete(explodedJarDir)
+//        IO.createDirectory(explodedJarDir)
+//
+//        packaged.flatMap { jar =>
+//          IO.unzip(jar, explodedJarDir).map {
+//            file =>
+//              val partialPath = IO.relativize(explodedJarDir, file).getOrElse(file.getName)
+//
+//              file -> ("WEB-INF/classes/" + partialPath)
+//          }
+//        }
+//      } else packaged.get.map(jar => jar -> ("WEB-INF/lib/" + jar.getName))
+      val distFile = packaged
+      val path = "WEB-INF/lib/" + distFile.getName
+      (distFile -> path) :: Nil
+    }
 
-      val warDir = target
-      val packageName = targetName.getOrElse(id + "-" + version)
-      val war = warDir / (packageName + ".war")
-      val manifestString = "Manifest-Version: 1.0\n"
+    files.foreach { case (file, path) =>
+      s.log.debug("Embedding file " + file + " -> " + path)
+    }
 
-      s.log.info("Packaging " + war.getCanonicalPath + " ...")
+    val webxmlFolder = webappResource.toTask.value / "WEB-INF"
+    val webxml = webxmlFolder / "web.xml"
 
-      IO.createDirectory(warDir)
+    // Web.xml generation
+    servletVersion.toTask.value match {
+      case "2.5" => {
 
-      val allFilteredArtifacts = defaultFilteredArtifacts ++ filteredArtifacts
-
-      allFilteredArtifacts.foreach {
-        case (groupId, artifactId) =>
-          s.log.debug("Ignoring dependency " + groupId + " -> " + artifactId)
-      }
-
-      val files: Traversable[(File, String)] = dependencies.
-        filter(_.data.ext == "jar").flatMap { dependency =>
-          val filename = for {
-            module <- dependency.metadata.get(AttributeKey[ModuleID]("module-id"))
-            artifact <- dependency.metadata.get(AttributeKey[Artifact]("artifact"))
-            if (!allFilteredArtifacts.contains((module.organization, module.name)))
-          } yield {
-            // groupId.artifactId-version[-classifier].extension
-            module.organization + "." + module.name + "-" + module.revision + artifact.classifier.map("-" + _).getOrElse("") + "." + artifact.extension
-          }
-          filename.map { fName =>
-            val path = ("WEB-INF/lib/" + fName)
-            Some(dependency.data -> path)
-          }.getOrElse(None)
-      } ++ unmanagedDependencies.map { unmanaged =>
-        val path = "WEB-INF/lib/" + unmanaged.data.getName
-        unmanaged.data -> path
-      } ++ {
-        if (explodedJar) {
-           s.log.info("Main artifacts " + packaged.map(_.getName).mkString("'", " ", "'") + " will be packaged exploded")
-
-          val explodedJarDir = target / "exploded"
-          
-          IO.delete(explodedJarDir)
-          IO.createDirectory(explodedJarDir)
-
-          packaged.flatMap { jar =>
-            IO.unzip(jar, explodedJarDir).map {
-              file =>
-                val partialPath = IO.relativize(explodedJarDir, file).getOrElse(file.getName)
-                
-                file -> ("WEB-INF/classes/" + partialPath)
-            }
-          }
-        } else packaged.map(jar => jar -> ("WEB-INF/lib/" + jar.getName))
-      }
-      
-      files.foreach { case (file, path) =>
-        s.log.debug("Embedding file " + file + " -> " + path)
-      }
-
-      val webxmlFolder = webappResource / "WEB-INF"
-      val webxml = webxmlFolder / "web.xml"
-
-      // Web.xml generation
-      servletVersion match {
-        case "2.5" => {
-
-          if (webxml.exists) {
-            s.log.info("WEB-INF/web.xml found.")
-          } else {
-            s.log.info("WEB-INF/web.xml not found, generate it in " + webxmlFolder)
-            IO.write(webxml,
-              """<?xml version="1.0" ?>
+        if (webxml.exists) {
+          s.log.info("WEB-INF/web.xml found.")
+        } else {
+          s.log.info("WEB-INF/web.xml not found, generate it in " + webxmlFolder)
+          IO.write(webxml,
+            """<?xml version="1.0" ?>
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
@@ -156,56 +154,57 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
 
 </web-app>
                                  """ /* */)
-          }
-
         }
 
-        case "3.0" => handleWebXmlFileOnServlet30(webxml, s, disableWarningWhenWebxmlFileFound)
-        
-        case unknown => {
-            s.log.warn("Unknown servlet container version: " + unknown + ". Force default 3.0 version")
-            handleWebXmlFileOnServlet30(webxml, s, disableWarningWhenWebxmlFileFound)
-        }
       }
 
-      // Webapp resources
-      s.log.debug("Webapp resources directory: " + webappResource.getAbsolutePath)
+      case "3.0" => handleWebXmlFileOnServlet30(webxml, s, disableWarningWhenWebxmlFileFound.toTask.value)
 
-      val filesToInclude = getFiles(webappResource).filter(f => f.isFile)
-
-      val additionnalResources = filesToInclude.map {
-        f =>
-          f -> Path.relativizeFile(webappResource, f).get.getPath
+      case unknown => {
+        s.log.warn("Unknown servlet container version: " + unknown + ". Force default 3.0 version")
+        handleWebXmlFileOnServlet30(webxml, s, disableWarningWhenWebxmlFileFound.toTask.value)
       }
+    }
 
-      additionnalResources.foreach {
-        r =>
-          s.log.debug("Embedding " + r._1 + " -> /" + r._2)
-      }
+    // Webapp resources
+    val webappR = webappResource.toTask.value
+    s.log.debug("Webapp resources directory: " + webappR.getAbsolutePath)
 
-      val metaInfFolder = webappResource / "META-INF"
-      val manifest = if (metaInfFolder.exists()) {
-        val option = metaInfFolder.listFiles.find(f =>
-          manifestRegex.r.pattern.matcher(f.getAbsolutePath()).matches())
-        if (option.isDefined) {
-          new Manifest(new FileInputStream(option.get))
-        }
-        else {
-          new Manifest(new ByteArrayInputStream(manifestString.getBytes))
-        }
+    val filesToInclude = getFiles(webappR).filter(f => f.isFile)
+
+    val additionnalResources = filesToInclude.map {
+      f =>
+        f -> Path.relativizeFile(webappR, f).get.getPath
+    }
+
+    additionnalResources.foreach {
+      r =>
+        s.log.debug("Embedding " + r._1 + " -> /" + r._2)
+    }
+
+    val metaInfFolder = webappR / "META-INF"
+    val manifest = if (metaInfFolder.exists()) {
+      val option = metaInfFolder.listFiles.find(f =>
+        manifestRegex.r.pattern.matcher(f.getAbsolutePath()).matches())
+      if (option.isDefined) {
+        new Manifest(new FileInputStream(option.get))
       }
       else {
         new Manifest(new ByteArrayInputStream(manifestString.getBytes))
       }
+    }
+    else {
+      new Manifest(new ByteArrayInputStream(manifestString.getBytes))
+    }
 
-      // Package final jar
-      val jarContent = files ++ additionnalResources
+    // Package final jar
+    val jarContent = files ++ additionnalResources
 
-      IO.jar(jarContent, war, manifest)
+    IO.jar(jarContent, war, manifest)
 
-      s.log.info("Packaging done.")
+    s.log.info("Packaging done.")
 
-      war
+    war
   }
 
   def handleWebXmlFileOnServlet30(webxml: File, s: TaskStreams, disableWarn: Boolean) = {

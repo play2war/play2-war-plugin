@@ -15,9 +15,8 @@
  */
 package com.github.play2war.plugin
 
-import sbt.{`package` => _, _}
+import sbt._
 import sbt.Keys._
-import play.Keys._
 import com.github.play2war.plugin.Play2WarKeys._
 
 trait Play2WarSettings {
@@ -56,7 +55,7 @@ trait Play2WarSettings {
     war <<= warTask,
 
     // Bind war task to "package" task (phase)
-    `package` <<= war //
+    sbt.Keys.`package` <<= war //
   )
 
   // TODO: the line below was causing the following error in "sbt play-package-everything" (and "sbt war"):
