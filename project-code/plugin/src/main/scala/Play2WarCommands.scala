@@ -48,7 +48,7 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
     val dependencies = (dependencyClasspath in Runtime).value
     val unmanagedDependencies = (unmanagedClasspath in Runtime).value
     val id = normalizedName.value
-    val packaged = com.typesafe.sbt.packager.Keys.dist.value
+    //val packaged = com.typesafe.sbt.packager.Keys.dist.value
     s.log.info("Build WAR package for servlet container: " + servletVersion.value)
 
     if (dependencies.exists(_.data.name.contains("play2-war-core-common"))) {
@@ -109,7 +109,7 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
 //          }
 //        }
 //      } else packaged.get.map(jar => jar -> ("WEB-INF/lib/" + jar.getName))
-      val distFile = packaged
+      val distFile = (sbt.Keys.`package` in Compile).value
       val path = "WEB-INF/lib/" + distFile.getName
       (distFile -> path) :: Nil
     }
