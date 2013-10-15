@@ -59,7 +59,7 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
     }
 
     val warDir = target.value
-    val packageName = targetName.value.getOrElse(id + "-" + version)
+    val packageName = targetName.value.getOrElse(id + "-" + version.value)
     val war = warDir / (packageName + ".war")
     val manifestString = "Manifest-Version: 1.0\n"
 
