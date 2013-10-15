@@ -43,13 +43,13 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
         })
     }
 
-  val warTask = Def.task[sbt.File] {
+  val warTask: Def.Initialize[Task[sbt.File]] = Def.task[sbt.File] {
     val s = streams.value
-    val dependencies = (dependencyClasspath in Runtime).toTask.value
-    val unmanagedDependencies = (unmanagedClasspath in Runtime).toTask.value
-    val id = normalizedName.toTask.value
-    val packaged = com.typesafe.sbt.packager.Keys.dist.toTask.value
-    s.log.info("Build WAR package for servlet container: " + servletVersion)
+    val dependencies = (dependencyClasspath in Runtime).value
+    val unmanagedDependencies = (unmanagedClasspath in Runtime).value
+    val id = normalizedName.value
+    val packaged = com.typesafe.sbt.packager.Keys.dist.value
+    s.log.info("Build WAR package for servlet container: " + servletVersion.value)
 
     if (dependencies.exists(_.data.name.contains("play2-war-core-common"))) {
       s.log.debug("play2-war-core-common found in dependencies!")
@@ -58,8 +58,8 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
       throw new IllegalArgumentException("play2-war-core-common not found in dependencies!")
     }
 
-    val warDir = target.toTask.value
-    val packageName = targetName.toTask.value.getOrElse(id + "-" + version)
+    val warDir = target.value
+    val packageName = targetName.value.getOrElse(id + "-" + version)
     val war = warDir / (packageName + ".war")
     val manifestString = "Manifest-Version: 1.0\n"
 
@@ -67,7 +67,7 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
 
     IO.createDirectory(warDir)
 
-    val allFilteredArtifacts = defaultFilteredArtifacts.toTask.value ++ filteredArtifacts.toTask.value
+    val allFilteredArtifacts = defaultFilteredArtifacts.value ++ filteredArtifacts.value
 
     allFilteredArtifacts.foreach {
       case (groupId, artifactId) =>
@@ -118,11 +118,11 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
       s.log.debug("Embedding file " + file + " -> " + path)
     }
 
-    val webxmlFolder = webappResource.toTask.value / "WEB-INF"
+    val webxmlFolder = webappResource.value / "WEB-INF"
     val webxml = webxmlFolder / "web.xml"
 
     // Web.xml generation
-    servletVersion.toTask.value match {
+    servletVersion.value match {
       case "2.5" => {
 
         if (webxml.exists) {
@@ -158,16 +158,16 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
 
       }
 
-      case "3.0" => handleWebXmlFileOnServlet30(webxml, s, disableWarningWhenWebxmlFileFound.toTask.value)
+      case "3.0" => handleWebXmlFileOnServlet30(webxml, s, disableWarningWhenWebxmlFileFound.value)
 
       case unknown => {
         s.log.warn("Unknown servlet container version: " + unknown + ". Force default 3.0 version")
-        handleWebXmlFileOnServlet30(webxml, s, disableWarningWhenWebxmlFileFound.toTask.value)
+        handleWebXmlFileOnServlet30(webxml, s, disableWarningWhenWebxmlFileFound.value)
       }
     }
 
     // Webapp resources
-    val webappR = webappResource.toTask.value
+    val webappR = webappResource.value
     s.log.debug("Webapp resources directory: " + webappR.getAbsolutePath)
 
     val filesToInclude = getFiles(webappR).filter(f => f.isFile)

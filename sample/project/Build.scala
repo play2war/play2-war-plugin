@@ -39,7 +39,7 @@ object ApplicationBuild extends Build {
 
   lazy val common = play.Project(appName + "common", appVersion, commonAppDependencies, path = file("common"), settings = commonSettings ++ playProjectSettings)
 
-  override def rootProject = Some(common)
+  override def rootProject = Some(parent)
 
   lazy val appDependencies = commonAppDependencies ++ Seq(
     "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.1"
