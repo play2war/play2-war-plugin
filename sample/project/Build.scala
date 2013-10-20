@@ -9,7 +9,7 @@ object ApplicationBuild extends Build {
   lazy val appName = "a-play2war-sample-"
   lazy val appVersion = "1.0-SNAPSHOT"
 
-  lazy val commonSettings = Defaults.defaultSettings ++ Seq(
+  lazy val commonSettings = Defaults.defaultSettings ++ playJavaSettings ++ Seq(
     //      resolvers += "Local Repository" at "http://localhost:8090/publish",
     resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns),
     // Doesn't work
@@ -38,6 +38,8 @@ object ApplicationBuild extends Build {
   )
 
   lazy val common = play.Project(appName + "common", appVersion, commonAppDependencies, path = file("common"), settings = commonSettings ++ playProjectSettings)
+
+  override def rootProject = Some(parent)
 
   lazy val appDependencies = commonAppDependencies ++ Seq(
     "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.1"

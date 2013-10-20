@@ -92,7 +92,7 @@ trait CargoContainerManager extends BeforeAndAfterAll with WarContext {
     val configuration: LocalConfiguration = new DefaultConfigurationFactory().createConfiguration(
       containerName, ContainerType.INSTALLED, ConfigurationType.STANDALONE).asInstanceOf[LocalConfiguration]
 
-    configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.MEDIUM.getLevel);
+    configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.MEDIUM.getLevel)
 
     getJavaVersion match {
       case "java6" => // Nothing, use current JVM
