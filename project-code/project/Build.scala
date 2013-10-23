@@ -13,7 +13,8 @@ object Build extends Build {
   val scalasbt = "http://repo.scala-sbt.org/scalasbt/"
 
   val curDir = new File(".")
-  val servlet30SampleProjectTargetDir = new File(curDir, "../sample/servlet30/target")
+  //val servlet30SampleProjectTargetDir = new File(curDir, "../sample/servlet30/target")
+  val servlet30SampleProjectTargetDir = new File(curDir, "../common/servlet30/target")
   val servlet30SampleWarPath = new File(servlet30SampleProjectTargetDir, "a-play2war-sample-servlet30-1.0-SNAPSHOT.war").getAbsolutePath
 
   val servlet25SampleProjectTargetDir = new File(curDir, "../sample/servlet25/target")
@@ -84,7 +85,7 @@ object Build extends Build {
       parallelExecution in Test := false,
       testOptions in Test += Tests.Argument("-oD"),
       testOptions in Test += Tests.Argument("-Dwar.servlet30=" + servlet30SampleWarPath),
-      testOptions in Test += Tests.Argument("-Dwar.servlet25=" + servlet25SampleWarPath),
+//      testOptions in Test += Tests.Argument("-Dwar.servlet25=" + servlet25SampleWarPath),
       testListeners <<= target.map(t => Seq(new eu.henkelmann.sbt.JUnitXmlTestsListener(t.getAbsolutePath)))))
 
   //

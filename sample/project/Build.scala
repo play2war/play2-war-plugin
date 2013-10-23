@@ -27,7 +27,7 @@ object ApplicationBuild extends Build {
     publishTo := Some(Resolver.file("file", file(Path.userHome.absolutePath + "/.ivy2/publish"))),
     publishMavenStyle := true)
 
-  lazy val parent = Project(id = appName + "parent", base = file("."), settings = commonSettings ++ Seq(publishArtifact := false)) aggregate (common, servlet25, servlet30)
+  lazy val parent = Project(id = appName + "parent", base = file("."), settings = commonSettings ++ Seq(publishArtifact := false)) aggregate (/*common, servlet25, */servlet30)
 
   lazy val playProjectSettings = Seq(
     //
@@ -37,7 +37,7 @@ object ApplicationBuild extends Build {
     javaCore
   )
 
-  lazy val common = play.Project(appName + "common", appVersion, commonAppDependencies, path = file("common"), settings = commonSettings ++ playProjectSettings)
+//  lazy val common = play.Project(appName + "common", appVersion, commonAppDependencies, path = file("common"), settings = commonSettings ++ playProjectSettings)
 
   override def rootProject = Some(parent)
 
@@ -50,14 +50,14 @@ object ApplicationBuild extends Build {
     Play2WarKeys.filteredArtifacts := Seq()
   )
 
-  lazy val servlet25 = play.Project(
-      appName + "servlet25", appVersion, appDependencies, path = file("servlet25"), 
-      settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "2.5")
-  ) dependsOn (common)
+//  lazy val servlet25 = play.Project(
+//      appName + "servlet25", appVersion, appDependencies, path = file("servlet25"), 
+//      settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "2.5")
+//  ) dependsOn (common)
 
   lazy val servlet30 = play.Project(
-      appName + "servlet30", appVersion, appDependencies, path = file("servlet30"), 
+      appName + "servlet30", appVersion, appDependencies, path = file(/*"servlet30"*/"common"), 
       settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "3.0")
-  ) dependsOn (common)
+  ) /*dependsOn (common)*/
 
 }
