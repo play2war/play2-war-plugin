@@ -14,4 +14,4 @@ addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Option(System.getProperty("pla
 
 //addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.0.0")
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "1.2-beta1")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "1.2-beta2-SNAPSHOT")
