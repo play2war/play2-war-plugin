@@ -614,19 +614,19 @@ class Tomcat739Tests extends AbstractTomcat7x with Java6 {
   override def containerFileNameInCloudbeesCache = Option("apache-tomcat-7.0.39.zip")
 }
 
-@RunWith(classOf[JUnitRunner])
-class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container with Java6 {
-  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
-  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-8.1.3.v20120416.tar.gz")
-  override def containerName = "jetty8x"
-}
+//@RunWith(classOf[JUnitRunner])
+//class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container with Java6 {
+//  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
+//  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-8.1.3.v20120416.tar.gz")
+//  override def containerName = "jetty8x"
+//}
 
-@RunWith(classOf[JUnitRunner])
-class Jetty9xTests extends AbstractPlay2WarTests with Servlet30Container with Java7 {
-  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.0.0.v20130308/jetty-distribution-9.0.0.v20130308.tar.gz"
-  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-9.0.0.v20130308.tar.gz")
-  override def containerName = "jetty9x"
-}
+//@RunWith(classOf[JUnitRunner])
+//class Jetty9xTests extends AbstractPlay2WarTests with Servlet30Container with Java7 {
+//  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.0.0.v20130308/jetty-distribution-9.0.0.v20130308.tar.gz"
+//  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-9.0.0.v20130308.tar.gz")
+//  override def containerName = "jetty9x"
+//}
 
 // Doesn't work yet : deployment of sample war fails : Command deploy requires an operand of type class java.io.File
 //@RunWith(classOf[JUnitRunner])
