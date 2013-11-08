@@ -81,6 +81,15 @@ trait CargoContainerManager extends WarContext {
     val installer = new ZipURLInstaller(new URL(containerUrlToDownload))
     println("Download container done")
 
+    Option(System.getenv("http_proxy")).map { systemProxy =>
+      println(s"Using system proxy '$systemProxy'")
+      val uri = new java.net.URI(systemProxy)
+      val proxy = new org.codehaus.cargo.container.installer.Proxy()
+      proxy.setHost(uri.getHost)
+      proxy.setPort(uri.getPort)
+      installer.setProxy(proxy)
+    }
+
     println("Install container ...")
     installer.install
     println("Install container done")
