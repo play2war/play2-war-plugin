@@ -94,7 +94,6 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
     val servletUri = servletPath + Option(servletRequest.getQueryString).filterNot(_.isEmpty).map { "?" + _ }.getOrElse { "" }
     val parameters = getHttpParameters(servletRequest)
     val rHeaders = getPlayHeaders(servletRequest)
-    val rCookies = getPlayCookies(servletRequest)
     val httpMethod = servletRequest.getMethod
 
     def rRemoteAddress = {
