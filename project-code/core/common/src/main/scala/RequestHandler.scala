@@ -271,8 +271,8 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
     }
 
-    def cleanFlashCookie(r: SimpleResult): SimpleResult = {
-      val header = r.header
+    def cleanFlashCookie(result: SimpleResult): SimpleResult = {
+      val header = result.header
 
       val flashCookie = {
         header.headers.get(HeaderNames.SET_COOKIE)
@@ -285,8 +285,8 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       }
 
       flashCookie.map { newCookie =>
-        r.withHeaders(HeaderNames.SET_COOKIE -> Cookies.merge(header.headers.get(HeaderNames.SET_COOKIE).getOrElse(""), Seq(newCookie)))
-      }.getOrElse(r)
+        result.withHeaders(HeaderNames.SET_COOKIE -> Cookies.merge(header.headers.get(HeaderNames.SET_COOKIE).getOrElse(""), Seq(newCookie)))
+      }.getOrElse(result)
     }
 
     handler match {
