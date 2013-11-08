@@ -15,27 +15,18 @@
  */
 package play.core.server.servlet30
 
-import java.util.Arrays
-import java.util.concurrent._
 
-import javax.servlet.http.{ Cookie => ServletCookie, _ }
+import javax.servlet.http.{ Cookie => ServletCookie }
 
-import play.core._
 import play.core.server.servlet._
-import play.api._
-import play.api.mvc._
-import play.api.libs.iteratee._
-import play.api.libs.iteratee.Input._
-import play.api.libs.concurrent._
 
-import scala.collection.JavaConverters._
 
 private[servlet30] trait Helpers extends HTTPHelpers {
 
   override def getPlayCookie(c: ServletCookie): play.api.mvc.Cookie = play.api.mvc.Cookie(
     c.getName,
     c.getValue,
-    Some(c.getMaxAge),
+    if (c.getMaxAge == -1) None else Some(c.getMaxAge),
     Option(c.getPath).getOrElse("/"),
     Option(c.getDomain),
     c.getSecure,
@@ -43,9 +34,19 @@ private[servlet30] trait Helpers extends HTTPHelpers {
 
   override def getServletCookie(pCookie: play.api.mvc.Cookie): ServletCookie = {
     val sc = new ServletCookie(pCookie.name, pCookie.value)
-    pCookie.domain.map(sc.setDomain(_))
+    pCookie.domain.map(sc.setDomain)
     sc.setHttpOnly(pCookie.httpOnly)
-    pCookie.maxAge.map(sc.setMaxAge)
+
+    // conversion Play cookie to servlet cookie
+    // |---------------------------------------|------------------|--------------------------|
+    // | Use case                              | Play             | Servlet Container        |
+    // |---------------------------------------|------------------|--------------------------|
+    // | tell the browser to delete the cookie | Some(maxAge < 0) | maxAge = 0               |
+    // | set a session cookie                  | None             | maxAge = -1 (or not set) |
+    // | set a persistent cookie               | Some(maxAge > 0) | maxAge > 0               |
+    // |---------------------------------------|------------------|--------------------------|
+    pCookie.maxAge.map(ex => if (ex < 0) sc.setMaxAge(0) else sc.setMaxAge(ex))
+
     sc.setPath(pCookie.path)
     sc.setSecure(pCookie.secure)
     sc
