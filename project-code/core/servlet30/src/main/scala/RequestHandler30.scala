@@ -34,7 +34,7 @@ class Play2Servlet30RequestHandler(servletRequest: HttpServletRequest)
   val asyncListener = new AsyncListener(servletRequest.toString)
 
   val asyncContext = servletRequest.startAsync
-  asyncContext.setTimeout(play.core.server.servlet30.Play2Servlet.asyncTimeout);
+  asyncContext.setTimeout(play.core.server.servlet30.Play2Servlet.asyncTimeout)
 
   protected override def onFinishService() = {
     // Nothing to do
