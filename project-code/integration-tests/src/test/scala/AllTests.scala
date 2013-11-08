@@ -33,21 +33,11 @@ object AbstractPlay2WarTests {
 
 }
 
-abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with CargoContainerManager with BeforeAndAfter with WarContext {
+abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with CargoContainerManagerFixture with BeforeAndAfter with WarContext {
 
   import AbstractPlay2WarTests._
 
   var webClient: WebClient = null
-
-  var container: InstalledLocalContainer = null
-
-  def getContainer = container
-
-  def setContainer(container: InstalledLocalContainer) = this.container = container
-
-  def containerUrl = ""
-
-  def containerName = ""
 
   before {
     onBefore
