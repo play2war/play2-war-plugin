@@ -16,6 +16,7 @@ GET     /redirect                   controllers.Application.redirect
 
 GET     /internalServerError        controllers.Application.internalServerError
 
+GET     /httpVersion                controllers.Application.httpVersion
 GET     /bigContent                 controllers.Application.bigContent
 GET     /chunkedBigContent          controllers.Application.chunkedBigContent
 

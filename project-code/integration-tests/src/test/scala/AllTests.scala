@@ -64,15 +64,15 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   }
 
   def onAfter {
-    webClient.closeAllWindows
+    webClient.closeAllWindows()
   }
 
   def getAWebClient(timeout: Int = HTTP_TIMEOUT) = {
-    val aWebClient = new WebClient
-    aWebClient.setJavaScriptEnabled(false)
-    aWebClient.setThrowExceptionOnFailingStatusCode(false)
+    val aWebClient = new WebClient()
+    aWebClient.getOptions.setJavaScriptEnabled(false)
+    aWebClient.getOptions.setThrowExceptionOnFailingStatusCode(false)
     aWebClient.getCookieManager.setCookiesEnabled(true)
-    aWebClient.setTimeout(timeout)
+    aWebClient.getOptions.setTimeout(timeout)
     new SkipClockiFrameWrapper(aWebClient)
     aWebClient
   }
@@ -364,10 +364,16 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     , (2000000, 14888890, false) //
     )
 
-  val seqTupleBigContent = Seq(
+  // disable chunked test for jetty9 for the moment
+  val seqTupleBigContent = if (containerName != "jetty9x")
+    Seq(
     // (page name, page url, expected header)
     ("big content", "/bigContent", "Content-length", ""),
     ("big chunked content", "/chunkedBigContent", "Transfer-Encoding", "chunked"))
+  else
+    Seq(
+      // (page name, page url, expected header)
+      ("big content", "/bigContent", "Content-length", ""))
 
   feature("The container must handle GET requests of big content") {
 
@@ -611,12 +617,19 @@ class Tomcat739Tests extends AbstractTomcat7x with Java6 {
 //  override def containerName = "jetty8x"
 //}
 
-//@RunWith(classOf[JUnitRunner])
-//class Jetty9xTests extends AbstractPlay2WarTests with Servlet30Container with Java7 {
-//  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.0.0.v20130308/jetty-distribution-9.0.0.v20130308.tar.gz"
-//  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-9.0.0.v20130308.tar.gz")
-//  override def containerName = "jetty9x"
-//}
+// test fails for chunked responses. Play sets the right transfer encoding, but jetty tries to be clever and buffer the response.
+// Idea: jetty thinks that the http client cannot handle chunked responses
+// Answer from Jetty regarding Transfer-Encoding: chunked:
+// "A servlet should never set Transfer-Encoding: chunked It is up to the server to decide if chunking is needed (or even available).
+// If the request is HTTP/1.0 or SPDY, then chunking is not available. If there is a Connection:close header, then EOF marks the end
+// of the message so there is no need for jetty to go to the effort of chunking. So jetty basically ignores any transfer encoding a
+// servlet sets, because that is a value that only Jetty really knows what it can be."
+@RunWith(classOf[JUnitRunner])
+class Jetty9xTests extends AbstractPlay2WarTests with Servlet30Container with Java7 {
+  override def containerUrl = "http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.0.6.v20130930/jetty-distribution-9.0.6.v20130930.tar.gz"
+  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-9.0.6.v20130930.tar.gz")
+  override def containerName = "jetty9x"
+}
 
 // Doesn't work yet : deployment of sample war fails : Command deploy requires an operand of type class java.io.File
 //@RunWith(classOf[JUnitRunner])

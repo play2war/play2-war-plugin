@@ -89,7 +89,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
     //    val keepAlive -> non-sens
     //    val websocketableRequest -> non-sens
-    val httpVersion = servletRequest.getProtocol.substring("HTTP/".length, servletRequest.getProtocol.length)
+    val httpVersion = servletRequest.getProtocol
     val servletPath = servletRequest.getRequestURI
     val servletUri = servletPath + Option(servletRequest.getQueryString).filterNot(_.isEmpty).map { "?" + _ }.getOrElse { "" }
     val parameters = getHttpParameters(servletRequest)
@@ -120,7 +120,6 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
         def queryString = parameters
         def headers = rHeaders
         lazy val remoteAddress = rRemoteAddress
-        def username = None
       }
       untaggedRequestHeader
     }

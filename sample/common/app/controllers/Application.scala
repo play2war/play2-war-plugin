@@ -59,6 +59,10 @@ object Application extends Controller {
     throw new RuntimeException("This a desired exception in order to test exception interception")
   }
 
+  def httpVersion = Action { request =>
+    Ok(request.version)
+  }
+
   // All in memory
   def bigContent = Action { request =>
 
