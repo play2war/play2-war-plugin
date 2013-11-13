@@ -5,7 +5,7 @@
         Play 2.0.5+       : 0.8.2
         Play 2.1 -> 2.1.3 : 1.0.1
         Play 2.1.4+       : 1.1
-        Play 2.2.x        : not compatible yet
+        Play 2.2.x        : 1.2-beta1 (unstable)
 
     Project-status: STABLE
     
