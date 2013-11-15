@@ -364,8 +364,8 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     , (2000000, 14888890, false) //
     )
 
-  // disable chunked test for jetty9 for the moment
-  val seqTupleBigContent = if (containerName != "jetty9x")
+  // TODO: fix chunked test for jetty
+  val seqTupleBigContent = if (!containerName.contains("jetty"))
     Seq(
     // (page name, page url, expected header)
     ("big content", "/bigContent", "Content-length", ""),
@@ -560,19 +560,19 @@ abstract class AbstractTomcat7x extends AbstractPlay2WarTests with Servlet30Cont
   override def containerName = "tomcat7x"
 }
 
-//@RunWith(classOf[JUnitRunner])
-//class Tomcat6xTests extends AbstractPlay2WarTests with Servlet25Container with Java6 {
-//  override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-6/v6.0.35/bin/apache-tomcat-6.0.35.tar.gz"
-//  override def containerFileNameInCloudbeesCache = Option("apache-tomcat-6.0.35.tar.gz")
-//  override def containerName = "tomcat6x"
-//}
+@RunWith(classOf[JUnitRunner])
+class Tomcat6xTests extends AbstractPlay2WarTests with Servlet25Container with Java6 {
+  override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-6/v6.0.35/bin/apache-tomcat-6.0.35.tar.gz"
+  override def containerFileNameInCloudbeesCache = Option("apache-tomcat-6.0.35.tar.gz")
+  override def containerName = "tomcat6x"
+}
 
-//@RunWith(classOf[JUnitRunner])
-//class Jetty7xTests extends AbstractPlay2WarTests with Servlet25Container with Java6 {
-//  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/7.6.5.v20120716/jetty-distribution-7.6.5.v20120716.tar.gz"
-//  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-7.6.5.v20120716.tar.gz")
-//  override def containerName = "jetty7x"
-//}
+@RunWith(classOf[JUnitRunner])
+class Jetty7xTests extends AbstractPlay2WarTests with Servlet25Container with Java6 {
+  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/7.6.5.v20120716/jetty-distribution-7.6.5.v20120716.tar.gz"
+  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-7.6.5.v20120716.tar.gz")
+  override def containerName = "jetty7x"
+}
 
 // @RunWith(classOf[JUnitRunner])
 // class Tomcat729Tests extends AbstractTomcat7x with Java6 {
@@ -610,12 +610,12 @@ class Tomcat739Tests extends AbstractTomcat7x with Java6 {
   override def containerFileNameInCloudbeesCache = Option("apache-tomcat-7.0.39.zip")
 }
 
-//@RunWith(classOf[JUnitRunner])
-//class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container with Java6 {
-//  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
-//  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-8.1.3.v20120416.tar.gz")
-//  override def containerName = "jetty8x"
-//}
+@RunWith(classOf[JUnitRunner])
+class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container with Java6 {
+  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
+  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-8.1.3.v20120416.tar.gz")
+  override def containerName = "jetty8x"
+}
 
 // test fails for chunked responses. Play sets the right transfer encoding, but jetty tries to be clever and buffer the response.
 // Idea: jetty thinks that the http client cannot handle chunked responses
