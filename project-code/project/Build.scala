@@ -79,8 +79,8 @@ object Build extends Build {
 
       libraryDependencies += "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
       libraryDependencies += "junit" % "junit" % "4.10" % "test",
-      libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.3.1" % "test",
-      libraryDependencies += "net.sourceforge.htmlunit" % "htmlunit" % "2.10" % "test",
+      libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.4.5" % "test",
+      libraryDependencies += "net.sourceforge.htmlunit" % "htmlunit" % "2.13" % "test",
 
       parallelExecution in Test := false,
       testOptions in Test += Tests.Argument("-oD"),
