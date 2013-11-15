@@ -13,7 +13,7 @@ object Jetty9xRunner extends App {
      override def containerName = "jetty9x"
    }
 
-   val servlet30SampleWarPath = new File("../sample/common/target", "a-play2war-sample-servlet30-1.0-SNAPSHOT.war").getAbsolutePath
+   val servlet30SampleWarPath = new File("../sample/servlet30/target", "a-play2war-sample-servlet30-1.0-SNAPSHOT.war").getAbsolutePath
 
   cargoContainer.startContainer(servlet30SampleWarPath)
 

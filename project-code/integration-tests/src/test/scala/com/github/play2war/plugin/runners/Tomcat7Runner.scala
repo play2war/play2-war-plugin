@@ -15,7 +15,7 @@ object Tomcat7Runner extends App {
     override def containerFileNameInCloudbeesCache = Option("apache-tomcat-7.0.39.zip")
   }
 
-  val servlet30SampleWarPath = new File("../sample/common/target", "a-play2war-sample-servlet30-1.0-SNAPSHOT.war").getAbsolutePath
+  val servlet30SampleWarPath = new File("../sample/servlet30/target", "a-play2war-sample-servlet30-1.0-SNAPSHOT.war").getAbsolutePath
 
   tomcat7CargoContainer.startContainer(servlet30SampleWarPath)
 
