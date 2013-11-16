@@ -89,12 +89,11 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
     //    val keepAlive -> non-sens
     //    val websocketableRequest -> non-sens
-    val httpVersion = servletRequest.getProtocol.substring("HTTP/".length, servletRequest.getProtocol.length)
+    val httpVersion = servletRequest.getProtocol
     val servletPath = servletRequest.getRequestURI
     val servletUri = servletPath + Option(servletRequest.getQueryString).filterNot(_.isEmpty).map { "?" + _ }.getOrElse { "" }
     val parameters = getHttpParameters(servletRequest)
     val rHeaders = getPlayHeaders(servletRequest)
-    val rCookies = getPlayCookies(servletRequest)
     val httpMethod = servletRequest.getMethod
 
     def rRemoteAddress = {
@@ -121,7 +120,6 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
         def queryString = parameters
         def headers = rHeaders
         lazy val remoteAddress = rRemoteAddress
-        def username = None
       }
       untaggedRequestHeader
     }
@@ -160,180 +158,110 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
         getHttpResponse().getHttpServletResponse.foreach { httpResponse =>
 
-          result match {
+          val status = result.header.status
+          val headers = result.header.headers
+          val body = result.body
 
-//            case AsyncResult(p) => p.extend1 {
-//              case Redeemed(v) => handle(v)
-//              case Thrown(e) => {
-//                server.applicationProvider.get match {
-//                  case Right(app) => app.handleError(requestHeader, e).map(sr => handle(sr))
-//                  case Left(_) => handle(Results.InternalServerError)
-//                }
-//              }
-//            }
-//
-            case r @ SimpleResult(ResponseHeader(status, headers), body, connection) => {
-              import play.api.libs.iteratee.Execution.Implicits.trampoline
+          // TODO: handle connection KeepAlive and Close?
+          val connection = result.connection
 
-              Logger("play").trace("Sending simple result: " + r)
 
-              httpResponse.setStatus(status)
+          import play.api.libs.iteratee.Execution.Implicits.trampoline
 
-              // Set response headers
-              headers.filterNot(_ == (CONTENT_LENGTH, "-1")).foreach {
+          Logger("play").trace("Sending simple result: " + result)
 
-                case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
-                  getServletCookies(value).map {
-                    c => httpResponse.addCookie(c)
-                  }
-                }
+          httpResponse.setStatus(status)
 
-                case (name, value) => httpResponse.setHeader(name, value)
-              }
+          // Set response headers
+          headers.filterNot(_ == (CONTENT_LENGTH, "-1")).foreach {
 
-              // Stream the result
-              headers.get(CONTENT_LENGTH).map { contentLength =>
-                Logger("play").trace("Result with Content-length: " + contentLength)
-
-                var hasError: AtomicBoolean = new AtomicBoolean(false)
-
-                val bodyIteratee: Iteratee[Array[Byte], Unit] = {
-
-                  def step(in: Input[Array[Byte]]): Iteratee[Array[Byte], Unit] = (!hasError.get, in) match {
-                    case (true, Input.El(x)) =>
-                      Iteratee.flatten(
-                        Promise.pure(
-                          if (hasError.get) {
-                            ()
-                          } else {
-                            getHttpResponse().getRichOutputStream.foreach { os =>
-                              os.write(x)
-                              os.flush()
-                            }
-                          })
-                          //                          .map(_ => if (!hasError.get) Cont(step) else Done((), Input.Empty)))
-                          .extend1 {
-                            case Redeemed(_) => if (!hasError.get) Cont(step) else Done((), Input.Empty)
-                            case Thrown(ex) =>
-                              hasError.set(true)
-                              Logger("play").debug(ex.toString)
-                              throw ex
-                          })
-                    case (true, Input.Empty) => Cont(step)
-                    case (_, inp) => Done((), inp)
-                  }
-                  Iteratee.flatten(
-                    Promise.pure(())
-                      .map(_ => if (!hasError.get) Cont(step) else Done((), Input.Empty: Input[Array[Byte]])))
-                }
-
-                (body |>>> bodyIteratee).extend1 {
-                  case Redeemed(_) =>
-                    cleanup()
-                    onHttpResponseComplete
-                  case Thrown(ex) =>
-                    Logger("play").debug(ex.toString)
-                    hasError.set(true)
-                    onHttpResponseComplete
-                }
-              }.getOrElse {
-                Logger("play").trace("Result without Content-length")
-
-                // No Content-Length header specified, buffer in-memory
-                val byteBuffer = new ByteArrayOutputStream
-                val writer: Function2[ByteArrayOutputStream, Array[Byte], Unit] = (b, x) => b.write(x)
-                val stringIteratee = Iteratee.fold(byteBuffer)((b, e: Array[Byte]) => { writer(b, e); b })
-
-                val p = (body |>>> Enumeratee.grouped(stringIteratee) &>> Cont {
-                  case Input.El(buffer) =>
-                    Logger("play").trace("Buffer size to send: " + buffer.size)
-                    getHttpResponse().getRichOutputStream.map { os =>
-                      getHttpResponse().getHttpServletResponse.map(_.setContentLength(buffer.size))
-                      os.flush
-                      buffer.writeTo(os)
-                    }
-                    val p = Promise.pure()
-                    Iteratee.flatten(p.map(_ => Done(1, Input.Empty: Input[ByteArrayOutputStream])))
-
-                  case other => Error("unexpected input", other)
-                })
-                p.extend1 {
-                  case Redeemed(_) =>
-                    cleanup()
-                    onHttpResponseComplete
-                  case Thrown(ex) =>
-                    Logger("play").debug(ex.toString)
-                    onHttpResponseComplete
-                }
+            // Fix a bug for Set-Cookie header.
+            // Multiple cookies could be merged in a single header
+            // but it's not properly supported by some browsers
+            case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
+              getServletCookies(value).map {
+                c => httpResponse.addCookie(c)
               }
             }
-//
-//            case r @ ChunkedResult(ResponseHeader(status, headers), chunks) => {
-//              Logger("play").trace("Sending chunked result: " + r)
-//
-//              httpResponse.setStatus(status)
-//
-//              // Copy headers to netty response
-//              headers.foreach {
-//
-//                case (name @ play.api.http.HeaderNames.SET_COOKIE, value) => {
-//                  getServletCookies(value).map {
-//                    c => httpResponse.addCookie(c)
-//                  }
-//                }
-//
-//                case (name, value) => httpResponse.setHeader(name, value)
-//              }
-//
-//              var hasError: AtomicBoolean = new AtomicBoolean(false)
-//
-//              val bodyIteratee = {
-//                def step(in: Input[r.BODY_CONTENT]): Iteratee[r.BODY_CONTENT, Unit] = (!hasError.get, in) match {
-//                  case (true, Input.El(x)) =>
-//                    Iteratee.flatten(
-//                      Promise.pure(
-//                        if (hasError.get) {
-//                          ()
-//                        } else {
-//                          getHttpResponse().getRichOutputStream.foreach { os =>
-//                            os.write(r.writeable.transform(x))
-//                            os.flush
-//                          }
-//                        })
-//                        .extend1 {
-//                          case Redeemed(_) => if (!hasError.get) Cont(step) else Done((), Input.Empty)
-//                          case Thrown(ex) =>
-//                            Logger("play").debug(ex.toString)
-//                            hasError.set(true)
-//                            throw ex
-//                        })
-//                  case (true, Input.Empty) => Cont(step)
-//                  case (_, in) => Done((), in)
-//                }
-//                Iteratee.flatten(Promise.pure()
-//                  .extend1 {
-//                    case Redeemed(_) => if (!hasError.get) Cont(step) else Done((), Input.Empty: Input[r.BODY_CONTENT])
-//                    case Thrown(ex) =>
-//                      Logger("play").debug(ex.toString)
-//                      hasError.set(true)
-//                      throw ex
-//                  })
-//              }
-//
-//              chunks apply bodyIteratee.map { _ =>
-//                cleanup()
-//                onHttpResponseComplete
-//              }
-//            }
-//
-//            case unknownResponse =>
-//              Logger("play").error("Unhandle default response: " + unknownResponse)
-//
-//              httpResponse.setContentLength(0);
-//              httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-//              onHttpResponseComplete()
-//
-          } // end match result
+
+            case (name, value) => httpResponse.setHeader(name, value)
+          }
+
+          // Stream the result
+          headers.get(CONTENT_LENGTH).map { contentLength =>
+            Logger("play").trace("Result with Content-length: " + contentLength)
+
+            var hasError: AtomicBoolean = new AtomicBoolean(false)
+
+            val bodyIteratee: Iteratee[Array[Byte], Unit] = {
+
+              def step(in: Input[Array[Byte]]): Iteratee[Array[Byte], Unit] = (!hasError.get, in) match {
+                case (true, Input.El(x)) =>
+                  Iteratee.flatten(
+                    Promise.pure(
+                      if (hasError.get) {
+                        ()
+                      } else {
+                        getHttpResponse().getRichOutputStream.foreach { os =>
+                          os.write(x)
+                          os.flush()
+                        }
+                      })
+                      //.map(_ => if (!hasError.get) Cont(step) else Done((), Input.Empty)))
+                      .extend1 {
+                        case Redeemed(_) => if (!hasError.get) Cont(step) else Done((), Input.Empty)
+                        case Thrown(ex) =>
+                          hasError.set(true)
+                          Logger("play").debug(ex.toString)
+                          throw ex
+                      })
+                case (true, Input.Empty) => Cont(step)
+                case (_, inp) => Done((), inp)
+              }
+              Iteratee.flatten(
+                Promise.pure(())
+                  .map(_ => if (!hasError.get) Cont(step) else Done((), Input.Empty: Input[Array[Byte]])))
+            }
+
+            (body |>>> bodyIteratee).extend1 {
+              case Redeemed(_) =>
+                cleanup()
+                onHttpResponseComplete
+              case Thrown(ex) =>
+                Logger("play").debug(ex.toString)
+                hasError.set(true)
+                onHttpResponseComplete
+            }
+          }.getOrElse {
+            Logger("play").trace("Result without Content-length")
+
+            // No Content-Length header specified, buffer in-memory
+            val byteBuffer = new ByteArrayOutputStream
+            val writer: Function2[ByteArrayOutputStream, Array[Byte], Unit] = (b, x) => b.write(x)
+            val stringIteratee = Iteratee.fold(byteBuffer)((b, e: Array[Byte]) => { writer(b, e); b })
+
+            val p = (body |>>> Enumeratee.grouped(stringIteratee) &>> Cont {
+              case Input.El(buffer) =>
+                Logger("play").trace("Buffer size to send: " + buffer.size)
+                getHttpResponse().getRichOutputStream.map { os =>
+                  getHttpResponse().getHttpServletResponse.map(_.setContentLength(buffer.size))
+                  os.flush
+                  buffer.writeTo(os)
+                }
+                val p = Promise.pure()
+                Iteratee.flatten(p.map(_ => Done(1, Input.Empty: Input[ByteArrayOutputStream])))
+
+              case other => Error("unexpected input", other)
+            })
+            p.extend1 {
+              case Redeemed(_) =>
+                cleanup()
+                onHttpResponseComplete
+              case Thrown(ex) =>
+                Logger("play").debug(ex.toString)
+                onHttpResponseComplete
+            }
+          }
 
         } // end match foreach
 
@@ -341,8 +269,8 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
     }
 
-    def cleanFlashCookie(r: SimpleResult): SimpleResult = {
-      val header = r.header
+    def cleanFlashCookie(result: SimpleResult): SimpleResult = {
+      val header = result.header
 
       val flashCookie = {
         header.headers.get(HeaderNames.SET_COOKIE)
@@ -355,8 +283,8 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       }
 
       flashCookie.map { newCookie =>
-        r.withHeaders(HeaderNames.SET_COOKIE -> Cookies.merge(header.headers.get(HeaderNames.SET_COOKIE).getOrElse(""), Seq(newCookie)))
-      }.getOrElse(r)
+        result.withHeaders(HeaderNames.SET_COOKIE -> Cookies.merge(header.headers.get(HeaderNames.SET_COOKIE).getOrElse(""), Seq(newCookie)))
+      }.getOrElse(result)
     }
 
     handler match {

@@ -23,6 +23,7 @@ import scala.collection.immutable.Stream.consWrapper
 
 import com.github.play2war.plugin.Play2WarKeys._
 
+import com.typesafe.sbt.packager.Keys.projectDependencyArtifacts
 import sbt.ConfigKey.configurationToKey
 import sbt.Keys._
 import sbt._
@@ -45,7 +46,7 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
 
   val warTask: Def.Initialize[Task[sbt.File]] = Def.task[sbt.File] {
     val s = streams.value
-    val dependencies = (dependencyClasspath in Runtime).value
+    val dependencies = (dependencyClasspath in Runtime).value ++ (projectDependencyArtifacts in Runtime).value
     val unmanagedDependencies = (unmanagedClasspath in Runtime).value
     val id = normalizedName.value
     //val packaged = com.typesafe.sbt.packager.Keys.dist.value

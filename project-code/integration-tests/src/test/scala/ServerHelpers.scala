@@ -47,12 +47,13 @@ trait Servlet25Container extends ServletContainer {
   def keyServletContainer = "25"
 }
 
-trait CargoContainerManager extends BeforeAndAfterAll with WarContext {
-  self: Suite =>
+trait CargoContainerManager extends WarContext {
 
-  def getContainer: InstalledLocalContainer
+  var container: InstalledLocalContainer = _
 
-  def setContainer(container: InstalledLocalContainer): Unit
+  def getContainer = container
+
+  def setContainer(container: InstalledLocalContainer) = this.container = container
 
   def containerUrl: String
 
@@ -60,14 +61,9 @@ trait CargoContainerManager extends BeforeAndAfterAll with WarContext {
 
   def containerName: String
 
-  def keyWarPath: String
-
   def getJavaVersion: String
 
-  abstract override def beforeAll(configMap: Map[String, Any]) {
-
-    val warPath = configMap.get(keyWarPath).getOrElse(Nil)
-
+  def startContainer(warPath: String) {
     println("WAR file to deploy: " + warPath)
 
     val containerUrlToDownload: String = containerFileNameInCloudbeesCache.flatMap { c =>
@@ -85,6 +81,15 @@ trait CargoContainerManager extends BeforeAndAfterAll with WarContext {
     val installer = new ZipURLInstaller(new URL(containerUrlToDownload))
     println("Download container done")
 
+    Option(System.getenv("http_proxy")).map { systemProxy =>
+      println(s"Using system proxy '$systemProxy'")
+      val uri = new java.net.URI(systemProxy)
+      val proxy = new org.codehaus.cargo.container.installer.Proxy()
+      proxy.setHost(uri.getHost)
+      proxy.setPort(uri.getPort)
+      installer.setProxy(proxy)
+    }
+
     println("Install container ...")
     installer.install
     println("Install container done")
@@ -101,7 +106,7 @@ trait CargoContainerManager extends BeforeAndAfterAll with WarContext {
         configuration.setProperty(GeneralPropertySet.JAVA_HOME, java7Home)
       }
     }
-    
+
     val container =
       new DefaultContainerFactory().createContainer(
         containerName, ContainerType.INSTALLED, configuration).asInstanceOf[InstalledLocalContainer]
@@ -119,11 +124,27 @@ trait CargoContainerManager extends BeforeAndAfterAll with WarContext {
     container.start
   }
 
-  abstract override def afterAll {
+
+  def stopContainer {
     println("Stop the container")
     Some(getContainer).map {
       _.stop
     }
+  }
+}
+
+trait CargoContainerManagerFixture extends BeforeAndAfterAll with CargoContainerManager {
+  self: Suite =>
+
+  def keyWarPath: String
+
+  abstract override def beforeAll(configMap: Map[String, Any]) {
+    val warPath = configMap.get(keyWarPath).getOrElse(throw new Exception("no war path defined")).asInstanceOf[String]
+    startContainer(warPath)
+  }
+
+  abstract override def afterAll {
+    stopContainer
   }
 }
 

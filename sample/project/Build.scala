@@ -51,13 +51,13 @@ object ApplicationBuild extends Build {
   )
 
   lazy val servlet25 = play.Project(
-      appName + "servlet25", appVersion, appDependencies, path = file("servlet25"), 
+      appName + "servlet25", appVersion, appDependencies, path = file("servlet25"),
       settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "2.5")
-  ) dependsOn (common)
+  ) dependsOn common
 
   lazy val servlet30 = play.Project(
-      appName + "servlet30", appVersion, appDependencies, path = file("servlet30"), 
+      appName + "servlet30", appVersion, appDependencies, path = file("servlet30"),
       settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "3.0")
-  ) dependsOn (common)
+  ) dependsOn common
 
 }
