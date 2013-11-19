@@ -16,17 +16,15 @@
 package play.core.server.servlet
 
 import java.io.ByteArrayOutputStream
-import java.net.{URI, URLDecoder}
+import java.net.URLDecoder
 import java.util.concurrent.atomic.AtomicBoolean
-
-import scala.io._
 
 import javax.servlet.http.{ Cookie => ServletCookie }
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import play.api._
 import play.api.Logger
-import play.api.http.HeaderNames
+import play.api.http.{HttpProtocol, HeaderNames}
 import play.api.http.HeaderNames.CONTENT_LENGTH
 import play.api.http.HeaderNames.X_FORWARDED_FOR
 import play.api.libs.concurrent._
@@ -187,27 +185,31 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
             case (name, value) => httpResponse.setHeader(name, value)
           }
 
-          // Stream the result
-          headers.get(CONTENT_LENGTH).map { contentLength =>
-            Logger("play").trace("Result with Content-length: " + contentLength)
+          val withContentLength = headers.exists ( _._1 == CONTENT_LENGTH)
+          val chunked = headers.exists { case (key, value) => key == HeaderNames.TRANSFER_ENCODING && value == HttpProtocol.CHUNKED }
 
-            var hasError: AtomicBoolean = new AtomicBoolean(false)
+          // TODO do not allow chunked for http 1.0?
+          // if (chunked && connection == KeepAlive) { send Results.HttpVersionNotSupported("The response to this request is chunked and hence requires HTTP 1.1 to be sent, but this is a HTTP 1.0 request.") }
+
+          // Stream the result
+          if (withContentLength || chunked) {
+
+            val hasError: AtomicBoolean = new AtomicBoolean(false)
 
             val bodyIteratee: Iteratee[Array[Byte], Unit] = {
 
               def step(in: Input[Array[Byte]]): Iteratee[Array[Byte], Unit] = (!hasError.get, in) match {
                 case (true, Input.El(x)) =>
                   Iteratee.flatten(
-                    Promise.pure(
+                    Future.successful(
                       if (hasError.get) {
                         ()
                       } else {
-                        getHttpResponse().getRichOutputStream.foreach { os =>
+                        getHttpResponse().getRichOutputStream.map { os =>
                           os.write(x)
                           os.flush()
                         }
                       })
-                      //.map(_ => if (!hasError.get) Cont(step) else Done((), Input.Empty)))
                       .extend1 {
                         case Redeemed(_) => if (!hasError.get) Cont(step) else Done((), Input.Empty)
                         case Thrown(ex) =>
@@ -219,47 +221,56 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
                 case (_, inp) => Done((), inp)
               }
               Iteratee.flatten(
-                Promise.pure(())
+                Future.successful(())
                   .map(_ => if (!hasError.get) Cont(step) else Done((), Input.Empty: Input[Array[Byte]])))
             }
 
-            (body |>>> bodyIteratee).extend1 {
+            val bodyConsumer = if (chunked) {
+              // if the result body is chunked, the chunks are already encoded with metadata in Results.chunk
+              // The problem is that the servlet container add metadata again, leading the chunks encoded 2 times.
+              // As workaround, we 'dechunk' the body one time before sending it to the servlet container
+              body &> Results.dechunk |>>> bodyIteratee
+            } else {
+              body |>>> bodyIteratee
+            }
+            bodyConsumer.extend1 {
               case Redeemed(_) =>
                 cleanup()
-                onHttpResponseComplete
+                onHttpResponseComplete()
               case Thrown(ex) =>
                 Logger("play").debug(ex.toString)
                 hasError.set(true)
-                onHttpResponseComplete
+                onHttpResponseComplete()
             }
-          }.getOrElse {
+          } else {
             Logger("play").trace("Result without Content-length")
 
             // No Content-Length header specified, buffer in-memory
             val byteBuffer = new ByteArrayOutputStream
             val writer: Function2[ByteArrayOutputStream, Array[Byte], Unit] = (b, x) => b.write(x)
-            val stringIteratee = Iteratee.fold(byteBuffer)((b, e: Array[Byte]) => { writer(b, e); b })
+            val byteArrayOSIteratee = Iteratee.fold(byteBuffer)((b, e: Array[Byte]) => { writer(b, e); b })
 
-            val p = (body |>>> Enumeratee.grouped(stringIteratee) &>> Cont {
+            val p = body |>>> Enumeratee.grouped(byteArrayOSIteratee) &>> Cont {
               case Input.El(buffer) =>
                 Logger("play").trace("Buffer size to send: " + buffer.size)
                 getHttpResponse().getRichOutputStream.map { os =>
+                  // set the content length ourselves
                   getHttpResponse().getHttpServletResponse.map(_.setContentLength(buffer.size))
-                  os.flush
+                  os.flush()
                   buffer.writeTo(os)
                 }
-                val p = Promise.pure()
+                val p = Future.successful()
                 Iteratee.flatten(p.map(_ => Done(1, Input.Empty: Input[ByteArrayOutputStream])))
 
               case other => Error("unexpected input", other)
-            })
+            }
             p.extend1 {
               case Redeemed(_) =>
                 cleanup()
-                onHttpResponseComplete
+                onHttpResponseComplete()
               case Thrown(ex) =>
                 Logger("play").debug(ex.toString)
-                onHttpResponseComplete
+                onHttpResponseComplete()
             }
           }
 

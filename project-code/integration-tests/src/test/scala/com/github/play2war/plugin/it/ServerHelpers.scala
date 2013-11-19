@@ -18,7 +18,7 @@ import com.gargoylesoftware.htmlunit.util._
 import org.codehaus.cargo.container.deployable.WAR
 import org.codehaus.cargo.container.property._
 import org.codehaus.cargo.util.log._
-import scala.collection.immutable.{ Page => _, _ }
+import scala.collection.immutable._
 import scala.collection.JavaConverters._
 import org.apache.commons.io.FileUtils
 import java.io.File
@@ -63,7 +63,7 @@ trait CargoContainerManager extends WarContext {
 
   def getJavaVersion: String
 
-  def startContainer(warPath: String) {
+  def startContainer(warPath: String, stopOnExit: Boolean) {
     println("WAR file to deploy: " + warPath)
 
     val containerUrlToDownload: String = containerFileNameInCloudbeesCache.flatMap { c =>
@@ -91,7 +91,7 @@ trait CargoContainerManager extends WarContext {
     }
 
     println("Install container ...")
-    installer.install
+    installer.install()
     println("Install container done")
 
     val configuration: LocalConfiguration = new DefaultConfigurationFactory().createConfiguration(
@@ -121,14 +121,25 @@ trait CargoContainerManager extends WarContext {
 
     println("Start the container " + containerName)
     setContainer(container)
-    container.start
+    container.start()
+
+    if (stopOnExit) {
+      Runtime.getRuntime.addShutdownHook(new Thread() {
+        override def run() {
+          stopContainer()
+        }
+      })
+    }
   }
 
 
-  def stopContainer {
-    println("Stop the container")
-    Some(getContainer).map {
-      _.stop
+  def stopContainer() {
+    val maybeContainer = Option(getContainer)
+    maybeContainer map { container =>
+      println("Stop the container " + container.getHome)
+      container.stop()
+    } getOrElse {
+      println("Container already stopped")
     }
   }
 }
@@ -140,11 +151,12 @@ trait CargoContainerManagerFixture extends BeforeAndAfterAll with CargoContainer
 
   abstract override def beforeAll(configMap: Map[String, Any]) {
     val warPath = configMap.get(keyWarPath).getOrElse(throw new Exception("no war path defined")).asInstanceOf[String]
-    startContainer(warPath)
+
+    startContainer(warPath, stopOnExit = false)
   }
 
-  abstract override def afterAll {
-    stopContainer
+  abstract override def afterAll() {
+    stopContainer()
   }
 }
 
