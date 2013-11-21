@@ -5,23 +5,9 @@ import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
 import org.scalatest.matchers._
 import org.scalatest._
-import org.codehaus.cargo.container.InstalledLocalContainer
-import org.codehaus.cargo.container.installer.ZipURLInstaller
-import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory
-import org.codehaus.cargo.container.ContainerType
-import org.codehaus.cargo.container.configuration.ConfigurationType
-import org.codehaus.cargo.generic.DefaultContainerFactory
-import org.codehaus.cargo.container.configuration.LocalConfiguration
 import com.gargoylesoftware.htmlunit._
-import com.gargoylesoftware.htmlunit.html._
 import com.gargoylesoftware.htmlunit.util._
-import org.codehaus.cargo.container.deployable.WAR
-import org.codehaus.cargo.container.property._
-import org.codehaus.cargo.util.log._
-import scala.collection.immutable.{ Page => _, _ }
 import scala.collection.JavaConverters._
-import org.apache.commons.io.FileUtils
-import java.io.File
 import java.util.concurrent._
 
 object AbstractPlay2WarTests {
@@ -40,30 +26,30 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
   var webClient: WebClient = null
 
   before {
-    onBefore
+    onBefore()
   }
 
   after {
-    onAfter
+    onAfter()
   }
 
   override def beforeAll(configMap: Map[String, Any]) {
     super.beforeAll(configMap)
 
     // Init WebClient
-    onBefore
+    onBefore()
 
     // Warm up application
     sendRequest(pageUrl = rootUrl)
 
-    onAfter
+    onAfter()
   }
 
-  def onBefore {
+  def onBefore() {
     webClient = getAWebClient()
   }
 
-  def onAfter {
+  def onAfter() {
     webClient.closeAllWindows()
   }
 
@@ -249,7 +235,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
       Then("response should contain cookies")
 
       val cookies = webClient.getCookieManager.getCookies.asScala
-      cookies should have size (2)
+      cookies should have size 2
 
       cookies.map {
         c => (c.getName, c.getValue)
@@ -364,16 +350,10 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     , (2000000, 14888890, false) //
     )
 
-  // TODO: fix chunked test for jetty
-  val seqTupleBigContent = if (!containerName.contains("jetty"))
-    Seq(
+  val seqTupleBigContent = Seq(
     // (page name, page url, expected header)
     ("big content", "/bigContent", "Content-length", ""),
     ("big chunked content", "/chunkedBigContent", "Transfer-Encoding", "chunked"))
-  else
-    Seq(
-      // (page name, page url, expected header)
-      ("big content", "/bigContent", "Content-length", ""))
 
   feature("The container must handle GET requests of big content") {
 
@@ -447,7 +427,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
           val strictMethod = HttpMethod.valueOf("POST")
           val requestSettings = new WebRequest(new URL(pageUrl), strictMethod)
-          requestSettings.setEncodingType(FormEncodingType.MULTIPART);
+          requestSettings.setEncodingType(FormEncodingType.MULTIPART)
 
           import java.io._
 
@@ -533,7 +513,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
           .map(pool.submit(_))
           // Get each result from Future
           .map(_.get)
-          
+
           results.foreach(r => info(s"Request duration: $r ms"))
 
           val maxDuration = results.max
@@ -544,7 +524,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
           assert(maxDuration <= maxExpectedDuration, s"Max duration $maxDuration ms is higher than max excepted duration $maxExpectedDuration ms")
         } finally {
-          pool.shutdown
+          pool.shutdown()
           pool.awaitTermination(2, TimeUnit.SECONDS)
         }
       }
@@ -605,9 +585,9 @@ class Jetty7xTests extends AbstractPlay2WarTests with Servlet25Container with Ja
 // }
 
 @RunWith(classOf[JUnitRunner])
-class Tomcat739Tests extends AbstractTomcat7x with Java6 {
-  override def tomcatVersion = "7.0.39"
-  override def containerFileNameInCloudbeesCache = Option("apache-tomcat-7.0.39.zip")
+class Tomcat7xTests extends AbstractTomcat7x with Java6 {
+  override def tomcatVersion = "7.0.47"
+  override def containerFileNameInCloudbeesCache = Option("apache-tomcat-7.0.47.zip")
 }
 
 @RunWith(classOf[JUnitRunner])
@@ -617,13 +597,6 @@ class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container with Ja
   override def containerName = "jetty8x"
 }
 
-// test fails for chunked responses. Play sets the right transfer encoding, but jetty tries to be clever and buffer the response.
-// Idea: jetty thinks that the http client cannot handle chunked responses
-// Answer from Jetty regarding Transfer-Encoding: chunked:
-// "A servlet should never set Transfer-Encoding: chunked It is up to the server to decide if chunking is needed (or even available).
-// If the request is HTTP/1.0 or SPDY, then chunking is not available. If there is a Connection:close header, then EOF marks the end
-// of the message so there is no need for jetty to go to the effort of chunking. So jetty basically ignores any transfer encoding a
-// servlet sets, because that is a value that only Jetty really knows what it can be."
 @RunWith(classOf[JUnitRunner])
 class Jetty9xTests extends AbstractPlay2WarTests with Servlet30Container with Java7 {
   override def containerUrl = "http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.0.6.v20130930/jetty-distribution-9.0.6.v20130930.tar.gz"

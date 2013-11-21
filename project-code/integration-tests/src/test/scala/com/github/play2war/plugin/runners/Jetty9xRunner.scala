@@ -15,12 +15,6 @@ object Jetty9xRunner extends App {
 
    val servlet30SampleWarPath = new File("../sample/servlet30/target", "a-play2war-sample-servlet30-1.0-SNAPSHOT.war").getAbsolutePath
 
-  cargoContainer.startContainer(servlet30SampleWarPath)
-
-   Runtime.getRuntime.addShutdownHook(new Thread() {
-     override def run() {
-       cargoContainer.stopContainer
-     }
-   })
+  cargoContainer.startContainer(servlet30SampleWarPath, stopOnExit = true)
  }
 
