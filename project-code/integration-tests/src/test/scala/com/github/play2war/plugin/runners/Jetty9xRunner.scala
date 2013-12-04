@@ -1,12 +1,12 @@
 package com.github.play2war.plugin.runners
 
-import com.github.play2war.plugin.it.{Java7, Servlet30Container, CargoContainerManager}
+import com.github.play2war.plugin.it.{Servlet30Container, Java7, CargoContainerManager}
 import java.io.File
 
 /**
   * Starts jetty9
   */
-object Jetty9xRunner extends App {
+object Jetty90xRunner extends App {
 
    val cargoContainer = new CargoContainerManager with Servlet30Container with Java7 {
      override def containerUrl = "http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.0.6.v20130930/jetty-distribution-9.0.6.v20130930.tar.gz"
