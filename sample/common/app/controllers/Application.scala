@@ -2,14 +2,14 @@ package controllers
 
 import java.io._
 
-import play.api._
 import play.api.mvc._
-import play.api.libs.{ Comet }
+import play.api.libs.Comet
 import play.api.libs.iteratee._
 import play.api.libs.concurrent._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import scala.concurrent.duration._
+import scala.concurrent.Future
 
 object Application extends Controller {
 
@@ -59,6 +59,10 @@ object Application extends Controller {
     throw new RuntimeException("This a desired exception in order to test exception interception")
   }
 
+  def httpVersion = Action { request =>
+    Ok(request.version)
+  }
+
   // All in memory
   def bigContent = Action { request =>
 
@@ -95,7 +99,7 @@ object Application extends Controller {
           Enumerator.generateM({
 
             if (counter >= iMaxRange) {
-              Promise.pure(None)
+              Future.successful(None)
             } else {
 
               val tempCounter = counter + 50000
@@ -112,14 +116,14 @@ object Application extends Controller {
 
               counter = tempCounter
 
-              Promise.pure(Some(sb.toString))
+              Future.successful(Some(sb.toString()))
             }
           })
       }.getOrElse {
         Enumerator("Max range not found\n")
       }
 
-    Ok.stream(dataContent >>> Enumerator.eof)
+    Ok.chunked(dataContent >>> Enumerator.eof)
   }
 
   def echoGetParameters = Action { request =>
@@ -175,7 +179,7 @@ object Application extends Controller {
   }
   
   def liveClock = Action {
-    Ok.stream(clock &> Comet(callback = "parent.clockChanged"))
+    Ok.chunked(clock &> Comet(callback = "parent.clockChanged"))
   }
   
   def longRequest(duration: Long) = Action {

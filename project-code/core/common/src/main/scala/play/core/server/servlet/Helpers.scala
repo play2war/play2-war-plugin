@@ -16,7 +16,6 @@
 package play.core.server.servlet
 
 import java.util.Arrays
-import java.util.Collections
 
 import scala.collection.JavaConverters.asScalaBufferConverter
 import scala.collection.JavaConverters.enumerationAsScalaIteratorConverter
@@ -24,8 +23,7 @@ import scala.collection.JavaConverters.enumerationAsScalaIteratorConverter
 import javax.servlet.http.{Cookie => ServletCookie}
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import play.api.mvc.Cookies
-import play.api.mvc.Headers
+import play.api.mvc.{Cookie, Cookies, Headers}
 
 trait HTTPHelpers {
 
@@ -46,7 +44,7 @@ trait HTTPHelpers {
 
     new Headers {
 
-      protected def data: Seq[(String, Seq[String])] = {
+      val data: Seq[(String, Seq[String])] = {
         allHeaders.toSeq
       }
     }
@@ -64,6 +62,8 @@ trait HTTPHelpers {
 
     new Cookies {
       def get(name: String) = cookies.get(name)
+
+      def foreach[U](f: (Cookie) => U) { cookies.values.foreach(f) }
 
       override def toString = cookies.toString
     }

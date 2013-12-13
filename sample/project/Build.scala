@@ -9,7 +9,7 @@ object ApplicationBuild extends Build {
   lazy val appName = "a-play2war-sample-"
   lazy val appVersion = "1.0-SNAPSHOT"
 
-  lazy val commonSettings = Defaults.defaultSettings ++ Seq(
+  lazy val commonSettings = Defaults.defaultSettings ++ playJavaSettings ++ Seq(
     //      resolvers += "Local Repository" at "http://localhost:8090/publish",
     resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns),
     // Doesn't work
@@ -39,6 +39,8 @@ object ApplicationBuild extends Build {
 
   lazy val common = play.Project(appName + "common", appVersion, commonAppDependencies, path = file("common"), settings = commonSettings ++ playProjectSettings)
 
+  override def rootProject = Some(parent)
+
   lazy val appDependencies = commonAppDependencies ++ Seq(
     "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.1"
   )
@@ -49,13 +51,13 @@ object ApplicationBuild extends Build {
   )
 
   lazy val servlet25 = play.Project(
-      appName + "servlet25", appVersion, appDependencies, path = file("servlet25"), 
+      appName + "servlet25", appVersion, appDependencies, path = file("servlet25"),
       settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "2.5")
-  ) dependsOn (common)
+  ) dependsOn common
 
   lazy val servlet30 = play.Project(
-      appName + "servlet30", appVersion, appDependencies, path = file("servlet30"), 
+      appName + "servlet30", appVersion, appDependencies, path = file("servlet30"),
       settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "3.0")
-  ) dependsOn (common)
+  ) dependsOn common
 
 }

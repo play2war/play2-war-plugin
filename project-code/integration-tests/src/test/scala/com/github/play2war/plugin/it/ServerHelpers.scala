@@ -18,7 +18,7 @@ import com.gargoylesoftware.htmlunit.util._
 import org.codehaus.cargo.container.deployable.WAR
 import org.codehaus.cargo.container.property._
 import org.codehaus.cargo.util.log._
-import scala.collection.immutable.{ Page => _, _ }
+import scala.collection.immutable._
 import scala.collection.JavaConverters._
 import org.apache.commons.io.FileUtils
 import java.io.File
@@ -47,12 +47,13 @@ trait Servlet25Container extends ServletContainer {
   def keyServletContainer = "25"
 }
 
-trait CargoContainerManager extends BeforeAndAfterAll with WarContext {
-  self: Suite =>
+trait CargoContainerManager extends WarContext {
 
-  def getContainer: InstalledLocalContainer
+  var container: InstalledLocalContainer = _
 
-  def setContainer(container: InstalledLocalContainer): Unit
+  def getContainer = container
+
+  def setContainer(container: InstalledLocalContainer) = this.container = container
 
   def containerUrl: String
 
@@ -60,14 +61,9 @@ trait CargoContainerManager extends BeforeAndAfterAll with WarContext {
 
   def containerName: String
 
-  def keyWarPath: String
-
   def getJavaVersion: String
 
-  abstract override def beforeAll(configMap: Map[String, Any]) {
-
-    val warPath = configMap.get(keyWarPath).getOrElse(Nil)
-
+  def startContainer(warPath: String, stopOnExit: Boolean) {
     println("WAR file to deploy: " + warPath)
 
     val containerUrlToDownload: String = containerFileNameInCloudbeesCache.flatMap { c =>
@@ -85,14 +81,23 @@ trait CargoContainerManager extends BeforeAndAfterAll with WarContext {
     val installer = new ZipURLInstaller(new URL(containerUrlToDownload))
     println("Download container done")
 
+    Option(System.getenv("http_proxy")).map { systemProxy =>
+      println(s"Using system proxy '$systemProxy'")
+      val uri = new java.net.URI(systemProxy)
+      val proxy = new org.codehaus.cargo.container.installer.Proxy()
+      proxy.setHost(uri.getHost)
+      proxy.setPort(uri.getPort)
+      installer.setProxy(proxy)
+    }
+
     println("Install container ...")
-    installer.install
+    installer.install()
     println("Install container done")
 
     val configuration: LocalConfiguration = new DefaultConfigurationFactory().createConfiguration(
       containerName, ContainerType.INSTALLED, ConfigurationType.STANDALONE).asInstanceOf[LocalConfiguration]
 
-    configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.MEDIUM.getLevel);
+    configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.MEDIUM.getLevel)
 
     getJavaVersion match {
       case "java6" => // Nothing, use current JVM
@@ -101,7 +106,7 @@ trait CargoContainerManager extends BeforeAndAfterAll with WarContext {
         configuration.setProperty(GeneralPropertySet.JAVA_HOME, java7Home)
       }
     }
-    
+
     val container =
       new DefaultContainerFactory().createContainer(
         containerName, ContainerType.INSTALLED, configuration).asInstanceOf[InstalledLocalContainer]
@@ -116,14 +121,42 @@ trait CargoContainerManager extends BeforeAndAfterAll with WarContext {
 
     println("Start the container " + containerName)
     setContainer(container)
-    container.start
+    container.start()
+
+    if (stopOnExit) {
+      Runtime.getRuntime.addShutdownHook(new Thread() {
+        override def run() {
+          stopContainer()
+        }
+      })
+    }
   }
 
-  abstract override def afterAll {
-    println("Stop the container")
-    Some(getContainer).map {
-      _.stop
+
+  def stopContainer() {
+    val maybeContainer = Option(getContainer)
+    maybeContainer map { container =>
+      println("Stop the container " + container.getHome)
+      container.stop()
+    } getOrElse {
+      println("Container already stopped")
     }
+  }
+}
+
+trait CargoContainerManagerFixture extends BeforeAndAfterAll with CargoContainerManager {
+  self: Suite =>
+
+  def keyWarPath: String
+
+  abstract override def beforeAll(configMap: Map[String, Any]) {
+    val warPath = configMap.get(keyWarPath).getOrElse(throw new Exception("no war path defined")).asInstanceOf[String]
+
+    startContainer(warPath, stopOnExit = false)
+  }
+
+  abstract override def afterAll() {
+    stopContainer()
   }
 }
 

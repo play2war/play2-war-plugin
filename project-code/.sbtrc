@@ -1,3 +1,9 @@
 alias itt = ;project integration-tests;test;project play2-war
-alias itt-tomcat7 = ;project integration-tests;test-only com.github.play2war.plugin.it.Tomcat70xTests;project play2-war
-alias itt-quick-tomcat7 = ;project integration-tests;test-quick com.github.play2war.plugin.it.Tomcat70xTests;project play2-war
+
+alias tomcat7 = ;project integration-tests;test:runMain com.github.play2war.plugin.runners.Tomcat7xRunner
+alias itt-tomcat7 = ;project integration-tests;testOnly com.github.play2war.plugin.it.Tomcat7xTests;project play2-war
+alias itt-quick-tomcat7 = ;project integration-tests;testQuick com.github.play2war.plugin.it.Tomcat7xTests;project play2-war
+
+alias jetty9 = ;project integration-tests;test:runMain com.github.play2war.plugin.runners.Jetty9xRunner
+alias itt-jetty9 = ;project integration-tests;testOnly com.github.play2war.plugin.it.Jetty9xTests;project play2-war
+

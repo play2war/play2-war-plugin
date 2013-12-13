@@ -5,23 +5,9 @@ import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
 import org.scalatest.matchers._
 import org.scalatest._
-import org.codehaus.cargo.container.InstalledLocalContainer
-import org.codehaus.cargo.container.installer.ZipURLInstaller
-import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory
-import org.codehaus.cargo.container.ContainerType
-import org.codehaus.cargo.container.configuration.ConfigurationType
-import org.codehaus.cargo.generic.DefaultContainerFactory
-import org.codehaus.cargo.container.configuration.LocalConfiguration
 import com.gargoylesoftware.htmlunit._
-import com.gargoylesoftware.htmlunit.html._
 import com.gargoylesoftware.htmlunit.util._
-import org.codehaus.cargo.container.deployable.WAR
-import org.codehaus.cargo.container.property._
-import org.codehaus.cargo.util.log._
-import scala.collection.immutable.{ Page => _, _ }
 import scala.collection.JavaConverters._
-import org.apache.commons.io.FileUtils
-import java.io.File
 import java.util.concurrent._
 
 object AbstractPlay2WarTests {
@@ -33,56 +19,46 @@ object AbstractPlay2WarTests {
 
 }
 
-abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with CargoContainerManager with BeforeAndAfter with WarContext {
+abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with CargoContainerManagerFixture with BeforeAndAfter with WarContext {
 
   import AbstractPlay2WarTests._
 
   var webClient: WebClient = null
 
-  var container: InstalledLocalContainer = null
-
-  def getContainer = container
-
-  def setContainer(container: InstalledLocalContainer) = this.container = container
-
-  def containerUrl = ""
-
-  def containerName = ""
-
   before {
-    onBefore
+    onBefore()
   }
 
   after {
-    onAfter
+    onAfter()
   }
 
   override def beforeAll(configMap: Map[String, Any]) {
     super.beforeAll(configMap)
 
     // Init WebClient
-    onBefore
+    onBefore()
 
     // Warm up application
     sendRequest(pageUrl = rootUrl)
 
-    onAfter
+    onAfter()
   }
 
-  def onBefore {
+  def onBefore() {
     webClient = getAWebClient()
   }
 
-  def onAfter {
-    webClient.closeAllWindows
+  def onAfter() {
+    webClient.closeAllWindows()
   }
 
   def getAWebClient(timeout: Int = HTTP_TIMEOUT) = {
-    val aWebClient = new WebClient
-    aWebClient.setJavaScriptEnabled(false)
-    aWebClient.setThrowExceptionOnFailingStatusCode(false)
+    val aWebClient = new WebClient()
+    aWebClient.getOptions.setJavaScriptEnabled(false)
+    aWebClient.getOptions.setThrowExceptionOnFailingStatusCode(false)
     aWebClient.getCookieManager.setCookiesEnabled(true)
-    aWebClient.setTimeout(timeout)
+    aWebClient.getOptions.setTimeout(timeout)
     new SkipClockiFrameWrapper(aWebClient)
     aWebClient
   }
@@ -259,7 +235,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
       Then("response should contain cookies")
 
       val cookies = webClient.getCookieManager.getCookies.asScala
-      cookies should have size (2)
+      cookies should have size 2
 
       cookies.map {
         c => (c.getName, c.getValue)
@@ -451,7 +427,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
           val strictMethod = HttpMethod.valueOf("POST")
           val requestSettings = new WebRequest(new URL(pageUrl), strictMethod)
-          requestSettings.setEncodingType(FormEncodingType.MULTIPART);
+          requestSettings.setEncodingType(FormEncodingType.MULTIPART)
 
           import java.io._
 
@@ -537,7 +513,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
           .map(pool.submit(_))
           // Get each result from Future
           .map(_.get)
-          
+
           results.foreach(r => info(s"Request duration: $r ms"))
 
           val maxDuration = results.max
@@ -548,7 +524,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
           assert(maxDuration <= maxExpectedDuration, s"Max duration $maxDuration ms is higher than max excepted duration $maxExpectedDuration ms")
         } finally {
-          pool.shutdown
+          pool.shutdown()
           pool.awaitTermination(2, TimeUnit.SECONDS)
         }
       }
@@ -559,7 +535,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 }
 
 abstract class AbstractTomcat7x extends AbstractPlay2WarTests with Servlet30Container {
-  def tomcatVersion() = "Version to override"
+  def tomcatVersion(): String
   override def containerUrl = "http://archive.apache.org/dist/tomcat/tomcat-7/v" + tomcatVersion + "/bin/apache-tomcat-" + tomcatVersion + ".tar.gz"
   override def containerName = "tomcat7x"
 }
@@ -609,9 +585,9 @@ class Jetty7xTests extends AbstractPlay2WarTests with Servlet25Container with Ja
 // }
 
 @RunWith(classOf[JUnitRunner])
-class Tomcat739Tests extends AbstractTomcat7x with Java6 {
-  override def tomcatVersion = "7.0.39"
-  override def containerFileNameInCloudbeesCache = Option("apache-tomcat-7.0.39.zip")
+class Tomcat7xTests extends AbstractTomcat7x with Java6 {
+  override def tomcatVersion = "7.0.47"
+  override def containerFileNameInCloudbeesCache = Option("apache-tomcat-7.0.47.zip")
 }
 
 @RunWith(classOf[JUnitRunner])
@@ -623,8 +599,8 @@ class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container with Ja
 
 @RunWith(classOf[JUnitRunner])
 class Jetty9xTests extends AbstractPlay2WarTests with Servlet30Container with Java7 {
-  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.0.0.v20130308/jetty-distribution-9.0.0.v20130308.tar.gz"
-  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-9.0.0.v20130308.tar.gz")
+  override def containerUrl = "http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.0.6.v20130930/jetty-distribution-9.0.6.v20130930.tar.gz"
+  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-9.0.6.v20130930.tar.gz")
   override def containerName = "jetty9x"
 }
 

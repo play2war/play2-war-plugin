@@ -10,8 +10,8 @@ resolvers += Resolver.typesafeRepo("releases")
 resolvers += Resolver.sbtPluginRepo("snapshots")
 
 // Use the Play sbt plugin for Play projects
-addSbtPlugin("play" % "sbt-plugin" % Option(System.getProperty("play.version")).getOrElse("2.1.4"))
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Option(System.getProperty("play.version")).getOrElse("2.2.0"))
 
 //addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.0.0")
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "1.2-SNAPSHOT")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "1.2-beta3-SNAPSHOT")
