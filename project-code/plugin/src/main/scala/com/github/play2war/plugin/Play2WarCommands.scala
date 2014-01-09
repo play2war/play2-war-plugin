@@ -46,6 +46,8 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
 
   val warTask: Def.Initialize[Task[sbt.File]] = Def.task[sbt.File] {
     val s = streams.value
+
+    // projectDependencyArtifacts value contains the jar of the projects and all sub-projects
     val dependencies = (dependencyClasspath in Runtime).value ++ (projectDependencyArtifacts in Runtime).value
     val unmanagedDependencies = (unmanagedClasspath in Runtime).value
     val id = normalizedName.value
@@ -92,7 +94,7 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
     } ++ unmanagedDependencies.map { unmanaged =>
       val path = "WEB-INF/lib/" + unmanaged.data.getName
       unmanaged.data -> path
-    } ++ {
+//    } ++ {
 //      if (explodedJar) {
 //        s.log.info("Main artifacts " + packaged.map(_.getName).mkString("'", " ", "'") + " will be packaged exploded")
 //
@@ -110,9 +112,9 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
 //          }
 //        }
 //      } else packaged.get.map(jar => jar -> ("WEB-INF/lib/" + jar.getName))
-      val distFile = (sbt.Keys.`package` in Compile).value
-      val path = "WEB-INF/lib/" + distFile.getName
-      (distFile -> path) :: Nil
+//      val distFile = (sbt.Keys.`package` in Compile).value
+//      val path = "WEB-INF/lib/" + distFile.getName
+//      (distFile -> path) :: Nil
     }
 
     files.foreach { case (file, path) =>
