@@ -199,7 +199,7 @@ trait Play2WarCommands extends sbt.PlayCommands with sbt.PlayReloader with sbt.P
       }
 
       // Package final jar
-      val jarContent = files ++ additionnalResources
+      val jarContent = (files ++ additionnalResources).toSet
 
       IO.jar(jarContent, war, manifest)
 
