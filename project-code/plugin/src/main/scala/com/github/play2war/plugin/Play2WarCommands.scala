@@ -201,7 +201,7 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
     }
 
     // Package final jar
-    val jarContent = files ++ additionnalResources
+    val jarContent = (files ++ additionnalResources).toSet
 
     IO.jar(jarContent, war, manifest)
 
