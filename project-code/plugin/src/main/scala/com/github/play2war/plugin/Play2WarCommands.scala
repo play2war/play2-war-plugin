@@ -30,7 +30,7 @@ import sbt._
 
 trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with play.PlayPositionMapper {
 
-  val manifestRegex = """(?i).*META-INF/MANIFEST.MF"""
+  val manifestRegex = """(?i).*META-INF[/\\]MANIFEST.MF"""
 
   def getFiles(root: File, skipHidden: Boolean = false): Stream[File] =
     if (!root.exists || (skipHidden && root.isHidden) ||
