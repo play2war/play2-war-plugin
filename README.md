@@ -11,15 +11,15 @@
     
 [![Build Status](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_Play_21x/badge/icon)](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_Play_21x/)
 
-This project is a module for Play framework 2 to package your apps into standard WAR packages. It can be used with **Servlet 3.0 and 2.5 containers** (Tomcat 6/7, Jetty 7/8/9, JBoss 5/6/7, ...)
+This project is a module for Play framework 2 to package your apps into standard WAR packages. It can be used with **Servlet 3.1, 3.0 and 2.5 containers** (Tomcat 6/7/8, Jetty 7/8/9, JBoss 5/6/7/8, ...)
 
 Why choosing WAR packaging when native Play 2 is a better deployment model (features and performances) ?
 - Ops don't want to change their deployment model and still want to use WAR in your company
 - SSL is available, easy to configure and well documented on JBoss, Tomcat, ... when SSL is newer on Play 2.1
 - You need to add extra Servlet filters specific to your company (to handle SSO, ...)
 
-You can trust this plugin because it is [heavily tested](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_Play_21x/lastCompletedBuild/testReport/), with hundreds of integration tests run on :
-- several open-source application servers (Tomcat 6/7, Jetty 7/8/9, JBoss AS 7.x)
+You can trust this plugin because it is [heavily tested](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_Play_22x/lastCompletedBuild/testReport/), with hundreds of integration tests run on :
+- several open-source application servers (Tomcat 6/7/8, Jetty 7/8/9)
 - *all versions* of Play Framework 2.x
 
 Live demo: JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
@@ -46,29 +46,29 @@ See [releases and changelog](https://github.com/dlecan/play2-war-plugin/releases
   <tr>
   <td colspan="2">Availability</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-  <td>In progress</td>
-    <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-    <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
   <tr>
   <td colspan="2">Performances</td>
   <td>+++</td>
   <td>++</td>
-    <td>+</td>
-    <td>-</td>
+  <td>+</td>
+  <td>-</td>
   </tr>
   <tr>
   <td rowspan="2">HTTP</td>
-    <td>Asynchronous request<br/>processing</td>
+  <td>Asynchronous request<br/>processing</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-    <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-    <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
   </tr>
   <tr>
-    <td>Web Socket</td>
+  <td>Web Socket</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
-  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td>Not available yet</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20"></td>  
   </tr>
@@ -76,7 +76,7 @@ See [releases and changelog](https://github.com/dlecan/play2-war-plugin/releases
   <td rowspan="3">Container</td>
   <td>Data sources</td>
   <td>Built-in<br/>(<a href="http://jolbox.com/">Bone CP</a>)</td>
-  <td colspan="3">Built-in (<a href="http://jolbox.com/">Bone CP</a>)<br/>External DS support : TBD</td>
+  <td colspan="3">Built-in (<a href="http://jolbox.com/">Bone CP</a>)<br/>Support external DataSource without JTA</td>
   </tr>
   <tr>
     <td>Applications deployed at root context
@@ -93,7 +93,7 @@ See [releases and changelog](https://github.com/dlecan/play2-war-plugin/releases
     <td colspan="4">
       <p align="center">
         Play 2.0.x : <img src="http://openclipart.org/image/800px/svg_to_png/161515/OK-2.png" height="20" title="Always deployed at root context">
-        <br/>Play 2.1.x : <img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
+        <br/>Play 2.1.x and more : <img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
       </p>
     </td>
   </tr>
@@ -108,6 +108,22 @@ See [releases and changelog](https://github.com/dlecan/play2-war-plugin/releases
   <th>Public PaaS</th>
   </tr>
   <tr>
+  <td rowspan="3">Servlet 3.1</td>
+  <td>Tomcat 8</td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td>TBD</td>
+  </tr>
+  <tr>
+  <td>Jetty 9.1</td>
+  <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
+  <td>TBD</td>
+  </tr>
+  <tr>
+  <td>JBoss/Wildfly 8</td>
+  <td>TBD</td>
+  <td>TBD</td>
+  </tr>
+  <tr>
   <td rowspan="9">Servlet 3.0</td>
   <td>Tomcat 7</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
@@ -119,7 +135,7 @@ See [releases and changelog](https://github.com/dlecan/play2-war-plugin/releases
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   </tr>
   <tr>
-  <td>Jetty 9 (M2)</td>
+  <td>Jetty 9.0</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   <td>TBD</td>
   </tr>
@@ -170,7 +186,7 @@ See [releases and changelog](https://github.com/dlecan/play2-war-plugin/releases
   </tr>
 </table>
 
-The plugin may work on others containers, such as Weblogic or other versions of Websphere (not tested yet).
+The plugin may work on others containers, such as Weblogic (not tested yet).
 
 ## Configuration
 
