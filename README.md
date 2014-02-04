@@ -216,6 +216,10 @@ Watch it in action here : [https://play-war.ci.cloudbees.com/](https://play-war.
 
 Discover [how you can help the project](https://github.com/dlecan/play2-war-plugin/wiki/How-to-help).
 
+## Contributors
+
+[Ivan Meredith](https://github.com/hadashi), [Rossi Oddet](https://github.com/roddet), [Sam Spycher](https://github.com/samspycher), [Naoki Takezoe](https://github.com/takezoe), [Quinn Slack](https://github.com/sqs), [Eugene Platonov](https://github.com/jozic), [László Zsolt Kustra](https://github.com/kustra).
+
 ## Licence
 
 This software is licensed under the Apache 2 license, quoted below.
