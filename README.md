@@ -108,7 +108,7 @@ See [releases and changelog](https://github.com/dlecan/play2-war-plugin/releases
   <th>Public PaaS</th>
   </tr>
   <tr>
-  <td rowspan="3">Servlet 3.1</td>
+  <td rowspan="4">Servlet 3.1</td>
   <td>Tomcat 8</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   <td>TBD</td>
@@ -124,7 +124,12 @@ See [releases and changelog](https://github.com/dlecan/play2-war-plugin/releases
   <td>TBD</td>
   </tr>
   <tr>
-  <td rowspan="9">Servlet 3.0</td>
+  <td>Glassfish 4</td>
+  <td>TBD</td>
+  <td>TBD</td>
+  </tr>
+  <tr>
+  <td rowspan="8">Servlet 3.0</td>
   <td>Tomcat 7</td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
@@ -154,11 +159,6 @@ See [releases and changelog](https://github.com/dlecan/play2-war-plugin/releases
   </tr>
   <tr>
   <td>Glassfish 3</td>
-  <td>TBD</td>
-  <td>TBD</td>
-  </tr>
-  <tr>
-  <td>Glassfish 4</td>
   <td>TBD</td>
   <td>TBD</td>
   </tr>
