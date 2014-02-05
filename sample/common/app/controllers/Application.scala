@@ -7,6 +7,8 @@ import play.api.libs.Comet
 import play.api.libs.iteratee._
 import play.api.libs.concurrent._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api._
+import play.api.Play.current
 
 import scala.concurrent.duration._
 import scala.concurrent.Future
@@ -191,6 +193,15 @@ object Application extends Controller {
     Redirect(routes.Application.redirectLanding).flashing(
       "success" -> "found"
     )
+  }
+
+  def unmanagedlib = Action {
+    val maybeUnmanagedlib = Play.resource("unmanagedlib.txt")
+
+    maybeUnmanagedlib match {
+      case Some(_) => Ok("")
+      case None => NotFound
+    }
   }
 
 }

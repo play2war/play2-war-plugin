@@ -295,6 +295,19 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
    ******************
    */
 
+  feature("The build system should package unmanaged libraries") {
+
+    scenario("A file located in an unmanaged dependency should be found") {
+      val page = givenWhenGet("A file located in an unmanaged dependency", "/unmanagedlib")
+      thenCheckOk(page)
+    }
+  }
+
+  /*
+   ******************
+   ******************
+   */
+
   feature("The container must handle GET requests with 'Redirect' status in response") {
 
     scenario("container sends redirect") {
