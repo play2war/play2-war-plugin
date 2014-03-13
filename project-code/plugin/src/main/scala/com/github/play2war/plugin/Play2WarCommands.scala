@@ -161,11 +161,12 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
 
       }
 
-      case "3.0" => handleWebXmlFileOnServlet30(webxml, s, disableWarningWhenWebxmlFileFound.value)
+      case "3.0" => handleWebXmlFileOnServlet3x(webxml, s, disableWarningWhenWebxmlFileFound.value, "3.0")
+      case "3.1" => handleWebXmlFileOnServlet3x(webxml, s, disableWarningWhenWebxmlFileFound.value, "3.1")
 
       case unknown => {
         s.log.warn("Unknown servlet container version: " + unknown + ". Force default 3.0 version")
-        handleWebXmlFileOnServlet30(webxml, s, disableWarningWhenWebxmlFileFound.value)
+        handleWebXmlFileOnServlet3x(webxml, s, disableWarningWhenWebxmlFileFound.value, "3.0")
       }
     }
 
@@ -210,9 +211,9 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
     war
   }
 
-  def handleWebXmlFileOnServlet30(webxml: File, s: TaskStreams, disableWarn: Boolean) = {
+  def handleWebXmlFileOnServlet3x(webxml: File, s: TaskStreams, disableWarn: Boolean, containerVersion: String) = {
     if (webxml.exists && !disableWarn) {
-      s.log.warn("WEB-INF/web.xml found! As WAR package will be built for servlet 3.0 containers, check if this web.xml file is compatible with.")
+      s.log.warn(s"WEB-INF/web.xml found! As WAR package will be built for servlet $containerVersion containers, check if this web.xml file is compatible with.")
     }
   }
 }

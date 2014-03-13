@@ -604,6 +604,14 @@ class Tomcat7xTests extends AbstractTomcat7x with Java6 {
 }
 
 @RunWith(classOf[JUnitRunner])
+class Tomcat8xTests extends AbstractPlay2WarTests with Servlet31Container with Java7 {
+  val tomcatVersion = "8.0.3"
+  override def containerUrl = s"http://archive.apache.org/dist/tomcat/tomcat-8/v$tomcatVersion/bin/apache-tomcat-$tomcatVersion.tar.gz"
+  override def containerFileNameInCloudbeesCache = Option(s"apache-tomcat-$tomcatVersion.zip")
+  override def containerName = "tomcat8x"
+}
+
+@RunWith(classOf[JUnitRunner])
 class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container with Java6 {
   override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/8.1.3.v20120416/jetty-distribution-8.1.3.v20120416.tar.gz"
   override def containerFileNameInCloudbeesCache = Option("jetty-distribution-8.1.3.v20120416.tar.gz")
@@ -611,9 +619,16 @@ class Jetty8xTests extends AbstractPlay2WarTests with Servlet30Container with Ja
 }
 
 @RunWith(classOf[JUnitRunner])
-class Jetty9xTests extends AbstractPlay2WarTests with Servlet30Container with Java7 {
+class Jetty90xTests extends AbstractPlay2WarTests with Servlet30Container with Java7 {
   override def containerUrl = "http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.0.6.v20130930/jetty-distribution-9.0.6.v20130930.tar.gz"
   override def containerFileNameInCloudbeesCache = Option("jetty-distribution-9.0.6.v20130930.tar.gz")
+  override def containerName = "jetty9x"
+}
+
+@RunWith(classOf[JUnitRunner])
+class Jetty91xTests extends AbstractPlay2WarTests with Servlet31Container with Java7 {
+  override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.1.3.v20140225/jetty-distribution-9.1.3.v20140225.tar.gz"
+  override def containerFileNameInCloudbeesCache = Option("jetty-distribution-9.1.3.v20140225.tar.gz")
   override def containerName = "jetty9x"
 }
 
