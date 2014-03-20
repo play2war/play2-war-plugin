@@ -3,7 +3,7 @@ package controllers
 import java.io._
 
 import play.api.mvc._
-import play.api.libs.Comet
+import play.api.libs.{Files, Comet}
 import play.api.libs.iteratee._
 import play.api.libs.concurrent._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -140,28 +140,28 @@ object Application extends Controller {
     Ok(views.html.uploadForm())
   }
 
+  private def displayUploadDetails(uploadedFile: MultipartFormData.FilePart[Files.TemporaryFile]) = {
+    val filename = uploadedFile.filename
+    val contentType = uploadedFile.contentType.getOrElse("Unknown")
+    val size = uploadedFile.ref.file.length()
+    Ok( s"""File uploaded: $filename
+           |Content type: $contentType
+           |Size: $size""".stripMargin)
+  }
+
   def upload2 = Action { request =>
-    request.body.asMultipartFormData.map { b =>
-        b.file("uploadedFile").map { uploadedFile =>
-          import java.io.File
-          val filename = uploadedFile.filename
-          val contentType = uploadedFile.contentType
-          Ok("File uploaded: " + filename)
-        }.getOrElse {
-          Ok("Error when uploading")
-        }
+    {
+      for {
+        data <- request.body.asMultipartFormData
+        uploadedFile <- data.file("uploadedFile")
+      } yield displayUploadDetails(uploadedFile)
     }.getOrElse {
        Ok("Error when uploading")
     }
   }
-  
+
   def upload = Action(parse.multipartFormData) { request =>
-    request.body.file("uploadedFile").map { uploadedFile =>
-      import java.io.File
-      val filename = uploadedFile.filename
-      val contentType = uploadedFile.contentType
-      Ok("File uploaded: " + filename)
-    }.getOrElse {
+    request.body.file("uploadedFile").map(displayUploadDetails).getOrElse {
       Ok("Error when uploading")
     }
   }
