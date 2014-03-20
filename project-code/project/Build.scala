@@ -13,6 +13,10 @@ object Build extends Build {
   val scalasbt = "http://repo.scala-sbt.org/scalasbt/"
 
   val curDir = new File(".")
+
+  val servlet31SampleProjectTargetDir = new File(curDir, "../sample/servlet31/target")
+  val servlet31SampleWarPath = new File(servlet31SampleProjectTargetDir, "a-play2war-sample-servlet31-1.0-SNAPSHOT.war").getAbsolutePath
+
   val servlet30SampleProjectTargetDir = new File(curDir, "../sample/servlet30/target")
   val servlet30SampleWarPath = new File(servlet30SampleProjectTargetDir, "a-play2war-sample-servlet30-1.0-SNAPSHOT.war").getAbsolutePath
 
@@ -27,7 +31,7 @@ object Build extends Build {
   lazy val root = Project(id = "play2-war",
     base = file("."),
     settings = commonSettings ++ mavenSettings ++ Seq(
-      publishArtifact := false)) aggregate (play2WarCoreCommon, play2WarCoreservlet30, play2WarCoreservlet25, play2WarPlugin, play2WarIntegrationTests)
+      publishArtifact := false)) aggregate (play2WarCoreCommon, play2WarCoreservlet30, play2WarCoreservlet25, play2WarCoreservlet31, play2WarPlugin, play2WarIntegrationTests)
 
   //
   // Servlet implementations
@@ -37,6 +41,12 @@ object Build extends Build {
     settings = commonSettings ++ mavenSettings ++ Seq(
       libraryDependencies += playDependency,
       libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default"))
+
+  lazy val play2WarCoreservlet31 = Project(id = "play2-war-core-servlet31",
+    base = file("core/servlet31"),
+    settings = commonSettings ++ mavenSettings ++ Seq(
+      libraryDependencies += playDependency,
+      libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided->default")) dependsOn (play2WarCoreCommon)
 
   lazy val play2WarCoreservlet30 = Project(id = "play2-war-core-servlet30",
     base = file("core/servlet30"),
@@ -78,11 +88,12 @@ object Build extends Build {
 
       libraryDependencies += "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
       libraryDependencies += "junit" % "junit" % "4.10" % "test",
-      libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.4.5" % "test",
+      libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.4.7" % "test",
       libraryDependencies += "net.sourceforge.htmlunit" % "htmlunit" % "2.13" % "test",
 
       parallelExecution in Test := false,
       testOptions in Test += Tests.Argument("-oD"),
+      testOptions in Test += Tests.Argument("-Dwar.servlet31=" + servlet31SampleWarPath),
       testOptions in Test += Tests.Argument("-Dwar.servlet30=" + servlet30SampleWarPath),
       testOptions in Test += Tests.Argument("-Dwar.servlet25=" + servlet25SampleWarPath),
       testListeners <<= target.map(t => Seq(new eu.henkelmann.sbt.JUnitXmlTestsListener(t.getAbsolutePath)))))

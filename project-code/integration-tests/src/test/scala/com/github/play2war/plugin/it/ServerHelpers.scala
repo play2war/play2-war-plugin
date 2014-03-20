@@ -39,6 +39,10 @@ trait ServletContainer {
 
 }
 
+trait Servlet31Container extends ServletContainer {
+  def keyServletContainer = "31"
+}
+
 trait Servlet30Container extends ServletContainer {
   def keyServletContainer = "30"
 }

@@ -27,7 +27,7 @@ object ApplicationBuild extends Build {
     publishTo := Some(Resolver.file("file", file(Path.userHome.absolutePath + "/.ivy2/publish"))),
     publishMavenStyle := true)
 
-  lazy val parent = Project(id = appName + "parent", base = file("."), settings = commonSettings ++ Seq(publishArtifact := false)) aggregate (common, servlet25, servlet30)
+  lazy val parent = Project(id = appName + "parent", base = file("."), settings = commonSettings ++ Seq(publishArtifact := false)) aggregate (common, servlet25, servlet30, servlet31)
 
   lazy val playProjectSettings = Seq(
     //
@@ -57,6 +57,11 @@ object ApplicationBuild extends Build {
   lazy val servlet30 = play.Project(
       appName + "servlet30", appVersion, appDependencies, path = file("servlet30"),
       settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "3.0")
+  ) dependsOn common
+
+  lazy val servlet31 = play.Project(
+      appName + "servlet31", appVersion, appDependencies, path = file("servlet31"),
+      settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "3.1")
   ) dependsOn common
 
 }

@@ -42,8 +42,6 @@ trait RequestHandler {
 
 trait HttpServletRequestHandler extends RequestHandler {
 
-  protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]]
-
   protected def getPlayHeaders(request: HttpServletRequest): Headers
 
   protected def getPlayCookies(request: HttpServletRequest): Cookies
@@ -72,6 +70,26 @@ trait HttpServletRequestHandler extends RequestHandler {
    * Call every time the HTTP response must be terminated (completed).
    */
   protected def onHttpResponseComplete(): Unit
+
+  protected def feedBodyParser(bodyParser: Iteratee[Array[Byte], SimpleResult]): Future[SimpleResult] = {
+    // default synchronous blocking body enumerator
+
+    // FIXME this default body enumerator reads the entire stream in memory
+    // uploading a lot of data can lead to OutOfMemoryException
+    // For more details: https://github.com/dlecan/play2-war-plugin/issues/223
+    val bodyEnumerator = getHttpRequest().getRichInputStream.map { is =>
+      val output = new java.io.ByteArrayOutputStream()
+      val buffer = new Array[Byte](1024 * 8)
+      var length = is.read(buffer)
+      while(length != -1){
+        output.write(buffer, 0, length)
+        length = is.read(buffer)
+      }
+      Enumerator(output.toByteArray) andThen Enumerator.eof
+    }.getOrElse(Enumerator.eof)
+
+    bodyEnumerator |>>> bodyParser
+  }
 
 }
 
@@ -123,7 +141,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
     }
 
     // get handler for request
-    val (requestHeader, handler: Either[Future[SimpleResult],(Handler,Application)]) = Exception
+    val (requestHeader, handler: Either[Future[SimpleResult], (Handler,Application)]) = Exception
       .allCatch[RequestHeader].either(tryToCreateRequest)
       .fold(
       e => {
@@ -328,8 +346,6 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
     }
 
     def handleAction(action: EssentialAction, app: Option[Application]) {
-      Logger("play").trace("Serving this request with: " + action)
-
       val bodyParser = Iteratee.flatten(
         scala.concurrent.Future(action(requestHeader))(play.api.libs.concurrent.Execution.defaultContext)
       )
@@ -339,19 +355,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       // Remove Except: 100-continue handling, since it's impossible to handle it
       //val expectContinue: Option[_] = requestHeader.headers.get("Expect").filter(_.equalsIgnoreCase("100-continue"))
 
-      val bodyEnumerator = getHttpRequest().getRichInputStream.map { is =>
-        val output = new java.io.ByteArrayOutputStream()
-        val buffer = new Array[Byte](1024 * 8)
-        var length = is.read(buffer)
-        while(length != -1){
-          output.write(buffer, 0, length)
-          length = is.read(buffer)
-        }
-        Enumerator(output.toByteArray) andThen Enumerator.eof
-      }.getOrElse(Enumerator.eof)
-
-
-      val eventuallyResult: Future[SimpleResult] = bodyEnumerator |>>> bodyParser
+      val eventuallyResult: Future[SimpleResult] = feedBodyParser(bodyParser)
 
       val sent = eventuallyResult.recoverWith {
         case error =>
@@ -372,7 +376,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
   }
 
-  override protected def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
+  private def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
     request.getQueryString match {
       case null | "" => Map.empty
       case queryString => queryString.replaceFirst("^?", "").split("&").map { queryElement =>
