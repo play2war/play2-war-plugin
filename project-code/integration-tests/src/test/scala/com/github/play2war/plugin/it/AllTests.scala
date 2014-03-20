@@ -446,6 +446,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
 
           val imageName = "play-logo.png"
           val image = new File(getClass.getResource("/" + imageName).toURI)
+          val imageSize = image.length()
 
           val listParam: List[NameValuePair] = List(new KeyDataPair("uploadedFile", image, "image/png", "utf-8"))
 
@@ -456,7 +457,9 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
           Then("response page should contains image name")
 
           page.map { p =>
-            p.getWebResponse.getContentAsString should include(imageName)
+            val responseContent = p.getWebResponse.getContentAsString
+            responseContent should include(imageName)
+            responseContent should include(s"Size: $imageSize")
           }.getOrElse {
             fail("Page not found")
           }

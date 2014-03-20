@@ -22,7 +22,8 @@ public class JavaApplication extends Controller {
     } else {
       String fileName = uploadedFile.getFilename();
       String contentType = uploadedFile.getContentType();
-      return ok("File uploaded:" + fileName);
+      long size = uploadedFile.getFile().length();
+      return ok("File uploaded:" + fileName + "\nContent type: " + contentType + "\nSize: " + size);
     }
   }
 
