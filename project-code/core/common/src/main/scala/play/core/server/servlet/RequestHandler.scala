@@ -73,7 +73,10 @@ trait HttpServletRequestHandler extends RequestHandler {
 
   protected def feedBodyParser(bodyParser: Iteratee[Array[Byte], SimpleResult]): Future[SimpleResult] = {
     // default synchronous blocking body enumerator
-    // TODO (YaSi): to upload big files, it would be better to cut the upload into chunks and feed the body parser with them?
+
+    // FIXME this default body enumerator reads the entire stream in memory
+    // uploading a lot of data can lead to OutOfMemoryException
+    // For more details: https://github.com/dlecan/play2-war-plugin/issues/223
     val bodyEnumerator = getHttpRequest().getRichInputStream.map { is =>
       val output = new java.io.ByteArrayOutputStream()
       val buffer = new Array[Byte](1024 * 8)
