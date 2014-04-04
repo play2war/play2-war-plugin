@@ -74,7 +74,7 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
     val readListener = new ReadListener {
 
       // re-use buffer
-      private[this] val buffer = new Array[Byte](1024 * 8)
+      private[this] val buffer = new Array[Byte](Play2Servlet.internalUploadBufferSide)
 
       private[this] def consumeBody(body: ServletInputStream, buffer: Array[Byte]): Array[Byte] = {
         val output = new java.io.ByteArrayOutputStream()
