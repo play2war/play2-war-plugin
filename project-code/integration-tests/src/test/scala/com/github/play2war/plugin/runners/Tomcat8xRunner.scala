@@ -9,7 +9,7 @@ import java.io.File
 object Tomcat8xRunner extends App {
 
   val tomcat8CargoContainer = new CargoContainerManager with Servlet31Container with Java7 {
-    val tomcatVersion = "8.0.3"
+    val tomcatVersion = "8.0.5"
     override def containerUrl = s"http://archive.apache.org/dist/tomcat/tomcat-8/v$tomcatVersion/bin/apache-tomcat-$tomcatVersion.tar.gz"
     override def containerName = "tomcat8x"
   }
