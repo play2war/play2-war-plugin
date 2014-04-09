@@ -46,20 +46,20 @@ class Play2Servlet extends HttpServlet with ServletContextListener with Helpers 
     new Play2Servlet25RequestHandler(servletRequest, servletResponse)
   }
   override def contextInitialized(e: ServletContextEvent): Unit = {
-    e.getServletContext.log("PlayServletWrapper > contextInitialized")
+    println("PlayServletWrapper > contextInitialized")
 
     // Init or get singleton
     Play2WarServer(Some(e.getServletContext.getContextPath))
   }
 
   override def contextDestroyed(e: ServletContextEvent): Unit = {
-    e.getServletContext.log("PlayServletWrapper > contextDestroyed")
+    println("PlayServletWrapper > contextDestroyed")
 
     Play2WarServer.stop(e.getServletContext)
   }
 
   override def destroy(): Unit = {
-    getServletContext.log("PlayServletWrapper > destroy")
+    println("PlayServletWrapper > destroy")
 
     Play2WarServer.stop(getServletContext)
   }
