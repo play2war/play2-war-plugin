@@ -17,7 +17,6 @@ package play.core.server.servlet30
 
 import javax.servlet.annotation.WebListener
 import javax.servlet.annotation.WebServlet
-import play.api.Logger
 import play.core.server.servlet.Play2WarServer
 import javax.servlet.ServletContextEvent
 import javax.servlet.ServletContextListener
@@ -27,7 +26,7 @@ import javax.servlet.http.HttpServletResponse
 
 object Play2Servlet {
   val asyncTimeout = Play2WarServer.configuration.getInt("servlet30.asynctimeout").getOrElse(-1)
-  Logger("play").debug("Async timeout for HTTP requests: " + asyncTimeout + " ms")
+  println("Async timeout for HTTP requests: " + asyncTimeout + " ms")
 }
 
 @WebServlet(name = "Play", urlPatterns = Array { "/" }, asyncSupported = true)
@@ -63,7 +62,7 @@ class Play2Servlet extends HttpServlet with ServletContextListener {
   }
 
   override def destroy(): Unit = {
-    getServletContext.log("PlayServletWrapper > destroy")
+   println("PlayServletWrapper > destroy")
 
     Play2WarServer.stop(getServletContext)
   }

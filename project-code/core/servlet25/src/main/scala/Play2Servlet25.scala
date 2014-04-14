@@ -15,7 +15,6 @@
  */
 package play.core.server.servlet25
 
-import play.api.Logger
 import play.core.server.servlet.Play2WarServer
 import javax.servlet.ServletContextEvent
 import javax.servlet.ServletContextListener
@@ -28,7 +27,7 @@ object Play2Servlet {
   val DEFAULT_TIMEOUT = 60 * 1000
 
   val syncTimeout = Play2WarServer.configuration.getInt("servlet25.synctimeout").getOrElse(DEFAULT_TIMEOUT)
-  Logger("play").debug("Sync timeout for HTTP requests: " + syncTimeout + " ms")
+  println("Sync timeout for HTTP requests: " + syncTimeout + " ms")
 }
 
 class Play2Servlet extends HttpServlet with ServletContextListener with Helpers {

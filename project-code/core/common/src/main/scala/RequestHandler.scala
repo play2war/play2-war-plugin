@@ -25,7 +25,6 @@ import javax.servlet.http.{ Cookie => ServletCookie }
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import play.api._
-import play.api.Logger
 import play.api.http.HeaderNames
 import play.api.http.HeaderNames.CONTENT_LENGTH
 import play.api.http.HeaderNames.X_FORWARDED_FOR
@@ -141,7 +140,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       case _ => untaggedRequestHeader
     }).getOrElse(untaggedRequestHeader)
 
-    Logger("play").trace("HTTP request headers: " + requestHeader)
+    println("HTTP request headers: " + requestHeader)
 
     // Call onRequestCompletion after all request processing is done. Protected with an AtomicBoolean to ensure can't be executed more than once.
     val alreadyClean = new java.util.concurrent.atomic.AtomicBoolean(false)
@@ -171,7 +170,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
             }
 
             case r @ SimpleResult(ResponseHeader(status, headers), body) => {
-              Logger("play").trace("Sending simple result: " + r)
+              println("Sending simple result: " + r)
 
               httpResponse.setStatus(status)
 
@@ -189,7 +188,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
               // Stream the result
               headers.get(CONTENT_LENGTH).map { contentLength =>
-                Logger("play").trace("Result with Content-length: " + contentLength)
+                println("Result with Content-length: " + contentLength)
 
                 var hasError: AtomicBoolean = new AtomicBoolean(false)
 
@@ -211,7 +210,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
                             case Redeemed(_) => if (!hasError.get) Cont(step) else Done((), Input.Empty)
                             case Thrown(ex) =>
                               hasError.set(true)
-                              Logger("play").debug(ex.toString)
+                              println(ex.toString)
                               throw ex
                           })
                     case (true, Input.Empty) => Cont(step)
@@ -227,12 +226,12 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
                     cleanup()
                     onHttpResponseComplete
                   case Thrown(ex) =>
-                    Logger("play").debug(ex.toString)
+                    println(ex.toString)
                     hasError.set(true)
                     onHttpResponseComplete
                 }
               }.getOrElse {
-                Logger("play").trace("Result without Content-length")
+                println("Result without Content-length")
 
                 // No Content-Length header specified, buffer in-memory
                 val byteBuffer = new ByteArrayOutputStream
@@ -241,7 +240,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
                 val p = (body |>>> Enumeratee.grouped(stringIteratee) &>> Cont {
                   case Input.El(buffer) =>
-                    Logger("play").trace("Buffer size to send: " + buffer.size)
+                    println("Buffer size to send: " + buffer.size)
                     getHttpResponse().getRichOutputStream.map { os =>
                       getHttpResponse().getHttpServletResponse.map(_.setContentLength(buffer.size))
                       os.flush
@@ -257,14 +256,14 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
                     cleanup()
                     onHttpResponseComplete
                   case Thrown(ex) =>
-                    Logger("play").debug(ex.toString)
+                    println(ex.toString)
                     onHttpResponseComplete
                 }
               }
             }
 
             case r @ ChunkedResult(ResponseHeader(status, headers), chunks) => {
-              Logger("play").trace("Sending chunked result: " + r)
+              println("Sending chunked result: " + r)
 
               httpResponse.setStatus(status)
 
@@ -298,7 +297,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
                         .extend1 {
                           case Redeemed(_) => if (!hasError.get) Cont(step) else Done((), Input.Empty)
                           case Thrown(ex) =>
-                            Logger("play").debug(ex.toString)
+                            println(ex.toString)
                             hasError.set(true)
                             throw ex
                         })
@@ -309,7 +308,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
                   .extend1 {
                     case Redeemed(_) => if (!hasError.get) Cont(step) else Done((), Input.Empty: Input[r.BODY_CONTENT])
                     case Thrown(ex) =>
-                      Logger("play").debug(ex.toString)
+                      println(ex.toString)
                       hasError.set(true)
                       throw ex
                   })
@@ -322,7 +321,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
             }
 
             case unknownResponse =>
-              Logger("play").error("Unhandle default response: " + unknownResponse)
+             println("Unhandle default response: " + unknownResponse)
 
               httpResponse.setContentLength(0);
               httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
@@ -372,22 +371,22 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       //handle all websocket request as bad, since websocket are not handled
       //handle bad websocket request
       case Right((WebSocket(_), app)) =>
-        Logger("play").trace("Bad websocket request")
+       println("Bad websocket request")
         val a = EssentialAction(_ => Done(Results.BadRequest, Input.Empty))
         handleAction(a, Some(app))
 
       case Left(e) =>
-        Logger("play").trace("No handler, got direct result: " + e)
+       println("No handler, got direct result: " + e)
         val a = EssentialAction(_ => Done(e, Input.Empty))
         handleAction(a, None)
 
       case unexpected =>
-        Logger("play").error("Oops, unexpected message received in Play server (please report this problem): " + unexpected)
+        println("Oops, unexpected message received in Play server (please report this problem): " + unexpected)
         response.handle(Results.InternalServerError)
     }
 
     def handleAction(a: EssentialAction, app: Option[Application]) {
-      Logger("play").trace("Serving this request with: " + a)
+      println("Serving this request with: " + a)
 
       val filteredAction = app.map(_.global).getOrElse(DefaultGlobal).doFilter(a)
 
@@ -414,7 +413,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
         case Redeemed(result) => response.handle(result)
 
         case Thrown(error) =>
-          Logger("play").error("Cannot invoke the action, eventually got an error: " + error)
+          println("Cannot invoke the action, eventually got an error: " + error)
           response.handle( app.map(_.handleError(requestHeader, error)).getOrElse(DefaultGlobal.onError(requestHeader, error)))
       }
     }
