@@ -15,9 +15,10 @@
  */
 package play.core.server.servlet25
 
-import play.api.Logger
-import play.core.server.servlet.GenericPlay2Servlet
 import play.core.server.servlet.Play2WarServer
+import javax.servlet.ServletContextEvent
+import javax.servlet.ServletContextListener
+import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -26,13 +27,41 @@ object Play2Servlet {
   val DEFAULT_TIMEOUT = 60 * 1000
 
   val syncTimeout = Play2WarServer.configuration.getInt("servlet25.synctimeout").getOrElse(DEFAULT_TIMEOUT)
-  Logger("play").debug("Sync timeout for HTTP requests: " + syncTimeout + " ms")
+  println("Sync timeout for HTTP requests: " + syncTimeout + " ms")
 }
 
-class Play2Servlet extends GenericPlay2Servlet with Helpers {
+class Play2Servlet extends HttpServlet with ServletContextListener with Helpers {
+/**
+   * Classic "service" servlet method.
+   */
+  override protected def service(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
 
-  override protected def getRequestHandler(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
+    val requestHandler = getRequestHandler(servletRequest, servletResponse)
+
+    Play2WarServer.handleRequest(requestHandler)
+  }
+
+  protected def getRequestHandler(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
     new Play2Servlet25RequestHandler(servletRequest, servletResponse)
   }
+  override def contextInitialized(e: ServletContextEvent): Unit = {
+    println("PlayServletWrapper > contextInitialized")
+
+    // Init or get singleton
+    Play2WarServer(Some(e.getServletContext.getContextPath))
+  }
+
+  override def contextDestroyed(e: ServletContextEvent): Unit = {
+    println("PlayServletWrapper > contextDestroyed")
+
+    Play2WarServer.stop(e.getServletContext)
+  }
+
+  override def destroy(): Unit = {
+    println("PlayServletWrapper > destroy")
+
+    Play2WarServer.stop(getServletContext)
+  }
+  
 
 }

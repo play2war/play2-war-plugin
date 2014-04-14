@@ -17,23 +17,57 @@ package play.core.server.servlet30
 
 import javax.servlet.annotation.WebListener
 import javax.servlet.annotation.WebServlet
-import play.api.Logger
 import play.core.server.servlet.Play2WarServer
-import play.core.server.servlet.GenericPlay2Servlet
+import javax.servlet.ServletContextEvent
+import javax.servlet.ServletContextListener
+import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 object Play2Servlet {
   val asyncTimeout = Play2WarServer.configuration.getInt("servlet30.asynctimeout").getOrElse(-1)
-  Logger("play").debug("Async timeout for HTTP requests: " + asyncTimeout + " ms")
+  println("Async timeout for HTTP requests: " + asyncTimeout + " ms")
 }
 
 @WebServlet(name = "Play", urlPatterns = Array { "/" }, asyncSupported = true)
 @WebListener
-class Play2Servlet extends GenericPlay2Servlet {
+class Play2Servlet extends HttpServlet with ServletContextListener {
 
-  override protected def getRequestHandler(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
+
+/**
+   * Classic "service" servlet method.
+   */
+  override protected def service(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
+
+    val requestHandler = getRequestHandler(servletRequest, servletResponse)
+
+    Play2WarServer.handleRequest(requestHandler)
+  }
+
+  protected def getRequestHandler(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) = {
     new Play2Servlet30RequestHandler(servletRequest)
   }
+
+  override def contextInitialized(e: ServletContextEvent): Unit = {
+    println("PlayServletWrapper > contextInitialized")
+
+    // Init or get singleton
+    Play2WarServer(Some(e.getServletContext.getContextPath))
+  }
+
+  override def contextDestroyed(e: ServletContextEvent): Unit = {
+   println("PlayServletWrapper > contextDestroyed")
+
+    Play2WarServer.stop(e.getServletContext)
+  }
+
+  override def destroy(): Unit = {
+   println("PlayServletWrapper > destroy")
+
+    Play2WarServer.stop(getServletContext)
+  }
+
+  
+
 
 }

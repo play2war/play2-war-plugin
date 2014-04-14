@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.servlet.AsyncEvent
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import play.api.Logger
 import play.core.server.servlet.Play2GenericServletRequestHandler
 import play.core.server.servlet.RichHttpServletRequest
 import play.core.server.servlet.RichHttpServletResponse
@@ -98,13 +97,13 @@ private[servlet30] class AsyncListener(val requestId: String) extends javax.serv
 
   override def onError(event: AsyncEvent): Unit = {
     withError.set(true)
-    Logger("play").error("Error asynchronously received for request: " + requestId, event.getThrowable)
+    println("Error asynchronously received for request: " + requestId, event.getThrowable)
   }
 
   override def onStartAsync(event: AsyncEvent): Unit = {} // Nothing
 
   override def onTimeout(event: AsyncEvent): Unit = {
     withTimeout.set(true)
-    Logger("play").warn("Timeout asynchronously received for request: " + requestId)
+   println("Timeout asynchronously received for request: " + requestId)
   }
 }

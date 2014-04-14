@@ -23,7 +23,6 @@ import scala.util.control.NonFatal
 import javax.servlet.ServletContext
 import play.api.Application
 import play.api.Configuration
-import play.api.Logger
 import play.api.Mode
 import play.api.Play
 import play.api.WithDefaultConfiguration
@@ -43,7 +42,7 @@ object Play2WarServer {
 
   }
 
-  Logger.configure(Map.empty, Map.empty, Mode.Prod)
+  
 
   lazy val configuration = Play.current.configuration
 
@@ -61,7 +60,7 @@ object Play2WarServer {
   def handleRequest(requestHandler: RequestHandler) = {
 
     playServer.map(requestHandler(_)).getOrElse {
-      Logger("play").error("Play server as not been initialized. Due to a previous error ?")
+     println("Play server as not been initialized. Due to a previous error ?")
     }
 
   }
@@ -81,18 +80,18 @@ private[servlet] class Play2WarServer(appProvider: WarApplication) extends Serve
   def newRequestId = requestIDs.incrementAndGet
 
   override def stop() = {
-    Logger("play").info("Stopping play server...")
+    println("Stopping play server...")
 
     try {
       Play.stop()
     } catch {
-      case NonFatal(e) => Logger("play").error("Error while stopping the application", e)
+      case NonFatal(e) => println("Error while stopping the application", e)
     }
 
     try {
       super.stop()
     } catch {
-      case NonFatal(e) => Logger("play").error("Error while stopping akka", e)
+      case NonFatal(e) => println("Error while stopping akka", e)
     }
   }
 }
@@ -105,8 +104,7 @@ private[servlet] class WarApplication(val mode: Mode.Mode, contextPath: Option[S
 
   // Because of https://play.lighthouseapp.com/projects/82401-play-20/tickets/275, reconfigure Logger
   // without substitutions
-  Logger.configure(Map("application.home" -> path.getAbsolutePath), Map.empty,
-    mode)
+  
 
   Play.start(application)
 
@@ -123,7 +121,7 @@ private[servlet] class DefaultWarApplication(
   private lazy val warConfiguration = contextPath.filterNot(_.isEmpty)
                                         .map(cp => cp + (if (cp.endsWith("/")) "" else "/"))
                                         .map(cp => {
-                                          Logger("play").info(s"Force Play 'application.context' to '$cp'")
+                                          println(s"Force DSAPANDORA Play 'application.context' to '$cp'")
                                           Configuration.from(Map("application.context" -> cp))
                                         }).getOrElse(Configuration.empty) ++ super.configuration
 
