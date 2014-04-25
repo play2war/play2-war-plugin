@@ -154,6 +154,13 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     }
   }
 
+  feature("The container must handle asynchronous action") {
+    scenario("In Java") {
+      val page = givenWhenGet("async Java", "/asyncResultJava")
+      thenCheckOk(page)
+    }
+  }
+
   feature("The container must handle GET requests with 'Not Found' status in response") {
 
     mapOfUrlNotFoundStatus.foreach {

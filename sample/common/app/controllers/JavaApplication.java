@@ -3,6 +3,9 @@ package controllers;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import controllers.routes;
+import play.libs.F;
+import play.libs.WS;
 import play.mvc.*;
 import play.mvc.Http.*;
 import play.data.*;
@@ -13,6 +16,17 @@ import views.html.*;
 import models.*;
 
 public class JavaApplication extends Controller {
+
+  public static F.Promise<Result> asyncResult() {
+      String url = controllers.routes.Application.httpVersion().absoluteURL(request());
+      Logger.info("will make a web request to: " + url);
+      return WS.url(url).get().map(new F.Function<WS.Response, Result>() {
+          @Override
+          public Result apply(WS.Response response) throws Throwable {
+              return ok(response.getBody());
+          }
+      });
+  }
 
   public static Result upload() {
     MultipartFormData body = request().body().asMultipartFormData();

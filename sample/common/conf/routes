@@ -30,6 +30,8 @@ POST    /upload2                    controllers.Application.upload2
 POST    /uploadJava                 controllers.JavaApplication.upload
 POST    /uploadJava2                controllers.JavaApplication.upload2
 
+GET     /asyncResultJava            controllers.JavaApplication.asyncResult
+
 GET     /clock                      controllers.Application.liveClock
 
 GET     /longRequest/:duration      controllers.JavaApplication.longRequest(duration: Long)
