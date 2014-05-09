@@ -6,7 +6,7 @@ import java.io.File
 object Jetty91xRunner extends App {
 
   val cargoContainer = new CargoContainerManager with Servlet30Container with Java7 {
-    override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.1.3.v20140225/jetty-distribution-9.1.3.v20140225.tar.gz"
+    override def containerUrl = "http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.1.5.v20140505/jetty-distribution-9.1.5.v20140505.tar.gz"
     override def containerName = "jetty9x"
   }
 
