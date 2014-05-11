@@ -41,7 +41,7 @@ class Play2Servlet30RequestHandler(servletRequest: HttpServletRequest)
   }
 
   protected override def onHttpResponseComplete() = {
-    asyncContext.complete
+    asyncContext.complete()
   }
 
   protected override def getHttpRequest(): RichHttpServletRequest = {
