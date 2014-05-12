@@ -4,12 +4,13 @@ import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import play.core.server.servlet.{RichHttpServletResponse, RichHttpServletRequest, Play2GenericServletRequestHandler}
 import java.io.{OutputStream, InputStream}
 import java.util.concurrent.atomic.AtomicBoolean
-import javax.servlet.{ServletInputStream, ReadListener, AsyncEvent}
+import javax.servlet._
 import play.api.Logger
 import play.api.libs.iteratee._
 import scala.concurrent.{Future, Promise}
+import play.api.mvc.{Results, SimpleResult}
 import play.api.libs.iteratee.Input.El
-import play.api.mvc.SimpleResult
+import play.api.http.{HttpProtocol, HeaderNames}
 
 class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
   extends Play2GenericServletRequestHandler(servletRequest, None)
@@ -142,6 +143,109 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
   override protected def feedBodyParser(bodyParser: Iteratee[Array[Byte], SimpleResult]): Future[SimpleResult] = {
     val servletInputStream = servletRequest.getInputStream
     readServletRequest(servletInputStream, bodyParser)
+  }
+
+  /**
+   * push the result of a play action asynchronously to a servlet output stream
+   * @param httpResponse servlet response
+   * @param out servlet output stream
+   * @param futureResult result of a play action
+   * @param cleanup clean up callback
+   */
+  private class ResultWriteListener(
+      val httpResponse: HttpServletResponse,
+      val out: ServletOutputStream,
+      val futureResult: Future[SimpleResult],
+      val cleanup: () => Unit) extends WriteListener {
+
+    // the promise is completed when a write to the servlet IO is possible
+    @volatile var iterateeP = Promise[Iteratee[Array[Byte], Unit]]()
+    val futureIteratee = iterateeP.future
+    Logger("play.war.servlet31").trace("set write listener")
+
+    private def step(): Iteratee[Array[Byte], Unit] = {
+      Logger("play.war.servlet31").trace(s"step")
+      iterateeP = Promise[Iteratee[Array[Byte], Unit]]()
+
+      Cont[Array[Byte], Unit] {
+        case Input.EOF =>
+          Logger("play.war.servlet31").trace(s"EOF, finished!")
+          onHttpResponseComplete()
+          cleanup()
+          Done[Array[Byte], Unit](Unit)
+
+        case Input.Empty =>
+          Logger("play.war.servlet31").trace(s"empty, just continue")
+          step()
+
+        case Input.El(buffer) =>
+          out.write(buffer)
+          if (out.isReady) {
+            out.flush()
+          }
+          Logger("play.war.servlet31").trace(s"send ${buffer.length} bytes. out.isReady=${out.isReady}")
+          if (out.isReady) {
+            // can immediately push the next bytes
+            step()
+          } else {
+            // wait for next onWritePossible
+            Iteratee.flatten(iterateeP.future)
+          }
+      }
+    }
+
+    override def onWritePossible(): Unit = {
+      Logger("play.war.servlet31").trace("onWritePossible - begin")
+      if (iterateeP.isCompleted) {
+        throw new Exception("race condition: the servlet container should not call onWritePossible() when the iteratee is completed. Please report.")
+      }
+
+      // write is possible, let's use it
+      iterateeP.success(step())
+    }
+
+    override def onError(t: Throwable): Unit = {
+      Logger("play.war.servlet31").error("error while writing result to servlet output stream", t)
+      onHttpResponseComplete()
+      cleanup()
+    }
+
+    import play.core.Execution.Implicits.internalContext
+
+    futureIteratee.foreach { bodyIteratee =>
+      futureResult.foreach { result =>
+        val status = result.header.status
+        val headers = result.header.headers
+
+        Logger("play.war.servlet31").trace("Sending simple result: " + result)
+
+        httpResponse.setStatus(status)
+
+        setHeaders(headers, httpResponse)
+
+        val chunked = headers.exists { case (key, value) => key == HeaderNames.TRANSFER_ENCODING && value == HttpProtocol.CHUNKED }
+
+        Logger("play.war.servlet31").trace(s"the body iteratee is ready. chunked=$chunked")
+        if (chunked) {
+          // if the result body is chunked, the chunks are already encoded with metadata in Results.chunk
+          // The problem is that the servlet container adds metadata again, leading the chunks encoded 2 times.
+          // As workaround, we 'dechunk' the body one time before sending it to the servlet container
+          result.body &> Results.dechunk |>>> bodyIteratee
+        } else {
+          result.body |>>> bodyIteratee
+        }
+      }
+    }
+  }
+
+  override protected def pushPlayResultToServletOS(futureResult: Future[SimpleResult], cleanup: () => Unit): Unit = {
+    getHttpResponse().getHttpServletResponse map { httpResponse =>
+
+      val out = httpResponse.getOutputStream.asInstanceOf[ServletOutputStream]
+
+      // tomcat insists that the WriteListener is set on the servlet thread.
+      out.setWriteListener(new ResultWriteListener(httpResponse, out, futureResult, cleanup))
+    }
   }
 }
 
