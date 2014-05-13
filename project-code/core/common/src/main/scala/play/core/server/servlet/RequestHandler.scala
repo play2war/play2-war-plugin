@@ -77,7 +77,7 @@ trait HttpServletRequestHandler extends RequestHandler {
     // FIXME this default body enumerator reads the entire stream in memory
     // uploading a lot of data can lead to OutOfMemoryException
     // For more details: https://github.com/dlecan/play2-war-plugin/issues/223
-    val bodyEnumerator = getHttpRequest().getRichInputStream.map { is =>
+    val bodyEnumerator = getHttpRequest().getRichInputStream.fold(Enumerator.eof[Array[Byte]]) { is =>
       val output = new java.io.ByteArrayOutputStream()
       val buffer = new Array[Byte](1024 * 8)
       var length = is.read(buffer)
@@ -86,7 +86,7 @@ trait HttpServletRequestHandler extends RequestHandler {
         length = is.read(buffer)
       }
       Enumerator(output.toByteArray) andThen Enumerator.eof
-    }.getOrElse(Enumerator.eof)
+    }
 
     bodyEnumerator |>>> bodyParser
   }
@@ -248,7 +248,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
     //    val websocketableRequest -> non-sens
     val httpVersion = servletRequest.getProtocol
     val servletPath = servletRequest.getRequestURI
-    val servletUri = servletPath + Option(servletRequest.getQueryString).filterNot(_.isEmpty).map { "?" + _ }.getOrElse { "" }
+    val servletUri = servletPath + Option(servletRequest.getQueryString).filterNot(_.isEmpty).fold("")("?" + _)
     val parameters = getHttpParameters(servletRequest)
     val rHeaders = getPlayHeaders(servletRequest)
     val httpMethod = servletRequest.getMethod
@@ -313,7 +313,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
       val flashCookie = {
         header.headers.get(HeaderNames.SET_COOKIE)
-          .map(Cookies.decode(_))
+          .map(Cookies.decode)
           .flatMap(_.find(_.name == Flash.COOKIE_NAME)).orElse {
             Option(requestHeader.flash).filterNot(_.isEmpty).map { _ =>
               Flash.discard.toCookie
@@ -321,9 +321,9 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
           }
       }
 
-      flashCookie.map { newCookie =>
+      flashCookie.fold(result) { newCookie =>
         result.withHeaders(HeaderNames.SET_COOKIE -> Cookies.merge(header.headers.get(HeaderNames.SET_COOKIE).getOrElse(""), Seq(newCookie)))
-      }.getOrElse(result)
+      }
     }
 
     handler match {
@@ -370,8 +370,9 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       val eventuallyResultWithError = eventuallyResult.recoverWith {
         case error =>
           Logger("play").error("Cannot invoke the action, eventually got an error: " + error)
-          app.map(_.handleError(requestHeader, error))
-            .getOrElse(DefaultGlobal.onError(requestHeader, error))
+          app.fold(DefaultGlobal.onError(requestHeader, error)) {
+            _.handleError(requestHeader, error)
+          }
       }.map { result => cleanFlashCookie(result) }
 
       pushPlayResultToServletOS(eventuallyResultWithError, cleanup)

@@ -46,19 +46,19 @@ object Build extends Build {
     base = file("core/servlet31"),
     settings = commonSettings ++ mavenSettings ++ Seq(
       libraryDependencies += playDependency,
-      libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided->default")) dependsOn (play2WarCoreCommon)
+      libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided->default")) dependsOn play2WarCoreCommon
 
   lazy val play2WarCoreservlet30 = Project(id = "play2-war-core-servlet30",
     base = file("core/servlet30"),
     settings = commonSettings ++ mavenSettings ++ Seq(
       libraryDependencies += playDependency,
-      libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "provided->default")) dependsOn (play2WarCoreCommon)
+      libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "provided->default")) dependsOn play2WarCoreCommon
 
   lazy val play2WarCoreservlet25 = Project(id = "play2-war-core-servlet25",
     base = file("core/servlet25"),
     settings = commonSettings ++ mavenSettings ++ Seq(
       libraryDependencies += playDependency,
-      libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default")) dependsOn (play2WarCoreCommon)
+      libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default")) dependsOn play2WarCoreCommon
 
   //
   // Plugin
@@ -140,7 +140,7 @@ object Build extends Build {
 
   def ivySettings = commonIvyMavenSettings ++ Seq(
     publishMavenStyle := false,
-    publishTo <<= (version) {
+    publishTo <<= version {
       version: String => {
         val (name, url) = if (version.contains("-SNAPSHOT")) {
           ("sbt-plugin-snapshots", scalasbt+"sbt-plugin-snapshots")
@@ -155,7 +155,7 @@ object Build extends Build {
   def mavenSettings = commonIvyMavenSettings ++ Seq(
     publishMavenStyle := true,
     pomIncludeRepository := { _ => false },
-    publishTo <<= (version) {
+    publishTo <<= version {
       version: String => {
           if (version.trim.endsWith("SNAPSHOT")) {
             Some("snapshots" at nexus + "content/repositories/snapshots")
@@ -164,7 +164,7 @@ object Build extends Build {
           }
         }
     },
-    pomExtra := (
+    pomExtra :=
   <scm>
     <url>git@github.com:dlecan/play2-war-plugin.git</url>
     <connection>scm:git:git@github.com:dlecan/play2-war-plugin.git</connection>
@@ -175,7 +175,8 @@ object Build extends Build {
       <name>Damien Lecan</name>
       <email>dev@dlecan.com</email>
     </developer>
-  </developers>))
+  </developers>
+  )
 
   object Generators {
 

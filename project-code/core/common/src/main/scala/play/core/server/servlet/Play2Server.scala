@@ -61,9 +61,9 @@ object Play2WarServer {
 
   def handleRequest(requestHandler: RequestHandler) = {
 
-    playServer.map(requestHandler(_)).getOrElse {
+    playServer.fold {
       Logger("play").error("Play server as not been initialized. Due to a previous error ?")
-    }
+    }(requestHandler(_))
 
   }
 }
@@ -100,7 +100,7 @@ private[servlet] class Play2WarServer(appProvider: WarApplication) extends Serve
 
 private[servlet] class WarApplication(val mode: Mode.Mode, contextPath: Option[String]) extends ApplicationProvider {
 
-  val applicationPath = Option(System.getProperty("user.home")).map(new File(_)).getOrElse(new File(""))
+  val applicationPath = Option(System.getProperty("user.home")).fold(new File("")){ new File(_) }
 
   val application = new DefaultWarApplication(applicationPath, mode, contextPath)
 
@@ -123,10 +123,10 @@ private[servlet] class DefaultWarApplication(
 
   private lazy val warConfiguration = contextPath.filterNot(_.isEmpty)
                                         .map(cp => cp + (if (cp.endsWith("/")) "" else "/"))
-                                        .map(cp => {
+                                        .fold(Configuration.empty) { cp =>
                                           Logger("play").info(s"Force Play 'application.context' to '$cp'")
                                           Configuration.from(Map("application.context" -> cp))
-                                        }).getOrElse(Configuration.empty) ++ super.configuration
+                                        } ++ super.configuration
 
   override def classloader = Thread.currentThread.getContextClassLoader
   override def sources = None
