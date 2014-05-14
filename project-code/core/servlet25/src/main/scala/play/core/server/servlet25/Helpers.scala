@@ -15,7 +15,6 @@
  */
 package play.core.server.servlet25
 
-
 import javax.servlet.http.{ Cookie => ServletCookie }
 
 import play.core.server.servlet._
@@ -24,12 +23,12 @@ import play.core.server.servlet._
 private[servlet25] trait Helpers extends HTTPHelpers {
 
   override def getPlayCookie(c: ServletCookie): play.api.mvc.Cookie = play.api.mvc.Cookie(
-    c.getName,
-    c.getValue,
-    if (c.getMaxAge == -1) None else Some(c.getMaxAge),
-    Option(c.getPath).getOrElse("/"),
-    Option(c.getDomain),
-    c.getSecure)
+    name = c.getName,
+    value = c.getValue,
+    maxAge = if (c.getMaxAge == -1) None else Some(c.getMaxAge),
+    path = Option(c.getPath).getOrElse("/"),
+    domain = Option(c.getDomain),
+    secure = c.getSecure)
 
   override def getServletCookie(pCookie: play.api.mvc.Cookie): ServletCookie = {
     val sc = new ServletCookie(pCookie.name, pCookie.value)

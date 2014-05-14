@@ -34,7 +34,7 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
 
   def getFiles(root: File, skipHidden: Boolean = false): Stream[File] =
     if (!root.exists || (skipHidden && root.isHidden) ||
-      manifestRegex.r.pattern.matcher(root.getAbsolutePath()).matches()) {
+      manifestRegex.r.pattern.matcher(root.getAbsolutePath).matches()) {
       Stream.empty
     } else {
       root #:: (
@@ -82,10 +82,10 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
       val filename = for {
         module <- dependency.get(AttributeKey[ModuleID]("module-id"))
         artifact <- dependency.get(AttributeKey[Artifact]("artifact"))
-        if (!allFilteredArtifacts.contains((module.organization, module.name)))
+        if !allFilteredArtifacts.contains((module.organization, module.name))
       } yield {
         // groupId.artifactId-version[-classifier].extension
-        module.organization + "." + module.name + "-" + module.revision + artifact.classifier.map("-" + _).getOrElse("") + "." + artifact.extension
+        module.organization + "." + module.name + "-" + module.revision + artifact.classifier.fold(""){ "-" + _ } + "." + artifact.extension
       }
       filename.map { fName =>
         val path = "WEB-INF/lib/" + fName
@@ -189,7 +189,7 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
     val metaInfFolder = webappR / "META-INF"
     val manifest = if (metaInfFolder.exists()) {
       val option = metaInfFolder.listFiles.find(f =>
-        manifestRegex.r.pattern.matcher(f.getAbsolutePath()).matches())
+        manifestRegex.r.pattern.matcher(f.getAbsolutePath).matches())
       if (option.isDefined) {
         new Manifest(new FileInputStream(option.get))
       }

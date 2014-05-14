@@ -24,7 +24,7 @@ trait Play2WarSettings {
 
   lazy val play2WarSettings = Seq[Setting[_]](
 
-    libraryDependencies <++= (servletVersion) {
+    libraryDependencies <++= servletVersion {
       (v) =>
         val servletVersionString = v match {
           case "2.5" => "25"
