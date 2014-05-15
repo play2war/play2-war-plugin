@@ -134,9 +134,9 @@ trait HttpServletRequestHandler extends RequestHandler {
 
         setHeaders(headers, httpResponse)
 
-        val withContentLength = headers.exists(_._1 == CONTENT_LENGTH)
+        val withContentLength = headers.exists(_._1.equalsIgnoreCase(CONTENT_LENGTH))
         val chunked = headers.exists {
-          case (key, value) => key == HeaderNames.TRANSFER_ENCODING && value == HttpProtocol.CHUNKED
+          case (key, value) => key.equalsIgnoreCase(HeaderNames.TRANSFER_ENCODING) && value == HttpProtocol.CHUNKED
         }
 
         // TODO do not allow chunked for http 1.0?

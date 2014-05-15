@@ -229,7 +229,7 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
 
         setHeaders(headers, httpResponse)
 
-        chunked = headers.exists { case (key, value) => key == HeaderNames.TRANSFER_ENCODING && value == HttpProtocol.CHUNKED }
+        chunked = headers.exists { case (key, value) => key.equalsIgnoreCase(HeaderNames.TRANSFER_ENCODING) && value == HttpProtocol.CHUNKED }
 
         Logger("play.war.servlet31").trace(s"the body iteratee is ready. chunked=$chunked")
         if (chunked) {
