@@ -161,6 +161,8 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
     // the promise is completed when a write to the servlet IO is possible
     @volatile var iterateeP = Promise[Iteratee[Array[Byte], Unit]]()
     val futureIteratee = iterateeP.future
+
+    @volatile var chunked = true
     Logger("play.war.servlet31").trace("set write listener")
 
     private def step(): Iteratee[Array[Byte], Unit] = {
@@ -170,6 +172,9 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
       Cont[Array[Byte], Unit] {
         case Input.EOF =>
           Logger("play.war.servlet31").trace(s"EOF, finished!")
+          if (out.isReady) {
+            out.flush()
+          }
           onHttpResponseComplete()
           cleanup()
           Done[Array[Byte], Unit](Unit)
@@ -180,7 +185,8 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
 
         case Input.El(buffer) =>
           out.write(buffer)
-          if (out.isReady) {
+          if (chunked && out.isReady) {
+            // flush to send chunked content, like comet message
             out.flush()
           }
           Logger("play.war.servlet31").trace(s"send ${buffer.length} bytes. out.isReady=${out.isReady}")
@@ -223,7 +229,7 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
 
         setHeaders(headers, httpResponse)
 
-        val chunked = headers.exists { case (key, value) => key == HeaderNames.TRANSFER_ENCODING && value == HttpProtocol.CHUNKED }
+        chunked = headers.exists { case (key, value) => key.equalsIgnoreCase(HeaderNames.TRANSFER_ENCODING) && value == HttpProtocol.CHUNKED }
 
         Logger("play.war.servlet31").trace(s"the body iteratee is ready. chunked=$chunked")
         if (chunked) {
