@@ -93,18 +93,17 @@ trait HttpServletRequestHandler extends RequestHandler {
 
   protected def setHeaders(headers: Map[String, String], httpResponse: HttpServletResponse): Unit = {
     // Set response headers
-    headers.filterNot(_ ==(CONTENT_LENGTH, "-1")).foreach {
+    headers.foreach {
+      case (CONTENT_LENGTH, "-1") => // why is it skip?
 
       // Fix a bug for Set-Cookie header.
       // Multiple cookies could be merged in a single header
       // but it's not properly supported by some browsers
-      case (name@play.api.http.HeaderNames.SET_COOKIE, value) => {
-        getServletCookies(value).map {
-          c => httpResponse.addCookie(c)
-        }
-      }
+      case (name, value) if name.equalsIgnoreCase(play.api.http.HeaderNames.SET_COOKIE) =>
+        getServletCookies(value).foreach(httpResponse.addCookie)
 
-      case (name, value) => httpResponse.setHeader(name, value)
+      case (name, value) =>
+        httpResponse.setHeader(name, value)
     }
   }
 
@@ -230,7 +229,7 @@ trait HttpServletRequestHandler extends RequestHandler {
 
       } // end match foreach
 
-    }.map { _ => cleanup() }
+    }.onComplete { _ => cleanup() }
   }
 }
 
