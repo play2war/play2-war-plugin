@@ -49,7 +49,7 @@ object Application extends Controller {
   }
 
   def redirectLanding = Action { implicit request =>
-    val flashResult = flash.get("success").getOrElse("not found")
+    val flashResult = request.flash.get("success").getOrElse("not found")
     Ok(views.html.redirectLanding(flashResult))
   }
 
@@ -84,7 +84,7 @@ object Application extends Controller {
     val data = sb.toString.getBytes
     val dataContent: Enumerator[Array[Byte]] = Enumerator.fromStream(new ByteArrayInputStream(data))
 
-    SimpleResult(
+    Result(
       header = ResponseHeader(200, Map(CONTENT_LENGTH -> data.length.toString)),
       body = dataContent)
   }
