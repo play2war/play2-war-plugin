@@ -4,12 +4,12 @@ import com.github.play2war.plugin.it._
 import java.io.File
 
 /**
- * Starts tomcat7
+ * Starts tomcat8
  */
 object Tomcat8xRunner extends App {
 
   val tomcat8CargoContainer = new CargoContainerManager with Servlet31Container with Java7 {
-    val tomcatVersion = "8.0.5"
+    val tomcatVersion = "8.0.8"
     override def containerUrl = s"http://archive.apache.org/dist/tomcat/tomcat-8/v$tomcatVersion/bin/apache-tomcat-$tomcatVersion.tar.gz"
     override def containerName = "tomcat8x"
   }

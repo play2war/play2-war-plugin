@@ -615,7 +615,7 @@ class Tomcat7xTests extends AbstractTomcat7x with Java6 {
 
 @RunWith(classOf[JUnitRunner])
 class Tomcat8xTests extends AbstractPlay2WarTests with Servlet31Container with Java7 {
-  val tomcatVersion = "8.0.5"
+  val tomcatVersion = "8.0.8"
   override def containerUrl = s"http://archive.apache.org/dist/tomcat/tomcat-8/v$tomcatVersion/bin/apache-tomcat-$tomcatVersion.tar.gz"
   override def containerFileNameInCloudbeesCache = Option(s"apache-tomcat-$tomcatVersion.zip")
   override def containerName = "tomcat8x"
