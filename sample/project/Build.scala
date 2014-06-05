@@ -56,7 +56,10 @@ object ApplicationBuild extends Build {
 
   lazy val servlet30 = play.Project(
       appName + "servlet30", appVersion, appDependencies, path = file("servlet30"),
-      settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "3.0")
+      settings = commonSettings ++ warProjectSettings ++ Seq(
+        Play2WarKeys.servletVersion := "3.0",
+        Play2WarKeys.explodedJar := true
+      )
   ) dependsOn common
 
   lazy val servlet31 = play.Project(
