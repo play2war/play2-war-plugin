@@ -53,7 +53,7 @@ object Play2WarServer {
   def stop(sc: ServletContext) = {
     synchronized {
       if (started.getAndSet(false)) {
-        playServer.map(_.stop())
+        playServer.foreach(_.stop())
         sc.log("Play server stopped")
       }
     }

@@ -108,10 +108,9 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
 
           if (servletInputStream.isFinished) {
             Logger("play.war.servlet31").trace("will extract result from nextStep")
-            nextStep.run.map { a =>
+            result.completeWith(nextStep.run.andThen { case _ =>
               Logger("play.war.servlet31").trace("extract result from nextStep")
-              result.success(a)
-            }(exContext)
+            }(exContext))
           }
           nextStep
         }(exContext)
@@ -123,10 +122,9 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
         if (!onDataAvailableCalled) {
           // some containers, like Jetty, call directly onAllDataRead without calling onDataAvailable
           // when no data should be consumed
-          iteratee.run.map { a =>
+          result.completeWith(iteratee.run.andThen { case _ =>
             Logger("play.war.servlet31").trace("onAllDataRead: extract result from iteratee")
-            result.success(a)
-          }(exContext)
+          }(exContext))
         }
       }
 
@@ -245,7 +243,7 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
   }
 
   override protected def pushPlayResultToServletOS(futureResult: Future[SimpleResult], cleanup: () => Unit): Unit = {
-    getHttpResponse().getHttpServletResponse map { httpResponse =>
+    getHttpResponse().getHttpServletResponse.foreach { httpResponse =>
 
       val out = httpResponse.getOutputStream.asInstanceOf[ServletOutputStream]
 
