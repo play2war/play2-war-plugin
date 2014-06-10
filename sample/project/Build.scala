@@ -24,7 +24,7 @@ object ApplicationBuild extends Build {
 
     javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
 
-    scalaVersion := "2.10.4"
+    scalaVersion := propOr("play2-war.sbt.scala.version", "2.10.4")
   )
 
   lazy val root = Project(appName + "parent", file("."))
@@ -80,5 +80,10 @@ object ApplicationBuild extends Build {
       Play2WarKeys.servletVersion := "3.1"
     )
     .dependsOn(common)
+
+  def propOr(name: String, value: String): String =
+    (sys.props get name) orElse
+      (sys.env get name) getOrElse
+      value
 
 }
