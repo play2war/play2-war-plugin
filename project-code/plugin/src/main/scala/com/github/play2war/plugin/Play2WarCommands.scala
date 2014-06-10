@@ -47,8 +47,11 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
   val warTask: Def.Initialize[Task[sbt.File]] = Def.task[sbt.File] {
     val s = streams.value
 
-    // projectDependencyArtifacts value contains the jar of the projects and all sub-projects
-    val dependencies = (dependencyClasspath in Runtime).value ++ (projectDependencyArtifacts in Runtime).value
+    // projectJars value contains the jars of the projects and all sub-projects
+    val projectJars = (projectDependencyArtifacts in Runtime).value
+    s.log.debug(s"projectJars = ${projectJars.mkString(", ")}")
+
+    val dependencies = (dependencyClasspath in Runtime).value
     val unmanagedDependencies = (unmanagedClasspath in Runtime).value
     val id = normalizedName.value
     //val packaged = com.typesafe.sbt.packager.Keys.dist.value
@@ -89,32 +92,36 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
       }
       filename.map { fName =>
         val path = "WEB-INF/lib/" + fName
-        Some(dependency.data -> path)
-      }.getOrElse(None)
+        dependency.data -> path
+      }
     } ++ unmanagedDependencies.map { unmanaged =>
       val path = "WEB-INF/lib/" + unmanaged.data.getName
       unmanaged.data -> path
-//    } ++ {
-//      if (explodedJar) {
-//        s.log.info("Main artifacts " + packaged.map(_.getName).mkString("'", " ", "'") + " will be packaged exploded")
-//
-//        val explodedJarDir = target / "exploded"
-//
-//        IO.delete(explodedJarDir)
-//        IO.createDirectory(explodedJarDir)
-//
-//        packaged.flatMap { jar =>
-//          IO.unzip(jar, explodedJarDir).map {
-//            file =>
-//              val partialPath = IO.relativize(explodedJarDir, file).getOrElse(file.getName)
-//
-//              file -> ("WEB-INF/classes/" + partialPath)
-//          }
-//        }
-//      } else packaged.get.map(jar => jar -> ("WEB-INF/lib/" + jar.getName))
-//      val distFile = (sbt.Keys.`package` in Compile).value
-//      val path = "WEB-INF/lib/" + distFile.getName
-//      (distFile -> path) :: Nil
+    } ++ {
+
+      // project jars
+      if (explodedJar.value) {
+        s.log.info("Main artifacts " + projectJars.map(_.data.getName).mkString("'", " ", "'") + " will be packaged exploded")
+
+        val explodedJarDir = target.value / "exploded"
+
+        IO.delete(explodedJarDir)
+        IO.createDirectory(explodedJarDir)
+
+        projectJars.map(_.data).flatMap { jar =>
+          IO.unzip(jar, explodedJarDir).map {
+            file =>
+              val partialPath = IO.relativize(explodedJarDir, file).getOrElse(file.getName)
+
+              file -> ("WEB-INF/classes/" + partialPath)
+          }
+        }
+      } else {
+        projectJars.map { projectJar =>
+          val path = "WEB-INF/lib/" + projectJar.data.getName
+          projectJar.data -> path
+        }
+      }
     }
 
     files.foreach { case (file, path) =>
