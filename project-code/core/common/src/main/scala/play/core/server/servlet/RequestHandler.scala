@@ -33,6 +33,7 @@ import play.api.libs.iteratee.Enumerator
 import play.api.mvc._
 import scala.concurrent.Future
 import scala.util.control.Exception
+import scala.util.{Failure, Success}
 
 trait RequestHandler {
 
@@ -161,13 +162,13 @@ trait HttpServletRequestHandler extends RequestHandler {
                           os.flush()
                       }
                     })
-                    .extend1 {
-                    case Redeemed(_) => if (!hasError.get) Cont(step) else Done((), Input.Empty)
-                    case Thrown(ex) =>
-                      hasError.set(true)
-                      Logger("play").debug(ex.toString)
-                      throw ex
-                  })
+                    .map { _ => if (!hasError.get) Cont(step) else Done((), Input.Empty: Input[Array[Byte]]) }
+                    .andThen {
+                      case Failure(ex) =>
+                        hasError.set(true)
+                        Logger("play").debug(ex.toString)
+                        throw ex
+                    })
               case (true, Input.Empty) => Cont(step)
               case (_, inp) => Done((), inp)
             }
@@ -184,11 +185,11 @@ trait HttpServletRequestHandler extends RequestHandler {
           } else {
             body |>>> bodyIteratee
           }
-          bodyConsumer.extend1 {
-            case Redeemed(_) =>
+          bodyConsumer.andThen {
+            case Success(_) =>
               cleanup()
               onHttpResponseComplete()
-            case Thrown(ex) =>
+            case Failure(ex) =>
               Logger("play").debug(ex.toString)
               hasError.set(true)
               onHttpResponseComplete()
@@ -217,11 +218,11 @@ trait HttpServletRequestHandler extends RequestHandler {
 
             case other => Error("unexpected input", other)
           }
-          p.extend1 {
-            case Redeemed(_) =>
+          p.andThen {
+            case Success(_) =>
               cleanup()
               onHttpResponseComplete()
-            case Thrown(ex) =>
+            case Failure(ex) =>
               Logger("play").debug(ex.toString)
               onHttpResponseComplete()
           }
@@ -251,6 +252,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
     val parameters = getHttpParameters(servletRequest)
     val rHeaders = getPlayHeaders(servletRequest)
     val httpMethod = servletRequest.getMethod
+    val isSecure = servletRequest.isSecure
 
     def rRemoteAddress = {
       val remoteAddress = servletRequest.getRemoteAddr
@@ -276,6 +278,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
         def queryString = parameters
         def headers = rHeaders
         lazy val remoteAddress = rRemoteAddress
+        def secure: Boolean = isSecure
       }
       untaggedRequestHeader
     }

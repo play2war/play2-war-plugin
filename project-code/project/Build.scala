@@ -113,14 +113,14 @@ object Build extends Build {
   object BuildSettings {
 
     val buildOrganization = "com.github.play2war"
-    val defaultPlay2Version = "2.2.0"
+    val defaultPlay2Version = "2.3.0"
     val play2Version = Option(System.getProperty("play2.version")).filterNot(_.isEmpty).getOrElse(defaultPlay2Version)
     val defaultBuildVersion = "1.3-beta1-SNAPSHOT"
     val buildVersion = Option(System.getProperty("play2war.version")).filterNot(_.isEmpty).getOrElse(defaultBuildVersion)
-    val buildScalaVersion = "2.10.3"
-    val buildScalaVersionForSbt = "2.10.3"
+    val buildScalaVersion = propOr("play2-war.sbt.scala.version", "2.10.4")
+    val buildScalaVersionForSbt = "2.10.4"
     val buildScalaVersionForSbtBinaryCompatible = CrossVersion.binaryScalaVersion(buildScalaVersionForSbt)
-    val buildSbtVersion   = "0.13.0"
+    val buildSbtVersion   = "0.13.5"
     val buildSbtVersionBinaryCompatible = "0.13"
 
     val buildSettings = Defaults.defaultSettings ++ Seq(
@@ -177,6 +177,11 @@ object Build extends Build {
     </developer>
   </developers>
   )
+
+  def propOr(name: String, value: String): String =
+    (sys.props get name) orElse
+      (sys.env get name) getOrElse
+      value
 
   object Generators {
 

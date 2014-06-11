@@ -1,6 +1,7 @@
 import sbt._
 import Keys._
-import play.Project._
+import play.Play.autoImport._
+import PlayKeys._
 import com.github.play2war.plugin._
 import com.typesafe.sbteclipse.plugin.EclipsePlugin._
 
@@ -9,7 +10,9 @@ object ApplicationBuild extends Build {
   lazy val appName = "a-play2war-sample-"
   lazy val appVersion = "1.0-SNAPSHOT"
 
-  lazy val commonSettings = Defaults.defaultSettings ++ playJavaSettings ++ Seq(
+  lazy val commonSettings = Seq(
+    version := appVersion,
+
     //      resolvers += "Local Repository" at "http://localhost:8090/publish",
     resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns),
     // Doesn't work
@@ -21,25 +24,26 @@ object ApplicationBuild extends Build {
 
     javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
 
-    publishArtifact in (Compile, packageDoc) := false,
-    publishArtifact in (Compile, packageSrc) := false,
+    scalaVersion := propOr("play2-war.sbt.scala.version", "2.10.4")
+  )
 
-    publishTo := Some(Resolver.file("file", file(Path.userHome.absolutePath + "/.ivy2/publish"))),
-    publishMavenStyle := true)
-
-  lazy val parent = Project(id = appName + "parent", base = file("."), settings = commonSettings ++ Seq(publishArtifact := false)) aggregate (common, servlet25, servlet30, servlet31)
+  lazy val root = Project(appName + "parent", file("."))
+    .settings(commonSettings: _*)
+    .settings(
+      publishArtifact := false
+    )
+    .aggregate(common, servlet25, servlet30, servlet31)
 
   lazy val playProjectSettings = Seq(
-    //
+    libraryDependencies ++= Seq(ws, javaWs)
   )
     
   lazy val commonAppDependencies = Seq(
-    javaCore
   )
 
-  lazy val common = play.Project(appName + "common", appVersion, commonAppDependencies, path = file("common"), settings = commonSettings ++ playProjectSettings)
-
-  override def rootProject = Some(parent)
+  lazy val common = Project(appName + "common", file("common"))
+    .enablePlugins(play.PlayJava)
+    .settings(commonSettings ++ playProjectSettings: _*)
 
   lazy val appDependencies = commonAppDependencies ++ Seq(
     "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.1"
@@ -49,22 +53,37 @@ object ApplicationBuild extends Build {
     Play2WarKeys.filteredArtifacts := Seq()
   )
 
-  lazy val servlet25 = play.Project(
-      appName + "servlet25", appVersion, appDependencies, path = file("servlet25"),
-      settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "2.5")
-  ) dependsOn common
+  lazy val servlet25 = Project(appName + "servlet25", file("servlet25"))
+    .enablePlugins(play.PlayJava)
+    .settings(commonSettings ++ warProjectSettings: _*)
+    .settings(
+      libraryDependencies ++= appDependencies,
+      Play2WarKeys.servletVersion := "2.5"
+    )
+    .dependsOn(common)
 
-  lazy val servlet30 = play.Project(
-      appName + "servlet30", appVersion, appDependencies, path = file("servlet30"),
-      settings = commonSettings ++ warProjectSettings ++ Seq(
-        Play2WarKeys.servletVersion := "3.0",
-        Play2WarKeys.explodedJar := true
-      )
-  ) dependsOn common
+  lazy val servlet30 = Project(appName + "servlet30", file("servlet30"))
+    .enablePlugins(play.PlayJava)
+    .settings(commonSettings ++ warProjectSettings: _*)
+    .settings(
+      libraryDependencies ++= appDependencies,
+      Play2WarKeys.servletVersion := "3.0",
+      Play2WarKeys.explodedJar := true
+    )
+    .dependsOn(common)
 
-  lazy val servlet31 = play.Project(
-      appName + "servlet31", appVersion, appDependencies, path = file("servlet31"),
-      settings = commonSettings ++ warProjectSettings ++ Seq(Play2WarKeys.servletVersion := "3.1")
-  ) dependsOn common
+  lazy val servlet31 = Project(appName + "servlet31", file("servlet31"))
+    .enablePlugins(play.PlayJava)
+    .settings(commonSettings ++ warProjectSettings: _*)
+    .settings(
+      libraryDependencies ++= appDependencies,
+      Play2WarKeys.servletVersion := "3.1"
+    )
+    .dependsOn(common)
+
+  def propOr(name: String, value: String): String =
+    (sys.props get name) orElse
+      (sys.env get name) getOrElse
+      value
 
 }

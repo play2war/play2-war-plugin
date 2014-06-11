@@ -1,28 +1,24 @@
 package controllers;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-import controllers.routes;
+import play.Logger;
 import play.libs.F;
-import play.libs.WS;
-import play.mvc.*;
-import play.mvc.Http.*;
-import play.data.*;
-import play.*;
+import play.libs.ws.WS;
+import play.libs.ws.WSResponse;
+import play.mvc.BodyParser;
+import play.mvc.Controller;
+import play.mvc.Http.MultipartFormData;
+import play.mvc.Result;
 
-import views.html.*;
-
-import models.*;
+import java.util.concurrent.TimeUnit;
 
 public class JavaApplication extends Controller {
 
   public static F.Promise<Result> asyncResult() {
       String url = controllers.routes.Application.httpVersion().absoluteURL(request());
       Logger.info("will make a web request to: " + url);
-      return WS.url(url).get().map(new F.Function<WS.Response, Result>() {
+      return WS.url(url).get().map(new F.Function<WSResponse, Result>() {
           @Override
-          public Result apply(WS.Response response) throws Throwable {
+          public Result apply(WSResponse response) throws Throwable {
               return ok(response.getBody());
           }
       });

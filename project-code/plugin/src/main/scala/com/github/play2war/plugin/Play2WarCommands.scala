@@ -24,6 +24,9 @@ import scala.collection.immutable.Stream.consWrapper
 import com.github.play2war.plugin.Play2WarKeys._
 
 import com.typesafe.sbt.packager.Keys.projectDependencyArtifacts
+
+import play.PlayImport.PlayKeys.playPackageAssets
+
 import sbt.ConfigKey.configurationToKey
 import sbt.Keys._
 import sbt._
@@ -47,9 +50,11 @@ trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with pla
   val warTask: Def.Initialize[Task[sbt.File]] = Def.task[sbt.File] {
     val s = streams.value
 
-    // projectJars value contains the jars of the projects and all sub-projects
-    val projectJars = (projectDependencyArtifacts in Runtime).value
-    s.log.debug(s"projectJars = ${projectJars.mkString(", ")}")
+    // projectJars contains the jar of the projects and all sub-projects
+    val projectBinJars = (projectDependencyArtifacts in Runtime).value
+    val projectAssets = Attributed(playPackageAssets.value)(AttributeMap.empty)
+    val projectJars = projectBinJars :+ projectAssets
+    s.log.debug(s"projectJars = ${projectJars.mkString(", ")}, projectBinJars = ${projectBinJars.mkString(", ")}, projectAssets = $projectAssets")
 
     val dependencies = (dependencyClasspath in Runtime).value
     val unmanagedDependencies = (unmanagedClasspath in Runtime).value
