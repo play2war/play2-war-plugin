@@ -5,7 +5,8 @@
         Play 2.0.5+       : 0.8.2
         Play 2.1 -> 2.1.3 : 1.0.2
         Play 2.1.4+       : 1.1.1
-        Play 2.2.x        : 1.2-beta4
+        Play 2.2.x        : 1.2
+        Play 2.3.x        : 1.3 (TBD)
 
     Project-status: STABLE
     
@@ -218,7 +219,7 @@ Discover [how you can help the project](https://github.com/dlecan/play2-war-plug
 
 ## Contributors
 
-[Ivan Meredith](https://github.com/hadashi), [Rossi Oddet](https://github.com/roddet), [Sam Spycher](https://github.com/samspycher), [Naoki Takezoe](https://github.com/takezoe), [Quinn Slack](https://github.com/sqs), [Eugene Platonov](https://github.com/jozic), [László Zsolt Kustra](https://github.com/kustra).
+[Ivan Meredith](https://github.com/hadashi), [Rossi Oddet](https://github.com/roddet), [Sam Spycher](https://github.com/samspycher), [Naoki Takezoe](https://github.com/takezoe), [Quinn Slack](https://github.com/sqs), [Eugene Platonov](https://github.com/jozic), [László Zsolt Kustra](https://github.com/kustra), [Yann Simon](https://github.com/yanns).
 
 ## Licence
 
