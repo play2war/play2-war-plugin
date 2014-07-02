@@ -114,9 +114,9 @@ object Build extends Build {
 
     val buildOrganization = "com.github.play2war"
     val defaultPlay2Version = "2.3.0"
-    val play2Version = Option(System.getProperty("play2.version")).filterNot(_.isEmpty).getOrElse(defaultPlay2Version)
+    val play2Version = sys.props.get("play2.version").filterNot(_.isEmpty).getOrElse(defaultPlay2Version)
     val defaultBuildVersion = "1.3-beta1-SNAPSHOT"
-    val buildVersion = Option(System.getProperty("play2war.version")).filterNot(_.isEmpty).getOrElse(defaultBuildVersion)
+    val buildVersion = sys.props.get("play2war.version").filterNot(_.isEmpty).getOrElse(defaultBuildVersion)
     val buildScalaVersion210 = "2.10.4"
     val buildScalaVersion211 = "2.11.1"
     val buildScalaVersion = sys.props.get("play2war.sbt.scala211").map(p => buildScalaVersion211).getOrElse(buildScalaVersion210)
