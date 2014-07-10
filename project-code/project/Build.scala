@@ -101,8 +101,7 @@ object Build extends Build {
   //
   // Settings
   //
-  def commonSettings = buildSettings ++ Seq(ScalastylePlugin.Settings: _*)
-    Seq(
+  def commonSettings = buildSettings ++ Seq(ScalastylePlugin.Settings: _*) ++ Seq(
       javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
       EclipseKeys.withSource := true,
