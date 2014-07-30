@@ -117,7 +117,7 @@ object Build extends Build {
     val defaultBuildVersion = "1.3-beta2-SNAPSHOT"
     val buildVersion = sys.props.get("play2war.version").filterNot(_.isEmpty).getOrElse(defaultBuildVersion)
     val buildScalaVersion210 = "2.10.4"
-    val buildScalaVersion211 = "2.11.1"
+    val buildScalaVersion211 = "2.11.2"
     val buildScalaVersion = sys.props.get("play2war.sbt.scala211").map(p => buildScalaVersion211).getOrElse(buildScalaVersion210)
     val buildScalaVersionForSbt = "2.10.4"
     val buildScalaVersionForSbtBinaryCompatible = CrossVersion.binaryScalaVersion(buildScalaVersionForSbt)
