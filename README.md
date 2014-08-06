@@ -1,12 +1,13 @@
 # WAR Plugin for Play framework 2.x
 
     Current versions:
-        Play 2.0 -> 2.0.4 : 0.8.1
-        Play 2.0.5+       : 0.8.2
-        Play 2.1 -> 2.1.3 : 1.0.2
-        Play 2.1.4+       : 1.1.1
-        Play 2.2.x        : 1.2
-        Play 2.3.x        : 1.3-beta1 (Scala 2.10 & 2.11)
+        Play 2.0 -> 2.0.4   : 0.8.1
+        Play 2.0.5+         : 0.8.2
+        Play 2.1 -> 2.1.3   : 1.0.2
+        Play 2.1.4+         : 1.1.1
+        Play 2.2.x          : 1.2
+        Play 2.3.0 -> 2.3.1 : 1.3-beta1 (Scala 2.10 & 2.11)
+        Play 2.3.2+         : TBD
 
     Project-status: STABLE
     
