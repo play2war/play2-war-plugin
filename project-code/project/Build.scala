@@ -136,7 +136,7 @@ object Build extends Build {
 
   def commonIvyMavenSettings: Seq[Setting[_]] = Seq(
     licenses := Seq("The Apache Software License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
-    homepage := Some(url("https://github.com/dlecan/play2-war-plugin"))
+    homepage := Some(url("https://github.com/play2war/play2-war-plugin"))
   )
 
   def ivySettings = commonIvyMavenSettings ++ Seq(
