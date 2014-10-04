@@ -8,7 +8,7 @@ import javax.servlet._
 import play.api.Logger
 import play.api.libs.iteratee._
 import scala.concurrent.{Future, Promise}
-import play.api.mvc.{Results, SimpleResult}
+import play.api.mvc.{Results, Result}
 import play.api.libs.iteratee.Input.El
 import play.api.http.{HttpProtocol, HeaderNames}
 
@@ -138,7 +138,7 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
     result.future
   }
 
-  override protected def feedBodyParser(bodyParser: Iteratee[Array[Byte], SimpleResult]): Future[SimpleResult] = {
+  override protected def feedBodyParser(bodyParser: Iteratee[Array[Byte], Result]): Future[Result] = {
     val servletInputStream = servletRequest.getInputStream
     readServletRequest(servletInputStream, bodyParser)
   }
@@ -153,7 +153,7 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
   private class ResultWriteListener(
       val httpResponse: HttpServletResponse,
       val out: ServletOutputStream,
-      val futureResult: Future[SimpleResult],
+      val futureResult: Future[Result],
       val cleanup: () => Unit) extends WriteListener {
 
     // the promise is completed when a write to the servlet IO is possible
@@ -242,7 +242,7 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
     }
   }
 
-  override protected def pushPlayResultToServletOS(futureResult: Future[SimpleResult], cleanup: () => Unit): Unit = {
+  override protected def pushPlayResultToServletOS(futureResult: Future[Result], cleanup: () => Unit): Unit = {
     getHttpResponse().getHttpServletResponse.foreach { httpResponse =>
 
       val out = httpResponse.getOutputStream.asInstanceOf[ServletOutputStream]

@@ -27,7 +27,6 @@ import play.api.Logger
 import play.api.http.{HttpProtocol, HeaderNames}
 import play.api.http.HeaderNames.CONTENT_LENGTH
 import play.api.http.HeaderNames.X_FORWARDED_FOR
-import play.api.libs.concurrent._
 import play.api.libs.iteratee._
 import play.api.libs.iteratee.Enumerator
 import play.api.mvc._
@@ -72,7 +71,7 @@ trait HttpServletRequestHandler extends RequestHandler {
    */
   protected def onHttpResponseComplete(): Unit
 
-  protected def feedBodyParser(bodyParser: Iteratee[Array[Byte], SimpleResult]): Future[SimpleResult] = {
+  protected def feedBodyParser(bodyParser: Iteratee[Array[Byte], Result]): Future[Result] = {
     // default synchronous blocking body enumerator
 
     // FIXME this default body enumerator reads the entire stream in memory
@@ -113,7 +112,7 @@ trait HttpServletRequestHandler extends RequestHandler {
    * @param futureResult the result of the play action
    * @param cleanup clean up callback
    */
-  protected def pushPlayResultToServletOS(futureResult: Future[SimpleResult], cleanup: () => Unit): Unit = {
+  protected def pushPlayResultToServletOS(futureResult: Future[Result], cleanup: () => Unit): Unit = {
     // TODO: should use the servlet thread here or use special thread pool for blocking IO operations
     // (https://github.com/dlecan/play2-war-plugin/issues/223)
     import play.api.libs.iteratee.Execution.Implicits.trampoline
@@ -284,7 +283,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
     }
 
     // get handler for request
-    val (requestHeader, handler: Either[Future[SimpleResult], (Handler,Application)]) = Exception
+    val (requestHeader, handler: Either[Future[Result], (Handler,Application)]) = Exception
       .allCatch[RequestHeader].either(tryToCreateRequest)
       .fold(
       e => {
@@ -307,10 +306,10 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
     }
 
     trait Response {
-      def handle(result: SimpleResult): Unit
+      def handle(result: Result): Unit
     }
 
-    def cleanFlashCookie(result: SimpleResult): SimpleResult = {
+    def cleanFlashCookie(result: Result): Result = {
       val header = result.header
 
       val flashCookie = {
@@ -338,7 +337,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
             case error =>
               Iteratee.flatten(
                 app.handleError(requestHeader, error).map(result => Done(result, Input.Empty))
-              ): Iteratee[Array[Byte],SimpleResult]
+              ): Iteratee[Array[Byte], Result]
           })
         }
         handleAction(a, Some(app))
@@ -367,7 +366,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       // Remove Except: 100-continue handling, since it's impossible to handle it
       //val expectContinue: Option[_] = requestHeader.headers.get("Expect").filter(_.equalsIgnoreCase("100-continue"))
 
-      val eventuallyResult: Future[SimpleResult] = feedBodyParser(bodyParser)
+      val eventuallyResult: Future[Result] = feedBodyParser(bodyParser)
 
       val eventuallyResultWithError = eventuallyResult.recoverWith {
         case error =>
