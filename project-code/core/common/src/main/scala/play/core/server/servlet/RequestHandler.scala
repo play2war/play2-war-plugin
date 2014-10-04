@@ -323,7 +323,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       }
 
       flashCookie.fold(result) { newCookie =>
-        result.withHeaders(HeaderNames.SET_COOKIE -> Cookies.merge(header.headers.get(HeaderNames.SET_COOKIE).getOrElse(""), Seq(newCookie)))
+        result.withHeaders(HeaderNames.SET_COOKIE -> Cookies.merge(header.headers.getOrElse(HeaderNames.SET_COOKIE, ""), Seq(newCookie)))
       }
     }
 
