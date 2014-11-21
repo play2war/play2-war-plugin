@@ -20,8 +20,6 @@ You can trust this plugin because it is [heavily tested](https://play-war.ci.clo
 - several open-source application servers (Tomcat 6/7/8, Jetty 7/8/9)
 - *all versions* of Play Framework 2.x
 
-Live demo: JBoss7@Cloudbees : http://servlet30.play-war.cloudbees.net/
-
 Other references built with Play 2 and Play2War:
  - [Factile](http://factile.net/) (Survey platform)
 
