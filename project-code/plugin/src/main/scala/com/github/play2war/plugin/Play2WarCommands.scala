@@ -31,7 +31,7 @@ import sbt.ConfigKey.configurationToKey
 import sbt.Keys._
 import sbt._
 
-trait Play2WarCommands extends play.PlayCommands with play.PlayReloader with play.PlayPositionMapper {
+trait Play2WarCommands extends play.PlayCommands with play.PlayPositionMapper {
 
   val manifestRegex = """(?i).*META-INF[/\\]MANIFEST.MF"""
 
