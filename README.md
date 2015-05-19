@@ -25,7 +25,7 @@ Other references built with Play 2 and Play2War:
 
 ## What's new ?
 
-See [releases and changelog](https://github.com/dlecan/play2-war-plugin/releases/).
+See [releases and changelog](https://github.com/play2war/play2-war-plugin/releases/).
 
 ## Features
 <table>
@@ -145,7 +145,7 @@ See [releases and changelog](https://github.com/dlecan/play2-war-plugin/releases
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20"></td>
   <td><img src="http://openclipart.org/image/800px/svg_to_png/161503/OK-1.png" height="20">
     <a href="http://servlet30.play-war.cloudbees.net/" title="Play 2 WAR demo hosted at Cloudbees PaaS provider">Demo</a> @Cloudbees
-    <br/><a href="https://github.com/dlecan/play2-war-plugin/wiki/FAQ#jboss7-deployment-at-cloudbees">Need extra configuration</a> when deploying
+    <br/><a href="https://github.com/play2war/play2-war-plugin/wiki/FAQ#jboss7-deployment-at-cloudbees">Need extra configuration</a> when deploying
   </td>
   </tr>
   <tr>
@@ -186,23 +186,23 @@ The plugin may work on others containers, such as Weblogic (not tested yet).
 
 ## Configuration
 
-See [Configuration](https://github.com/dlecan/play2-war-plugin/wiki/Configuration).
+See [Configuration](https://github.com/play2war/play2-war-plugin/wiki/Configuration).
 
 ## Usage
 
-See [Usage](https://github.com/dlecan/play2-war-plugin/wiki/Usage).
+See [Usage](https://github.com/play2war/play2-war-plugin/wiki/Usage).
 
 ## Deployment
 
-See [Deployment](https://github.com/dlecan/play2-war-plugin/wiki/Deployment).
+See [Deployment](https://github.com/play2war/play2-war-plugin/wiki/Deployment).
 
 ## FAQ
 
-See [FAQ](https://github.com/dlecan/play2-war-plugin/wiki/FAQ).
+See [FAQ](https://github.com/play2war/play2-war-plugin/wiki/FAQ).
 
 ## Issues
 
-Please file issues here: https://github.com/dlecan/play2-war-plugin/issues.
+Please file issues here: https://github.com/play2war/play2-war-plugin/issues.
 
 ## Continous integration
 
@@ -210,7 +210,7 @@ Watch it in action here : [https://play-war.ci.cloudbees.com/](https://play-war.
 
 ## How to help ?
 
-Discover [how you can help the project](https://github.com/dlecan/play2-war-plugin/wiki/How-to-help).
+Discover [how you can help the project](https://github.com/play2war/play2-war-plugin/wiki/How-to-help).
 
 ## Contributors
 
