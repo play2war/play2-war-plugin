@@ -25,13 +25,13 @@ import com.github.play2war.plugin.Play2WarKeys._
 
 import com.typesafe.sbt.packager.Keys.projectDependencyArtifacts
 
-import play.PlayImport.PlayKeys.playPackageAssets
+import play.sbt.PlayImport.PlayKeys.playPackageAssets
 
 import sbt.ConfigKey.configurationToKey
 import sbt.Keys._
 import sbt._
 
-trait Play2WarCommands extends play.PlayCommands with play.PlayPositionMapper {
+trait Play2WarCommands {
 
   val manifestRegex = """(?i).*META-INF[/\\]MANIFEST.MF"""
 

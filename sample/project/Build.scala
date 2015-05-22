@@ -22,9 +22,9 @@ object ApplicationBuild extends Build {
     EclipseKeys.withSource := true,
     EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16),
 
-    javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
+    javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
 
-    scalaVersion := propOr("play2-war.sbt.scala.version", "2.10.4")
+    scalaVersion := propOr("play2-war.sbt.scala.version", "2.10.5")
   )
 
   lazy val root = Project(appName + "parent", file("."))
@@ -54,7 +54,7 @@ object ApplicationBuild extends Build {
   )
 
   lazy val servlet25 = Project(appName + "servlet25", file("servlet25"))
-    .enablePlugins(play.PlayJava)
+    .enablePlugins(play.sbt.PlayJava)
     .settings(commonSettings ++ warProjectSettings: _*)
     .settings(
       libraryDependencies ++= appDependencies,
@@ -63,7 +63,7 @@ object ApplicationBuild extends Build {
     .dependsOn(common)
 
   lazy val servlet30 = Project(appName + "servlet30", file("servlet30"))
-    .enablePlugins(play.PlayJava)
+    .enablePlugins(play.sbt.PlayJava)
     .settings(commonSettings ++ warProjectSettings: _*)
     .settings(
       libraryDependencies ++= appDependencies,
@@ -73,7 +73,7 @@ object ApplicationBuild extends Build {
     .dependsOn(common)
 
   lazy val servlet31 = Project(appName + "servlet31", file("servlet31"))
-    .enablePlugins(play.PlayJava)
+    .enablePlugins(play.sbt.PlayJava)
     .settings(commonSettings ++ warProjectSettings: _*)
     .settings(
       libraryDependencies ++= appDependencies,

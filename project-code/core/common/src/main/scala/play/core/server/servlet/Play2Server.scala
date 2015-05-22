@@ -17,22 +17,14 @@ package play.core.server.servlet
 
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.servlet.ServletContext
+
+import play.api._
+import play.core.ApplicationProvider
+import play.core.server.{Server, ServerWithStop}
 
 import scala.util.control.NonFatal
-
-import javax.servlet.ServletContext
-import play.api.Application
-import play.api.Configuration
-import play.api.Logger
-import play.api.Mode
-import play.api.Play
-import play.api.WithDefaultConfiguration
-import play.api.WithDefaultGlobal
-import play.api.WithDefaultPlugins
-import play.core.ApplicationProvider
-import play.core.server.Server
-import play.core.server.ServerWithStop
-import scala.util.{Try, Success}
+import scala.util.{Success, Try}
 
 object Play2WarServer {
 
@@ -44,7 +36,9 @@ object Play2WarServer {
 
   }
 
-  Logger.configure(Map.empty, Map.empty, Mode.Prod)
+  val context = ApplicationLoader.createContext(
+    new Environment(new File("."), ApplicationLoader.getClass.getClassLoader, Mode.Prod))
+  Logger.configure(context.environment)
 
   lazy val configuration = Play.current.configuration
 
@@ -78,6 +72,8 @@ private[servlet] class Play2WarServer(appProvider: WarApplication) extends Serve
 
   // This isn't currently used for anything except local dev mode, so just stub this out for now
   lazy val mainAddress = ???
+  override def httpPort: Option[Int] = ???
+  override def httpsPort: Option[Int] = ???
 
   def newRequestId = requestIDs.incrementAndGet
 
@@ -85,7 +81,7 @@ private[servlet] class Play2WarServer(appProvider: WarApplication) extends Serve
     Logger("play").info("Stopping play server...")
 
     try {
-      Play.stop()
+      Play.stop(appProvider.application)
     } catch {
       case NonFatal(e) => Logger("play").error("Error while stopping the application", e)
     }
@@ -102,33 +98,25 @@ private[servlet] class WarApplication(val mode: Mode.Mode, contextPath: Option[S
 
   val applicationPath = Option(System.getProperty("user.home")).fold(new File("")){ new File(_) }
 
-  val application = new DefaultWarApplication(applicationPath, mode, contextPath)
-
-  // Because of https://play.lighthouseapp.com/projects/82401-play-20/tickets/275, reconfigure Logger
-  // without substitutions
-  Logger.configure(Map("application.home" -> path.getAbsolutePath), Map.empty,
-    mode)
+  val application: Application = {
+    val environment = Environment(new File("."), Thread.currentThread.getContextClassLoader, mode)
+    val initialSettings = contextPath
+      .filterNot(_.isEmpty)
+      .map(cp => cp + (if (cp.endsWith("/")) "" else "/"))
+      .fold(Map.empty[String, AnyRef]) { cp ⇒
+        Logger("play").info(s"Force Play 'application.context' to '$cp'")
+        Map("application.context" -> cp)
+      }
+    val context = ApplicationLoader.createContext(environment, initialSettings = initialSettings)
+    // Because of https://play.lighthouseapp.com/projects/82401-play-20/tickets/275, reconfigure Logger
+    // without substitutions
+    Logger.configure(context.environment)
+    val loader = ApplicationLoader(context)
+    loader.load(context)
+  }
 
   Play.start(application)
 
   def get: Try[Application] = Success(application)
   def path = applicationPath
-}
-
-private[servlet] class DefaultWarApplication(
-  override val path: File,
-  override val mode: Mode.Mode,
-  private val contextPath: Option[String]
-) extends Application with WithDefaultConfiguration with WithDefaultGlobal with WithDefaultPlugins {
-
-  private lazy val warConfiguration = contextPath.filterNot(_.isEmpty)
-                                        .map(cp => cp + (if (cp.endsWith("/")) "" else "/"))
-                                        .fold(Configuration.empty) { cp =>
-                                          Logger("play").info(s"Force Play 'application.context' to '$cp'")
-                                          Configuration.from(Map("application.context" -> cp))
-                                        } ++ super.configuration
-
-  override def classloader = Thread.currentThread.getContextClassLoader
-  override def sources = None
-  override def configuration = warConfiguration
 }
