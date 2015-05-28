@@ -88,7 +88,7 @@ object Build extends Build {
 
       libraryDependencies += "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
       libraryDependencies += "junit" % "junit" % "4.10" % "test",
-      libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.4.8" % "test",
+      libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.4.13" % "test",
       libraryDependencies += "net.sourceforge.htmlunit" % "htmlunit" % "2.13" % "test",
 
       parallelExecution in Test := false,
@@ -104,15 +104,12 @@ object Build extends Build {
   def commonSettings = buildSettings ++ Seq(ScalastylePlugin.Settings: _*) ++ Seq(
       javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
-      EclipseKeys.withSource := true,
-      EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16),
-
       publishArtifact in Test := false)
 
   object BuildSettings {
 
     val buildOrganization = "com.github.play2war"
-    val defaultPlay2Version = "2.4.0-RC5"
+    val defaultPlay2Version = "2.4.0"
     val play2Version = sys.props.get("play2.version").filterNot(_.isEmpty).getOrElse(defaultPlay2Version)
     val defaultBuildVersion = "2.4-beta1-SNAPSHOT"
     val buildVersion = sys.props.get("play2war.version").filterNot(_.isEmpty).getOrElse(defaultBuildVersion)

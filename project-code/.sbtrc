@@ -12,3 +12,6 @@ alias itt-jetty90 = ;project integration-tests;testOnly com.github.play2war.plug
 
 alias jetty91 = ;project integration-tests;test:runMain com.github.play2war.plugin.runners.Jetty91xRunner
 alias itt-jetty91 = ;project integration-tests;testOnly com.github.play2war.plugin.it.Jetty91xTests;project play2-war
+
+alias jetty92 = ;project integration-tests;test:runMain com.github.play2war.plugin.runners.Jetty92xRunner
+alias itt-jetty92 = ;project integration-tests;testOnly com.github.play2war.plugin.it.Jetty92xTests;project play2-war
