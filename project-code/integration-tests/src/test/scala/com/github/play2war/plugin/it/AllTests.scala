@@ -118,7 +118,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     "home page" -> "/",
     "page in a sub directory" -> "/subdir",
     "page in a sub-sub directory" -> "/sub/subdir",
-    "asset as image" -> "/assets/images/favicon.png")
+    "asset as image" -> "/assets/lib/a-play2war-sample-common/images/favicon.png")
 
   val mapOfUrlNotFoundStatus: Map[String, String] = Map(
     "not found 1" -> "/notfound",
