@@ -42,12 +42,10 @@ object ApplicationBuild extends Build {
   )
 
   lazy val common = Project(appName + "common", file("common"))
-    .enablePlugins(play.PlayJava)
+    .enablePlugins(play.sbt.PlayJava)
     .settings(commonSettings ++ playProjectSettings: _*)
 
-  lazy val appDependencies = commonAppDependencies ++ Seq(
-    "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.1"
-  )
+  lazy val appDependencies = commonAppDependencies
 
   lazy val warProjectSettings = playProjectSettings ++ Play2WarPlugin.play2WarSettings ++ Seq(
     Play2WarKeys.filteredArtifacts := Seq()
