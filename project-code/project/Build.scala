@@ -65,7 +65,7 @@ object Build extends Build {
   //
   lazy val play2WarPlugin = Project(id = "play2-war-plugin",
     base = file("plugin"),
-    settings = commonSettings ++ ivySettings ++ Seq(
+    settings = commonSettings ++ publishToBintraySettings ++ Seq(
       scalaVersion := buildScalaVersionForSbt,
       scalaBinaryVersion := buildScalaVersionForSbtBinaryCompatible,
       sbtPlugin := true,
@@ -131,24 +131,38 @@ object Build extends Build {
 
   }
 
+
+  def publishToBintraySettings = {
+    import bintray.Plugin.bintrayPublishSettings
+    import bintray.Keys._
+    bintrayPublishSettings ++ Seq(
+      name := "play2-war",
+      description := "play2 war plugin",
+      publishMavenStyle := false,
+      licenses := Seq("The Apache Software License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
+      repository in bintray := "sbt-plugins",
+      bintrayOrganization in bintray := None
+    )
+  }
+
   def commonIvyMavenSettings: Seq[Setting[_]] = Seq(
     licenses := Seq("The Apache Software License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
     homepage := Some(url("https://github.com/play2war/play2-war-plugin"))
   )
 
-  def ivySettings = commonIvyMavenSettings ++ Seq(
-    publishMavenStyle := false,
-    publishTo <<= version {
-      version: String => {
-        val (name, url) = if (version.contains("-SNAPSHOT")) {
-          ("sbt-plugin-snapshots", scalasbt+"sbt-plugin-snapshots")
-        } else {
-          ("sbt-plugin-releases", scalasbt+"sbt-plugin-releases")
-        }
-        Some(Resolver.url(name, new URL(url))(Resolver.ivyStylePatterns))
-      }
-    }
-  )
+//  def ivySettings = commonIvyMavenSettings ++ Seq(
+//    publishMavenStyle := false,
+//    publishTo <<= version {
+//      version: String => {
+//        val (name, url) = if (version.contains("-SNAPSHOT")) {
+//          ("sbt-plugin-snapshots", scalasbt+"sbt-plugin-snapshots")
+//        } else {
+//          ("sbt-plugin-releases", scalasbt+"sbt-plugin-releases")
+//        }
+//        Some(Resolver.url(name, new URL(url))(Resolver.ivyStylePatterns))
+//      }
+//    }
+//  )
 
   def mavenSettings = commonIvyMavenSettings ++ Seq(
     publishMavenStyle := true,
