@@ -65,8 +65,6 @@ object Build extends Build {
     base = file("plugin"),
     settings = commonSettings ++ ivySettings ++ Seq(
       publishArtifact := true,
-      scalaVersion := buildScalaVersionForSbt,
-      scalaBinaryVersion := buildScalaVersionForSbtBinaryCompatible,
       sbtPlugin := true,
 
       sourceGenerators in Compile <+= sourceManaged in Compile map Play2WarVersion,
@@ -115,7 +113,7 @@ object Build extends Build {
     val buildScalaVersion210 = "2.10.5"
     val buildScalaVersion211 = "2.11.6"
     val buildScalaVersion = sys.props.get("play2war.sbt.scala211").map(p => buildScalaVersion211).getOrElse(buildScalaVersion210)
-    val buildScalaVersionForSbt = "2.10.5"
+    val buildScalaVersionForSbt = buildScalaVersion210
     val buildScalaVersionForSbtBinaryCompatible = CrossVersion.binaryScalaVersion(buildScalaVersionForSbt)
     val buildSbtVersion   = "0.13.8"
     val buildSbtVersionBinaryCompatible = "0.13"
@@ -124,8 +122,6 @@ object Build extends Build {
       resolvers           += Resolver.typesafeRepo("releases"),
       organization        := buildOrganization,
       version             := buildVersion,
-      scalaVersion        := buildScalaVersion,
-      scalaBinaryVersion  := CrossVersion.binaryScalaVersion(buildScalaVersion),
       checksums in update := Nil)
 
   }
@@ -139,10 +135,17 @@ object Build extends Build {
     publishMavenStyle := false,
     bintrayReleaseOnPublish := false,
     bintrayRepository := "sbt-plugins",
-    bintrayOrganization := Some("play2war")
+    bintrayOrganization := Some("play2war"),
+      scalaVersion := buildScalaVersionForSbt,
+//      scalaBinaryVersion := buildScalaVersionForSbtBinaryCompatible,
+      crossScalaVersions := Seq(buildScalaVersionForSbtBinaryCompatible)
   )
 
   def mavenSettings = commonIvyMavenSettings ++ Seq(
+      scalaVersion        := buildScalaVersion,
+//      scalaBinaryVersion  := CrossVersion.binaryScalaVersion(buildScalaVersion),
+      crossScalaVersions  := Seq(buildScalaVersion210, buildScalaVersion211),
+
     publishMavenStyle := true,
     pomIncludeRepository := { _ => false },
     publishTo := {
