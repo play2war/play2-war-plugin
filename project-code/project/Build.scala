@@ -3,14 +3,13 @@ import Keys._
 import java.io.File
 import com.typesafe.sbteclipse.plugin.EclipsePlugin._
 import org.scalastyle.sbt.ScalastylePlugin
+import bintray.BintrayPlugin
+import bintray.BintrayPlugin.autoImport._
 
 object Build extends Build {
 
   import BuildSettings._
   import Generators._
-
-  val nexus = "https://oss.sonatype.org/"
-  val scalasbt = "http://repo.scala-sbt.org/scalasbt/"
 
   val curDir = new File(".")
 
@@ -28,7 +27,7 @@ object Build extends Build {
   //
   // Root project
   //
-  lazy val root = Project(id = "play2-war",
+  lazy val root = project(id = "play2-war",
     base = file("."),
     settings = commonSettings ++ mavenSettings ++ Seq(
       publishArtifact := false)) aggregate (play2WarCoreCommon, play2WarCoreservlet30, play2WarCoreservlet25, play2WarCoreservlet31, play2WarPlugin, play2WarIntegrationTests)
@@ -36,25 +35,25 @@ object Build extends Build {
   //
   // Servlet implementations
   //
-  lazy val play2WarCoreCommon = Project(id = "play2-war-core-common",
+  lazy val play2WarCoreCommon = project(id = "play2-war-core-common",
     base = file("core/common"),
     settings = commonSettings ++ mavenSettings ++ Seq(
       libraryDependencies += playDependency,
       libraryDependencies += "javax.servlet" % "servlet-api" % "2.5" % "provided->default"))
 
-  lazy val play2WarCoreservlet31 = Project(id = "play2-war-core-servlet31",
+  lazy val play2WarCoreservlet31 = project(id = "play2-war-core-servlet31",
     base = file("core/servlet31"),
     settings = commonSettings ++ mavenSettings ++ Seq(
       libraryDependencies += playDependency,
       libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided->default")) dependsOn play2WarCoreCommon
 
-  lazy val play2WarCoreservlet30 = Project(id = "play2-war-core-servlet30",
+  lazy val play2WarCoreservlet30 = project(id = "play2-war-core-servlet30",
     base = file("core/servlet30"),
     settings = commonSettings ++ mavenSettings ++ Seq(
       libraryDependencies += playDependency,
       libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "provided->default")) dependsOn play2WarCoreCommon
 
-  lazy val play2WarCoreservlet25 = Project(id = "play2-war-core-servlet25",
+  lazy val play2WarCoreservlet25 = project(id = "play2-war-core-servlet25",
     base = file("core/servlet25"),
     settings = commonSettings ++ mavenSettings ++ Seq(
       libraryDependencies += playDependency,
@@ -66,6 +65,7 @@ object Build extends Build {
   lazy val play2WarPlugin = Project(id = "play2-war-plugin",
     base = file("plugin"),
     settings = commonSettings ++ ivySettings ++ Seq(
+      publishArtifact := true,
       scalaVersion := buildScalaVersionForSbt,
       scalaBinaryVersion := buildScalaVersionForSbtBinaryCompatible,
       sbtPlugin := true,
@@ -80,7 +80,7 @@ object Build extends Build {
   //
   // Integration tests
   //
-  lazy val play2WarIntegrationTests = Project(id = "integration-tests",
+  lazy val play2WarIntegrationTests = project(id = "integration-tests",
     base = file("integration-tests"),
     settings = commonSettings ++ mavenSettings ++ Seq(
       sbtPlugin := false,
@@ -106,7 +106,6 @@ object Build extends Build {
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
       EclipseKeys.withSource := true,
       EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16),
-
       publishArtifact in Test := false)
 
   object BuildSettings {
@@ -141,29 +140,21 @@ object Build extends Build {
 
   def ivySettings = commonIvyMavenSettings ++ Seq(
     publishMavenStyle := false,
-    publishTo <<= version {
-      version: String => {
-        val (name, url) = if (version.contains("-SNAPSHOT")) {
-          ("sbt-plugin-snapshots", scalasbt+"sbt-plugin-snapshots")
-        } else {
-          ("sbt-plugin-releases", scalasbt+"sbt-plugin-releases")
-        }
-        Some(Resolver.url(name, new URL(url))(Resolver.ivyStylePatterns))
-      }
-    }
+    bintrayReleaseOnPublish := false,
+    bintrayRepository := "sbt-plugins",
+    bintrayOrganization := Some("play2war")
   )
 
   def mavenSettings = commonIvyMavenSettings ++ Seq(
     publishMavenStyle := true,
     pomIncludeRepository := { _ => false },
-    publishTo <<= version {
-      version: String => {
-          if (version.trim.endsWith("SNAPSHOT")) {
-            Some("snapshots" at nexus + "content/repositories/snapshots")
-          } else {
-            Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-          }
-        }
+    publishTo := {
+      val nexus = "https://oss.sonatype.org/"
+      if (isSnapshot.value) {
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      } else {
+        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+      }
     },
     pomExtra :=
   <scm>
@@ -175,6 +166,11 @@ object Build extends Build {
       <id>dlecan</id>
       <name>Damien Lecan</name>
       <email>dev@dlecan.com</email>
+    </developer>
+    <developer>
+      <id>ysimon</id>
+      <name>Yann Simon</name>
+      <email>yann.simon.fr@gmail.com</email>
     </developer>
   </developers>
   )
@@ -199,4 +195,7 @@ object Build extends Build {
     }
 
   }
+
+  def project(id: String, base: File, settings: Seq[Def.Setting[_]] = Nil) =  
+    Project(id, base, settings = settings)
 }
