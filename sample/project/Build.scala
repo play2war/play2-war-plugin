@@ -3,7 +3,6 @@ import Keys._
 import play.Play.autoImport._
 import PlayKeys._
 import com.github.play2war.plugin._
-import com.typesafe.sbteclipse.plugin.EclipsePlugin._
 
 object ApplicationBuild extends Build {
 
@@ -18,10 +17,6 @@ object ApplicationBuild extends Build {
     // Doesn't work
     // resolvers += Resolver.defaultLocal,
     resolvers += Resolver.sonatypeRepo("snapshots"),
-
-    EclipseKeys.withSource := true,
-    EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16),
-
     javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
 
     scalaVersion := propOr("play2-war.sbt.scala.version", "2.10.5")

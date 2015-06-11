@@ -1,7 +1,6 @@
 import sbt._
 import Keys._
 import java.io.File
-import com.typesafe.sbteclipse.plugin.EclipsePlugin._
 import org.scalastyle.sbt.ScalastylePlugin
 import bintray.BintrayPlugin
 import bintray.BintrayPlugin.autoImport._
