@@ -104,8 +104,14 @@ trait CargoContainerManager extends WarContext {
     configuration.setProperty(GeneralPropertySet.LOGGING, LoggingLevel.MEDIUM.getLevel)
 
     getJavaVersion match {
-      case "java8" => // Nothing, use current JVM
-      case _ ⇒ throw new RuntimeException("Play 2.4 only supports java8")
+      case "java8" => {
+        // Try to set java_home from config property
+        Option(System.getProperty("java8.home")).foreach { home =>
+          configuration.setProperty(GeneralPropertySet.JAVA_HOME, home)
+        }
+        // Use current JVM otherwise
+      }
+      case _ => throw new RuntimeException("Play 2.4 only supports java8")
     }
 
     val container =
