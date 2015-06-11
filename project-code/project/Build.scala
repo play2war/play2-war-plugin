@@ -22,7 +22,7 @@ object Build extends Build {
   val servlet25SampleProjectTargetDir = new File(curDir, "../sample/servlet25/target")
   val servlet25SampleWarPath = new File(servlet25SampleProjectTargetDir, "a-play2war-sample-servlet25-1.0-SNAPSHOT.war").getAbsolutePath
 
-  val playDependency = "com.typesafe.play" %% "play" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api")
+  val playDependency = "com.typesafe.play" %% "play-server" % play2Version % "provided->default" exclude ("javax.servlet", "servlet-api")
 
   //
   // Root project
@@ -88,7 +88,7 @@ object Build extends Build {
 
       libraryDependencies += "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
       libraryDependencies += "junit" % "junit" % "4.10" % "test",
-      libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.4.8" % "test",
+      libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.4.13" % "test",
       libraryDependencies += "net.sourceforge.htmlunit" % "htmlunit" % "2.13" % "test",
 
       parallelExecution in Test := false,
@@ -102,25 +102,23 @@ object Build extends Build {
   // Settings
   //
   def commonSettings = buildSettings ++ Seq(ScalastylePlugin.Settings: _*) ++ Seq(
-      javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
+      javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
-      EclipseKeys.withSource := true,
-      EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16),
       publishArtifact in Test := false)
 
   object BuildSettings {
 
     val buildOrganization = "com.github.play2war"
-    val defaultPlay2Version = "2.3.8"
+    val defaultPlay2Version = "2.4.0"
     val play2Version = sys.props.get("play2.version").filterNot(_.isEmpty).getOrElse(defaultPlay2Version)
     val defaultBuildVersion = "1.4-beta1-SNAPSHOT"
     val buildVersion = sys.props.get("play2war.version").filterNot(_.isEmpty).getOrElse(defaultBuildVersion)
-    val buildScalaVersion210 = "2.10.4"
-    val buildScalaVersion211 = "2.11.2"
+    val buildScalaVersion210 = "2.10.5"
+    val buildScalaVersion211 = "2.11.6"
     val buildScalaVersion = sys.props.get("play2war.sbt.scala211").map(p => buildScalaVersion211).getOrElse(buildScalaVersion210)
-    val buildScalaVersionForSbt = "2.10.4"
+    val buildScalaVersionForSbt = "2.10.5"
     val buildScalaVersionForSbtBinaryCompatible = CrossVersion.binaryScalaVersion(buildScalaVersionForSbt)
-    val buildSbtVersion   = "0.13.5"
+    val buildSbtVersion   = "0.13.8"
     val buildSbtVersionBinaryCompatible = "0.13"
 
     val buildSettings = Defaults.defaultSettings ++ Seq(

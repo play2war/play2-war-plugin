@@ -16,7 +16,7 @@ private[servlet31] trait Helpers extends HTTPHelpers {
 
   override def getServletCookie(pCookie: play.api.mvc.Cookie): ServletCookie = {
     val sc = new ServletCookie(pCookie.name, pCookie.value)
-    pCookie.domain.map(sc.setDomain)
+    pCookie.domain.foreach(sc.setDomain)
     sc.setHttpOnly(pCookie.httpOnly)
 
     // conversion Play cookie to servlet cookie
@@ -27,7 +27,7 @@ private[servlet31] trait Helpers extends HTTPHelpers {
     // | set a session cookie                  | None             | maxAge = -1 (or not set) |
     // | set a persistent cookie               | Some(maxAge > 0) | maxAge > 0               |
     // |---------------------------------------|------------------|--------------------------|
-    pCookie.maxAge.map(ex => if (ex < 0) sc.setMaxAge(0) else sc.setMaxAge(ex))
+    pCookie.maxAge.foreach(ex => if (ex < 0) sc.setMaxAge(0) else sc.setMaxAge(ex))
 
     sc.setPath(pCookie.path)
     sc.setSecure(pCookie.secure)

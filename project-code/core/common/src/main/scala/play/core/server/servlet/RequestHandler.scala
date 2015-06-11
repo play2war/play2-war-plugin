@@ -336,7 +336,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
           Iteratee.flatten(action(rh).unflatten.map(_.it).recover {
             case error =>
               Iteratee.flatten(
-                app.handleError(requestHeader, error).map(result => Done(result, Input.Empty))
+                app.errorHandler.onServerError(requestHeader, error).map(result => Done(result, Input.Empty))
               ): Iteratee[Array[Byte], Result]
           })
         }
@@ -372,7 +372,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
         case error =>
           Logger("play").error("Cannot invoke the action, eventually got an error: " + error)
           app.fold(DefaultGlobal.onError(requestHeader, error)) {
-            _.handleError(requestHeader, error)
+            _.errorHandler.onServerError(requestHeader, error)
           }
       }.map { result => cleanFlashCookie(result) }
 
@@ -386,14 +386,14 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
   private def getHttpParameters(request: HttpServletRequest): Map[String, Seq[String]] = {
     request.getQueryString match {
       case null | "" => Map.empty
-      case queryString => queryString.replaceFirst("^?", "").split("&").map { queryElement =>
+      case queryString => queryString.replaceFirst("^?", "").split("&").flatMap { queryElement =>
         val array = queryElement.split("=")
         array.length match {
           case 0 => None
           case 1 => Some(URLDecoder.decode(array(0), "UTF-8") -> "")
           case _ => Some(URLDecoder.decode(array(0), "UTF-8") -> URLDecoder.decode(array(1), "UTF-8"))
         }
-      }.flatten.groupBy(_._1).map { case (key, value) => key -> value.map(_._2).toSeq }.toMap
+      }.groupBy(_._1).map { case (key, value) => key -> value.map(_._2).toSeq }
     }
   }
 

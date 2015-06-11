@@ -33,21 +33,14 @@ trait HTTPHelpers {
 
     val headerNames = request.getHeaderNames.asScala
 
-    val allHeaders: Map[String, Seq[String]] = headerNames.map {
-      key =>
-        key.toString.toUpperCase -> {
-          // /!\ It very important to COPY headers from request enumeration
-          val headers = Collections.list(request.getHeaders(key.toString)).asScala
-          headers.asInstanceOf[Seq[String]]
-        }
-    }.toMap
+    val allHeaders: Seq[(String, String)] = headerNames.flatMap { k =>
+      val key = k.toString
+      // /!\ It very important to COPY headers from request enumeration
+      val headers = Collections.list(request.getHeaders(key)).asScala
+      headers.asInstanceOf[Seq[String]].map(h ⇒ (key, h))
+    }.toSeq
 
-    new Headers {
-
-      val data: Seq[(String, Seq[String])] = {
-        allHeaders.toSeq
-      }
-    }
+    new Headers(allHeaders)
   }
 
   final def getPlayCookies(request: HttpServletRequest): Cookies = {
@@ -65,17 +58,14 @@ trait HTTPHelpers {
 
       def foreach[U](f: (Cookie) => U) { cookies.values.foreach(f) }
 
-      override def toString = cookies.toString
+      override def toString() = cookies.toString()
     }
   }
 
   def getPlayCookie(c: ServletCookie): play.api.mvc.Cookie
 
-  final def getServletCookies(flatCookie: String): Seq[ServletCookie] = {
-    Cookies.decode(flatCookie).map {
-      pCookie => getServletCookie(pCookie)
-    }
-  }
+  final def getServletCookies(flatCookie: String): Seq[ServletCookie] =
+    Cookies.decodeSetCookieHeader(flatCookie).map(getServletCookie)
 
   def getServletCookie(pCookie: play.api.mvc.Cookie): ServletCookie
 }
