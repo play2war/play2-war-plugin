@@ -4,6 +4,7 @@
         Play 2.2.x          : 1.2
         Play 2.3.0 -> 2.3.1 : 1.3-beta1 (Scala 2.10 & 2.11)
         Play 2.3.2+         : 1.3-beta3 (Scala 2.10 & 2.11)
+        Play 2.4.0+         : 1.4-beta1 (Scala 2.10 & 2.11)
 
     Project-status: STABLE
     
@@ -16,7 +17,7 @@ Why choosing WAR packaging when native Play 2 is a better deployment model (feat
 - SSL is available, easy to configure and well documented on JBoss, Tomcat, ... when SSL is newer on Play 2.1
 - You need to add extra Servlet filters specific to your company (to handle SSO, ...)
 
-You can trust this plugin because it is [heavily tested](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_Play_22x/lastCompletedBuild/testReport/), with hundreds of integration tests run on :
+You can trust this plugin because it is [heavily tested](https://play-war.ci.cloudbees.com/job/Play_2_War_Run_integration_tests_-_Play_23x/lastCompletedBuild/testReport/), with hundreds of integration tests run on :
 - several open-source application servers (Tomcat 6/7/8, Jetty 7/8/9)
 - *all versions* of Play Framework 2.x
 
