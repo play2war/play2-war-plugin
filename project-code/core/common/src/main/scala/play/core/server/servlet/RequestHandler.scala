@@ -102,6 +102,10 @@ trait HttpServletRequestHandler extends RequestHandler {
       case (name, value) if name.equalsIgnoreCase(play.api.http.HeaderNames.SET_COOKIE) =>
         getServletCookies(value).foreach(httpResponse.addCookie)
 
+      case (name, value) if name.equalsIgnoreCase(HeaderNames.TRANSFER_ENCODING) && value == HttpProtocol.CHUNKED =>
+        // ignore this header
+        // the JEE container sets this header itself. Avoid duplication of header (issues/289)
+
       case (name, value) =>
         httpResponse.setHeader(name, value)
     }
