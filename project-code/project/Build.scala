@@ -155,8 +155,8 @@ object Build extends Build {
     },
     pomExtra :=
   <scm>
-    <url>git@github.com:dlecan/play2-war-plugin.git</url>
-    <connection>scm:git:git@github.com:dlecan/play2-war-plugin.git</connection>
+    <url>git@github.com:play2war/play2-war-plugin.git</url>
+    <connection>scm:git:git@github.com:play2war/play2-war-plugin.git</connection>
   </scm>
   <developers>
     <developer>
