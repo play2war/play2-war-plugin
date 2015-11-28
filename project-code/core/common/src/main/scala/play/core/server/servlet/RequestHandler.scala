@@ -216,7 +216,7 @@ trait HttpServletRequestHandler extends RequestHandler {
                 os.flush()
                 buffer.writeTo(os)
               }
-              val p = Future.successful()
+              val p = Future.successful(())
               Iteratee.flatten(p.map(_ => Done(1, Input.Empty: Input[ByteArrayOutputStream])))
 
             case other => Error("unexpected input", other)
