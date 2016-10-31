@@ -38,7 +38,7 @@ object Play2WarServer {
 
   val context = ApplicationLoader.createContext(
     new Environment(new File("."), ApplicationLoader.getClass.getClassLoader, Mode.Prod))
-  Logger.configure(context.environment)
+//  Logger.configure(context.environment)
 
   lazy val configuration = Play.current.configuration
 
@@ -67,6 +67,7 @@ private[servlet] class Play2WarServer(appProvider: WarApplication) extends Serve
   private val requestIDs = new java.util.concurrent.atomic.AtomicLong(0)
 
   def mode = appProvider.mode
+  def materializer = appProvider.application.materializer
 
   def applicationProvider = appProvider
 
@@ -110,7 +111,7 @@ private[servlet] class WarApplication(val mode: Mode.Mode, contextPath: Option[S
     val context = ApplicationLoader.createContext(environment, initialSettings = initialSettings)
     // Because of https://play.lighthouseapp.com/projects/82401-play-20/tickets/275, reconfigure Logger
     // without substitutions
-    Logger.configure(context.environment)
+//    Logger.configure(context.environment)
     val loader = ApplicationLoader(context)
     loader.load(context)
   }

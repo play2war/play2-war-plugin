@@ -150,107 +150,106 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
    * @param futureResult result of a play action
    * @param cleanup clean up callback
    */
-  private class ResultWriteListener(
-      val httpResponse: HttpServletResponse,
-      val out: ServletOutputStream,
-      val futureResult: Future[Result],
-      val cleanup: () => Unit) extends WriteListener {
+//  private class ResultWriteListener(
+//      val httpResponse: HttpServletResponse,
+//      val out: ServletOutputStream,
+//      val futureResult: Future[Result]) extends WriteListener {
+//
+//    // the promise is completed when a write to the servlet IO is possible
+//    @volatile var iterateeP = Promise[Iteratee[Array[Byte], Unit]]()
+//    val futureIteratee = iterateeP.future
+//
+//    @volatile var chunked = true
+//    Logger("play.war.servlet31").trace("set write listener")
+//
+//    private def step(): Iteratee[Array[Byte], Unit] = {
+//      Logger("play.war.servlet31").trace(s"step")
+//      iterateeP = Promise[Iteratee[Array[Byte], Unit]]()
+//
+//      Cont[Array[Byte], Unit] {
+//        case Input.EOF =>
+//          Logger("play.war.servlet31").trace(s"EOF, finished!")
+//          if (out.isReady) {
+//            out.flush()
+//          }
+//          onHttpResponseComplete()
+//          cleanup()
+//          Done[Array[Byte], Unit](Unit)
+//
+//        case Input.Empty =>
+//          Logger("play.war.servlet31").trace(s"empty, just continue")
+//          step()
+//
+//        case Input.El(buffer) =>
+//          out.write(buffer)
+//          if (chunked && out.isReady) {
+//            // flush to send chunked content, like comet message
+//            out.flush()
+//          }
+//          Logger("play.war.servlet31").trace(s"send ${buffer.length} bytes. out.isReady=${out.isReady}")
+//          if (out.isReady) {
+//            // can immediately push the next bytes
+//            step()
+//          } else {
+//            // wait for next onWritePossible
+//            Iteratee.flatten(iterateeP.future)
+//          }
+//      }
+//    }
+//
+//    override def onWritePossible(): Unit = {
+//      Logger("play.war.servlet31").trace("onWritePossible - begin")
+//      if (iterateeP.isCompleted) {
+//        throw new Exception("race condition: the servlet container should not call onWritePossible() when the iteratee is completed. Please report.")
+//      }
+//
+//      // write is possible, let's use it
+//      iterateeP.success(step())
+//    }
+//
+//    override def onError(t: Throwable): Unit = {
+//      Logger("play.war.servlet31").error("error while writing result to servlet output stream", t)
+//      onHttpResponseComplete()
+//      cleanup()
+//    }
+//
+//    import play.core.Execution.Implicits.internalContext
+//
+//    futureIteratee.foreach { bodyIteratee =>
+//      futureResult.foreach { result =>
+//        val status = result.header.status
+//        val headers = result.header.headers
+//
+//        Logger("play.war.servlet31").trace("Sending simple result: " + result)
+//
+//        httpResponse.setStatus(status)
+//
+//        setHeaders(headers, httpResponse)
+//
+//        chunked = headers.exists { case (key, value) => key.equalsIgnoreCase(HeaderNames.TRANSFER_ENCODING) && value == HttpProtocol.CHUNKED }
+//
+//        Logger("play.war.servlet31").trace(s"the body iteratee is ready. chunked=$chunked")
+//        if (chunked) {
+//          // if the result body is chunked, the chunks are already encoded with metadata in Results.chunk
+//          // The problem is that the servlet container adds metadata again, leading the chunks encoded 2 times.
+//          // As workaround, we 'dechunk' the body one time before sending it to the servlet container
+//          result.body &> Results.dechunk |>>> bodyIteratee
+//        } else {
+//          result.body |>>> bodyIteratee
+//        }
+//      }
+//    }
+//  }
 
-    // the promise is completed when a write to the servlet IO is possible
-    @volatile var iterateeP = Promise[Iteratee[Array[Byte], Unit]]()
-    val futureIteratee = iterateeP.future
-
-    @volatile var chunked = true
-    Logger("play.war.servlet31").trace("set write listener")
-
-    private def step(): Iteratee[Array[Byte], Unit] = {
-      Logger("play.war.servlet31").trace(s"step")
-      iterateeP = Promise[Iteratee[Array[Byte], Unit]]()
-
-      Cont[Array[Byte], Unit] {
-        case Input.EOF =>
-          Logger("play.war.servlet31").trace(s"EOF, finished!")
-          if (out.isReady) {
-            out.flush()
-          }
-          onHttpResponseComplete()
-          cleanup()
-          Done[Array[Byte], Unit](Unit)
-
-        case Input.Empty =>
-          Logger("play.war.servlet31").trace(s"empty, just continue")
-          step()
-
-        case Input.El(buffer) =>
-          out.write(buffer)
-          if (chunked && out.isReady) {
-            // flush to send chunked content, like comet message
-            out.flush()
-          }
-          Logger("play.war.servlet31").trace(s"send ${buffer.length} bytes. out.isReady=${out.isReady}")
-          if (out.isReady) {
-            // can immediately push the next bytes
-            step()
-          } else {
-            // wait for next onWritePossible
-            Iteratee.flatten(iterateeP.future)
-          }
-      }
-    }
-
-    override def onWritePossible(): Unit = {
-      Logger("play.war.servlet31").trace("onWritePossible - begin")
-      if (iterateeP.isCompleted) {
-        throw new Exception("race condition: the servlet container should not call onWritePossible() when the iteratee is completed. Please report.")
-      }
-
-      // write is possible, let's use it
-      iterateeP.success(step())
-    }
-
-    override def onError(t: Throwable): Unit = {
-      Logger("play.war.servlet31").error("error while writing result to servlet output stream", t)
-      onHttpResponseComplete()
-      cleanup()
-    }
-
-    import play.core.Execution.Implicits.internalContext
-
-    futureIteratee.foreach { bodyIteratee =>
-      futureResult.foreach { result =>
-        val status = result.header.status
-        val headers = result.header.headers
-
-        Logger("play.war.servlet31").trace("Sending simple result: " + result)
-
-        httpResponse.setStatus(status)
-
-        setHeaders(headers, httpResponse)
-
-        chunked = headers.exists { case (key, value) => key.equalsIgnoreCase(HeaderNames.TRANSFER_ENCODING) && value == HttpProtocol.CHUNKED }
-
-        Logger("play.war.servlet31").trace(s"the body iteratee is ready. chunked=$chunked")
-        if (chunked) {
-          // if the result body is chunked, the chunks are already encoded with metadata in Results.chunk
-          // The problem is that the servlet container adds metadata again, leading the chunks encoded 2 times.
-          // As workaround, we 'dechunk' the body one time before sending it to the servlet container
-          result.body &> Results.dechunk |>>> bodyIteratee
-        } else {
-          result.body |>>> bodyIteratee
-        }
-      }
-    }
-  }
-
-  override protected def pushPlayResultToServletOS(futureResult: Future[Result], cleanup: () => Unit): Unit = {
-    getHttpResponse().getHttpServletResponse.foreach { httpResponse =>
-
-      val out = httpResponse.getOutputStream.asInstanceOf[ServletOutputStream]
-
-      // tomcat insists that the WriteListener is set on the servlet thread.
-      out.setWriteListener(new ResultWriteListener(httpResponse, out, futureResult, cleanup))
-    }
-  }
+//  override protected def pushPlayResultToServletOS(futureResult: Future[Result]): Future[Unit] = {
+//    getHttpResponse().getHttpServletResponse.foreach { httpResponse =>
+//
+//      val out = httpResponse.getOutputStream.asInstanceOf[ServletOutputStream]
+//
+//      // tomcat insists that the WriteListener is set on the servlet thread.
+//      out.setWriteListener(new ResultWriteListener(httpResponse, out, futureResult))
+//    }
+//  }
 }
 
 private[servlet31] class AsyncListener(val requestId: String) extends javax.servlet.AsyncListener {
