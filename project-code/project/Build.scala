@@ -110,7 +110,7 @@ object Build extends Build {
     val buildOrganization = "com.github.play2war"
     val defaultPlay2Version = "2.4.0"
     val play2Version = sys.props.get("play2.version").filterNot(_.isEmpty).getOrElse(defaultPlay2Version)
-    val defaultBuildVersion = "1.4-beta2-SNAPSHOT"
+    val defaultBuildVersion = "1.4.0"
     val buildVersion = sys.props.get("play2war.version").filterNot(_.isEmpty).getOrElse(defaultBuildVersion)
     val buildScalaVersion210 = "2.10.5"
     val buildScalaVersion211 = "2.11.6"
@@ -193,6 +193,6 @@ object Build extends Build {
 
   }
 
-  def project(id: String, base: File, settings: Seq[Def.Setting[_]] = Nil) =  
+  def project(id: String, base: File, settings: Seq[Def.Setting[_]] = Nil) =
     Project(id, base, settings = settings)
 }
