@@ -7,3 +7,5 @@ resolvers += Resolver.typesafeRepo("releases")
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.3.2")
 
 addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
+
+addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "4.0.0")
