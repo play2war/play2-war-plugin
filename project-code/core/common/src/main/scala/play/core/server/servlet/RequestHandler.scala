@@ -165,7 +165,7 @@ trait HttpServletRequestHandler extends RequestHandler {
 //        if (withContentLength || chunked) {
           val flow = body.dataStream.map { f ⇒
             getHttpResponse().getRichOutputStream.foreach { os ⇒
-              os.write(f.asByteBuffer.array())
+              os.write(f.toArray)
               os.flush()
             }
           }
@@ -176,7 +176,7 @@ trait HttpServletRequestHandler extends RequestHandler {
 //              cleanup()
               onHttpResponseComplete()
             case Failure(ex) =>
-              Logger("play").debug(ex.toString)
+              Logger("play").error(ex.toString, ex)
               onHttpResponseComplete()
           }
 //        } else {
