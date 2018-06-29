@@ -1,9 +1,9 @@
-import sbt._
-import Keys._
 import java.io.File
-import org.scalastyle.sbt.ScalastylePlugin
-import bintray.BintrayPlugin
+
 import bintray.BintrayPlugin.autoImport._
+import org.scalastyle.sbt.ScalastylePlugin
+import sbt.Keys._
+import sbt._
 
 object Build extends Build {
 
@@ -73,7 +73,9 @@ object Build extends Build {
 
       libraryDependencies <++= (scalaVersion, sbtVersion) { (scalaVersion, sbtVersion) =>
         Seq(
-          "com.typesafe.play" % "sbt-plugin" % play2Version % "provided->default(compile)" extra ("scalaVersion" -> buildScalaVersionForSbtBinaryCompatible, "sbtVersion" -> buildSbtVersionBinaryCompatible))
+          "com.typesafe.play" % "sbt-plugin" % play2Version % "provided->default(compile)" extra ("scalaVersion" -> buildScalaVersionForSbtBinaryCompatible, "sbtVersion" -> buildSbtVersionBinaryCompatible),
+          "com.typesafe" % "config" % "1.3.2"
+        )
       }))
 
   //
@@ -117,7 +119,7 @@ object Build extends Build {
     val buildScalaVersion = sys.props.get("play2war.sbt.scala211").map(p => buildScalaVersion211).getOrElse(buildScalaVersion210)
     val buildScalaVersionForSbt = "2.10.5"
     val buildScalaVersionForSbtBinaryCompatible = CrossVersion.binaryScalaVersion(buildScalaVersionForSbt)
-    val buildSbtVersion   = "0.13.8"
+    val buildSbtVersion   = "0.13.15"
     val buildSbtVersionBinaryCompatible = "0.13"
 
     val buildSettings = Defaults.defaultSettings ++ Seq(

@@ -1,8 +1,7 @@
-import sbt._
-import Keys._
-import play.Play.autoImport._
-import PlayKeys._
 import com.github.play2war.plugin._
+import play.Play.autoImport._
+import sbt.Keys._
+import sbt._
 
 object ApplicationBuild extends Build {
 
@@ -34,6 +33,7 @@ object ApplicationBuild extends Build {
   )
     
   lazy val commonAppDependencies = Seq(
+    "com.typesafe" % "config" % "1.3.2"
   )
 
   lazy val common = Project(appName + "common", file("common"))
