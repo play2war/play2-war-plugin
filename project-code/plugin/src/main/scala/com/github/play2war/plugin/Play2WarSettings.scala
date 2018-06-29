@@ -22,22 +22,22 @@ import com.github.play2war.plugin.Play2WarKeys._
 trait Play2WarSettings {
   this: Play2WarCommands =>
 
-  lazy val play2WarSettings = Seq[Setting[_]](
+  lazy val play2WarSettings: Seq[Setting[_]] = Seq[Setting[_]](
 
-    libraryDependencies <++= servletVersion {
-      (v) =>
+    libraryDependencies ++= servletVersion {
+      v =>
         val servletVersionString = v match {
           case "2.5" => "25"
           case "3.1" => "31"
           case _ => "30"
         }
         Seq("com.github.play2war" %% ("play2-war-core-servlet" + servletVersionString) % com.github.play2war.plugin.Play2WarVersion.current)
-    },
+    }.value,
 
-    webappResource <<= baseDirectory / "war",
+    webappResource := baseDirectory.value / "war",
 
     // War artifact
-    artifact in war <<= moduleName(n => Artifact(n, "war", "war")),
+    artifact in war := moduleName(n => Artifact(n, "war", "war")).value,
 
     targetName := None,
 
@@ -53,7 +53,7 @@ trait Play2WarSettings {
     explodedJar := false,
 
     // Bind war building to "war" task
-    war <<= warTask
+    war := warTask.value
 
     // Bind war task to "package" task (phase)
     //sbt.Keys.`package` <<= war //
