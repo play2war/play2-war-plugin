@@ -12,6 +12,6 @@ resolvers += Resolver.sbtPluginRepo("snapshots")
 libraryDependencies += "com.typesafe" % "config" % "1.3.2"
 
 // Use the Play sbt plugin for Play projects
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Option(System.getProperty("play.version")).getOrElse("2.4.0"))
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Option(System.getProperty("play.version")).getOrElse("2.6.15"))
 
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "1.4.1-SNAPSHOT")
+addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "1.6.0-SNAPSHOT")

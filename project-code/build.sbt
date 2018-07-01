@@ -15,6 +15,7 @@ val buildScalaVersionForSbt = buildScalaVersion212
 val buildScalaVersionForSbtBinaryCompatible = CrossVersion.binaryScalaVersion(buildScalaVersionForSbt)
 val buildSbtVersion   = "1.1.6"
 val buildSbtVersionBinaryCompatible = CrossVersion.binarySbtVersion(buildSbtVersion)
+val reactiveStreamsServletVersion = "1.0.0.EARLY"
 
 val buildSettings = Defaults.coreDefaultSettings ++ Seq(
   resolvers           += Resolver.typesafeRepo("releases"),
@@ -59,6 +60,7 @@ lazy val play2WarCoreservlet31 = project(id = "play2-war-core-servlet31",
   base = file("core/servlet31"),
   settings = commonSettings ++ mavenSettings ++ Seq(
     libraryDependencies += playDependency,
+    libraryDependencies += "de.envisia.reactivestreams" % "reactive-streams-servlet" % reactiveStreamsServletVersion,
     libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided->default")) dependsOn play2WarCoreCommon
 
 lazy val play2WarCoreservlet30 = project(id = "play2-war-core-servlet30",

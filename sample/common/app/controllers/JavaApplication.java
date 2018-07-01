@@ -1,32 +1,32 @@
 package controllers;
 
 import play.Logger;
-import play.libs.F;
-import play.libs.ws.WS;
-import play.libs.ws.WSResponse;
+import play.libs.ws.WSClient;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Result;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.io.File;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 
+@Singleton
 public class JavaApplication extends Controller {
+  @Inject
+  private WSClient ws;
 
-  public static F.Promise<Result> asyncResult() {
+  public CompletionStage<Result> asyncResult() {
       String url = controllers.routes.Application.httpVersion().absoluteURL(request());
       Logger.info("will make a web request to: " + url);
-      return WS.url(url).get().map(new F.Function<WSResponse, Result>() {
-          @Override
-          public Result apply(WSResponse response) throws Throwable {
-              return ok(response.getBody());
-          }
-      });
+      return ws.url(url).get().thenApply(response -> ok(response.getBody()));
   }
 
-  public static Result upload() {
-    MultipartFormData body = request().body().asMultipartFormData();
-    MultipartFormData.FilePart uploadedFile = body.getFile("uploadedFile");
+  public Result upload() {
+    MultipartFormData<File> body = request().body().asMultipartFormData();
+    MultipartFormData.FilePart<File> uploadedFile = body.getFile("uploadedFile");
     if (uploadedFile == null) {
       return ok("Error when uploading");
     } else {
@@ -38,11 +38,11 @@ public class JavaApplication extends Controller {
   }
 
   @BodyParser.Of(BodyParser.MultipartFormData.class)
-  public static Result upload2() {
+  public Result upload2() {
     return upload();
   }
 
-  public static Result longRequest(Long duration) throws Exception {
+  public Result longRequest(Long duration) throws Exception {
     Thread.sleep(TimeUnit.SECONDS.toMillis(duration));
     return ok();
   }

@@ -88,7 +88,11 @@ trait Play2WarCommands {
     val files: Traversable[(File, String)] = dependencies.
       filter(_.data.ext == "jar").flatMap { dependency =>
       val filename = for {
-        module <- dependency.get(AttributeKey[ModuleID]("module-id"))
+        module <- dependency
+          // sbt 1.0
+          .get(AttributeKey[ModuleID]("moduleID"))
+          // sbt 0.13
+          .orElse(dependency.get(AttributeKey[ModuleID]("module-id")))
         artifact <- dependency.get(AttributeKey[Artifact]("artifact"))
         if !allFilteredArtifacts.contains((module.organization, module.name))
       } yield {
@@ -190,7 +194,7 @@ trait Play2WarCommands {
 
     val additionnalResources = filesToInclude.map {
       f =>
-        f -> Path.relativizeFile(webappR, f).get.getPath
+        f -> IO.relativizeFile(webappR, f).get.getPath
     }
 
     additionnalResources.foreach {

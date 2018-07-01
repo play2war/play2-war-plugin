@@ -13,7 +13,7 @@ lazy val commonSettings = Seq(
   resolvers += Resolver.sonatypeRepo("snapshots"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
 
-  scalaVersion := propOr("play2-war.sbt.scala.version", "2.10.5")
+  scalaVersion := propOr("play2-war.sbt.scala.version", "2.12.6")
 )
 
 lazy val root = Project(appName + "parent", file("."))
@@ -24,7 +24,7 @@ lazy val root = Project(appName + "parent", file("."))
   .aggregate(common, servlet25, servlet30, servlet31)
 
 lazy val playProjectSettings = Seq(
-  libraryDependencies ++= Seq(ws, javaWs)
+  libraryDependencies ++= Seq(ws, javaWs, guice)
 )
 
 lazy val commonAppDependencies = Seq(

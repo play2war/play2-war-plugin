@@ -1,19 +1,22 @@
 package controllers
 
 import java.io._
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
-import play.api.mvc._
-import play.api.libs.{Files, Comet}
-import play.api.libs.iteratee._
-import play.api.libs.concurrent._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import akka.stream.scaladsl.{Source, StreamConverters}
+import javax.inject.{Inject, Singleton}
 import play.api._
-import play.api.Play.current
+import play.api.http.{ContentTypes, HttpEntity}
+import play.api.http.HttpEntity.Streamed
+import play.api.libs.{Comet, Files}
+import play.api.mvc._
 
-import scala.concurrent.duration._
 import scala.concurrent.Future
+import scala.concurrent.duration._
 
-object Application extends Controller {
+@Singleton
+class Application @Inject()(environment: Environment) extends InjectedController {
 
   def index = Action {
     Ok(views.html.index("This is a Play 2.0 application, running in a Servlet v3.0 Container :)"))
@@ -82,7 +85,8 @@ object Application extends Controller {
     }
 
     val data = sb.toString.getBytes
-    val dataContent: Enumerator[Array[Byte]] = Enumerator.fromStream(new ByteArrayInputStream(data))
+    val dataContent: HttpEntity = Streamed(
+      StreamConverters.fromInputStream(() => new ByteArrayInputStream(data)), Some(data.length), None)
 
     Result(
       header = ResponseHeader(200, Map(CONTENT_LENGTH -> data.length.toString)),
@@ -92,13 +96,13 @@ object Application extends Controller {
   // Streaming of big content
   def chunkedBigContent = Action { request =>
 
-    val dataContent: Enumerator[String] =
+    val dataContent: Source[String, _] =
       request.queryString.get("maxRange").map {
         maxRange =>
           val iMaxRange = maxRange.head.toInt
           var counter = 0
 
-          Enumerator.generateM({
+          Source.unfoldAsync(""){ s =>
 
             if (counter >= iMaxRange) {
               Future.successful(None)
@@ -118,14 +122,14 @@ object Application extends Controller {
 
               counter = tempCounter
 
-              Future.successful(Some(sb.toString()))
+              Future.successful(Some((sb.toString(), s)))
             }
-          })
+          }
       }.getOrElse {
-        Enumerator("Max range not found\n")
+        Source.single("Max range not found\n")
       }
 
-    Ok.chunked(dataContent >>> Enumerator.eof)
+    Ok.chunked(dataContent)
   }
 
   def echoGetParameters = Action { request =>
@@ -143,7 +147,7 @@ object Application extends Controller {
   private def displayUploadDetails(uploadedFile: MultipartFormData.FilePart[Files.TemporaryFile]) = {
     val filename = uploadedFile.filename
     val contentType = uploadedFile.contentType.getOrElse("Unknown")
-    val size = uploadedFile.ref.file.length()
+    val size = uploadedFile.ref.path.toFile.length()
     Ok( s"""File uploaded: $filename
            |Content type: $contentType
            |Size: $size""".stripMargin)
@@ -166,22 +170,11 @@ object Application extends Controller {
     }
   }
 
-  /** 
-   * A String Enumerator producing a formatted Time message every 100 millis.
-   * A callback enumerator is pure an can be applied on several Iteratee.
-   */
-  lazy val clock: Enumerator[String] = {
-    
-    import java.util._
-    import java.text._
-    
-    val dateFormat = new SimpleDateFormat("HH mm ss")
-    
-    Enumerator.generateM(Promise.timeout(Some(dateFormat.format(new Date)), 100 milliseconds))
-  }
-  
-  def liveClock = Action {
-    Ok.chunked(clock &> Comet(callback = "parent.clockChanged"))
+  val df: DateTimeFormatter = DateTimeFormatter.ofPattern("HH mm ss")
+  def liveClock() = Action {
+    val tickSource = Source.tick(0 millis, 100 millis, "TICK")
+    val source = tickSource.map(tick => df.format(ZonedDateTime.now()))
+    Ok.chunked(source via Comet.string("parent.clockChanged")).as(ContentTypes.HTML)
   }
   
   def longRequest(duration: Long) = Action {
@@ -196,7 +189,7 @@ object Application extends Controller {
   }
 
   def unmanagedlib = Action {
-    val maybeUnmanagedlib = Play.resource("unmanagedlib.txt")
+    val maybeUnmanagedlib = environment.resource("unmanagedlib.txt")
 
     maybeUnmanagedlib match {
       case Some(_) => Ok("")
