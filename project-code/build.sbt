@@ -14,7 +14,7 @@ val buildScalaVersion211 = "2.11.6"
 val buildScalaVersion = sys.props.get("play2war.sbt.scala211").map(p => buildScalaVersion211).getOrElse(buildScalaVersion210)
 val buildScalaVersionForSbt = "2.10.5"
 val buildScalaVersionForSbtBinaryCompatible = CrossVersion.binaryScalaVersion(buildScalaVersionForSbt)
-val buildSbtVersion   = "0.13.15"
+val buildSbtVersion   = "0.13.17"
 val buildSbtVersionBinaryCompatible = "0.13"
 
 val buildSettings = Defaults.defaultSettings ++ Seq(
