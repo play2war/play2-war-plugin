@@ -6,4 +6,4 @@ resolvers += Resolver.typesafeRepo("releases")
 
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.3.2")
 
-addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
+addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.2")
