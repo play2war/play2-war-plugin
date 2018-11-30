@@ -1,14 +1,16 @@
+
 package com.github.play2war.plugin.it
 
 import java.net.URL
-import org.scalatest.junit.JUnitRunner
-import org.junit.runner.RunWith
-import org.scalatest.matchers._
-import org.scalatest._
+import java.util.concurrent._
+
 import com.gargoylesoftware.htmlunit._
 import com.gargoylesoftware.htmlunit.util._
+import org.junit.runner.RunWith
+import org.scalatest._
+import org.scalatest.junit.JUnitRunner
+
 import scala.collection.JavaConverters._
-import java.util.concurrent._
 
 object AbstractPlay2WarTests {
 
@@ -19,7 +21,7 @@ object AbstractPlay2WarTests {
 
 }
 
-abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with ShouldMatchers with CargoContainerManagerFixture with BeforeAndAfter with WarContext {
+abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with Matchers with CargoContainerManagerFixture with BeforeAndAfter with WarContext {
 
   import AbstractPlay2WarTests._
 
@@ -33,7 +35,7 @@ abstract class AbstractPlay2WarTests extends FeatureSpec with GivenWhenThen with
     onAfter()
   }
 
-  override def beforeAll(configMap: Map[String, Any]) {
+  override def beforeAll(configMap: ConfigMap) {
     super.beforeAll(configMap)
 
     // Init WebClient

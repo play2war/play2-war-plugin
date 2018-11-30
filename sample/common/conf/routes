@@ -3,43 +3,43 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
-GET     /subdir                     controllers.Application.index
-GET     /sub/subdir                 controllers.Application.index
+GET     /                           @controllers.Application.index
+GET     /subdir                     @controllers.Application.index
+GET     /sub/subdir                 @controllers.Application.index
 
-GET     /setCookies                 controllers.Application.setCookies
+GET     /setCookies                 @controllers.Application.setCookies
 
-GET     /getCookies                 controllers.Application.getCookies
+GET     /getCookies                 @controllers.Application.getCookies
 
-GET     /redirectLanding            controllers.Application.redirectLanding
-GET     /redirect                   controllers.Application.redirect
+GET     /redirectLanding            @controllers.Application.redirectLanding
+GET     /redirect                   @controllers.Application.redirect
 
-GET     /internalServerError        controllers.Application.internalServerError
+GET     /internalServerError        @controllers.Application.internalServerError
 
-GET     /httpVersion                controllers.Application.httpVersion
-GET     /bigContent                 controllers.Application.bigContent
-GET     /chunkedBigContent          controllers.Application.chunkedBigContent
+GET     /httpVersion                @controllers.Application.httpVersion
+GET     /bigContent                 @controllers.Application.bigContent
+GET     /chunkedBigContent          @controllers.Application.chunkedBigContent
 
-GET     /echoGetParameters          controllers.Application.echoGetParameters
-POST    /echoPostParameters         controllers.Application.echoPostParameters
+GET     /echoGetParameters          @controllers.Application.echoGetParameters
+POST    /echoPostParameters         @controllers.Application.echoPostParameters
 
-GET     /uploadForm                 controllers.Application.uploadForm
-POST    /upload                     controllers.Application.upload
-POST    /upload2                    controllers.Application.upload2
+GET     /uploadForm                 @controllers.Application.uploadForm
+POST    /upload                     @controllers.Application.upload
+POST    /upload2                    @controllers.Application.upload2
 
-POST    /uploadJava                 controllers.JavaApplication.upload
-POST    /uploadJava2                controllers.JavaApplication.upload2
+POST    /uploadJava                 @controllers.JavaApplication.upload
+POST    /uploadJava2                @controllers.JavaApplication.upload2
 
-GET     /asyncResultJava            controllers.JavaApplication.asyncResult
+GET     /asyncResultJava            @controllers.JavaApplication.asyncResult
 
-GET     /clock                      controllers.Application.liveClock
+GET     /clock                      @controllers.Application.liveClock
 
-GET     /longRequest/:duration      controllers.JavaApplication.longRequest(duration: Long)
-GET     /slongRequest/:duration     controllers.Application.longRequest(duration: Long)
+GET     /longRequest/:duration      @controllers.JavaApplication.longRequest(duration: Long)
+GET     /slongRequest/:duration     @controllers.Application.longRequest(duration: Long)
 
-GET     /flashing                   controllers.Application.flashing
+GET     /flashing                   @controllers.Application.flashing
 
-GET     /unmanagedlib				controllers.Application.unmanagedlib
+GET     /unmanagedlib				         @controllers.Application.unmanagedlib
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

@@ -1,27 +1,17 @@
 package com.github.play2war.plugin.it
 
-import java.net.URL
-import org.scalatest.junit.JUnitRunner
-import org.junit.runner.RunWith
-import org.scalatest.matchers._
-import org.scalatest._
-import org.codehaus.cargo.container.InstalledLocalContainer
-import org.codehaus.cargo.container.installer.ZipURLInstaller
-import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory
-import org.codehaus.cargo.container.ContainerType
-import org.codehaus.cargo.container.configuration.ConfigurationType
-import org.codehaus.cargo.generic.DefaultContainerFactory
-import org.codehaus.cargo.container.configuration.LocalConfiguration
-import com.gargoylesoftware.htmlunit._
-import com.gargoylesoftware.htmlunit.html._
-import com.gargoylesoftware.htmlunit.util._
-import org.codehaus.cargo.container.deployable.WAR
-import org.codehaus.cargo.container.property._
-import org.codehaus.cargo.util.log._
-import scala.collection.immutable._
-import scala.collection.JavaConverters._
-import org.apache.commons.io.FileUtils
 import java.io.File
+import java.net.URL
+
+import org.codehaus.cargo.container.{ContainerType, InstalledLocalContainer}
+import org.codehaus.cargo.container.configuration.{ConfigurationType, LocalConfiguration}
+import org.codehaus.cargo.container.deployable.WAR
+import org.codehaus.cargo.container.installer.ZipURLInstaller
+import org.codehaus.cargo.container.property._
+import org.codehaus.cargo.generic.DefaultContainerFactory
+import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory
+import org.codehaus.cargo.util.log._
+import org.scalatest._
 
 trait WarContext {
   
@@ -151,18 +141,18 @@ trait CargoContainerManager extends WarContext {
   }
 }
 
-trait CargoContainerManagerFixture extends BeforeAndAfterAll with CargoContainerManager {
+trait CargoContainerManagerFixture extends BeforeAndAfterAllConfigMap with CargoContainerManager {
   self: Suite =>
 
   def keyWarPath: String
 
-  abstract override def beforeAll(configMap: Map[String, Any]) {
+  abstract override def beforeAll(configMap: ConfigMap) {
     val warPath = configMap.getOrElse(keyWarPath, throw new Exception("no war path defined")).asInstanceOf[String]
 
     startContainer(warPath, stopOnExit = false)
   }
 
-  abstract override def afterAll() {
+  abstract override def afterAll(configMap: ConfigMap) {
     stopContainer()
   }
 }

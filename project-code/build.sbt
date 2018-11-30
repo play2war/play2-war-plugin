@@ -1,23 +1,23 @@
+
 import java.io.File
 
-import org.scalastyle.sbt.ScalastylePlugin
-import sbt.Keys._
-import sbt._
+import sbt.Def
 
 val buildOrganization = "com.github.play2war"
-val defaultPlay2Version = "2.4.0"
+val defaultPlay2Version = "2.6.15"
 val play2Version = sys.props.get("play2.version").filterNot(_.isEmpty).getOrElse(defaultPlay2Version)
-val defaultBuildVersion = "1.4.1-SNAPSHOT"
+val defaultBuildVersion = "1.6.0-SNAPSHOT"
 val buildVersion = sys.props.get("play2war.version").filterNot(_.isEmpty).getOrElse(defaultBuildVersion)
-val buildScalaVersion210 = "2.10.5"
-val buildScalaVersion211 = "2.11.6"
-val buildScalaVersion = sys.props.get("play2war.sbt.scala211").map(p => buildScalaVersion211).getOrElse(buildScalaVersion210)
-val buildScalaVersionForSbt = "2.10.5"
+val buildScalaVersion211 = "2.11.12"
+val buildScalaVersion212 = "2.12.6"
+val buildScalaVersion = sys.props.get("play2war.sbt.scala211").map(_ => buildScalaVersion211).getOrElse(buildScalaVersion212)
+val buildScalaVersionForSbt = buildScalaVersion212
 val buildScalaVersionForSbtBinaryCompatible = CrossVersion.binaryScalaVersion(buildScalaVersionForSbt)
-val buildSbtVersion   = "0.13.17"
-val buildSbtVersionBinaryCompatible = "0.13"
+val buildSbtVersion   = "1.1.6"
+val buildSbtVersionBinaryCompatible = CrossVersion.binarySbtVersion(buildSbtVersion)
+val reactiveStreamsServletVersion = "1.0.0.EARLY"
 
-val buildSettings = Defaults.defaultSettings ++ Seq(
+val buildSettings = Defaults.coreDefaultSettings ++ Seq(
   resolvers           += Resolver.typesafeRepo("releases"),
   organization        := buildOrganization,
   version             := buildVersion,
@@ -44,7 +44,8 @@ val playDependency = "com.typesafe.play" %% "play-server" % play2Version % "prov
 lazy val root = project(id = "play2-war",
   base = file("."),
   settings = commonSettings ++ mavenSettings ++ Seq(
-    publishArtifact := false)) aggregate (play2WarCoreCommon, play2WarCoreservlet30, play2WarCoreservlet25, play2WarCoreservlet31, play2WarPlugin, play2WarIntegrationTests)
+    publishArtifact := false)) aggregate (
+  play2WarCoreCommon, play2WarCoreservlet30, play2WarCoreservlet25, play2WarCoreservlet31, play2WarPlugin, play2WarIntegrationTests)
 
 //
 // Servlet implementations
@@ -59,6 +60,7 @@ lazy val play2WarCoreservlet31 = project(id = "play2-war-core-servlet31",
   base = file("core/servlet31"),
   settings = commonSettings ++ mavenSettings ++ Seq(
     libraryDependencies += playDependency,
+    libraryDependencies += "de.envisia.reactivestreams" % "reactive-streams-servlet" % reactiveStreamsServletVersion,
     libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided->default")) dependsOn play2WarCoreCommon
 
 lazy val play2WarCoreservlet30 = project(id = "play2-war-core-servlet30",
@@ -76,22 +78,21 @@ lazy val play2WarCoreservlet25 = project(id = "play2-war-core-servlet25",
 //
 // Plugin
 //
-lazy val play2WarPlugin = Project(id = "play2-war-plugin",
-  base = file("plugin"),
-  settings = commonSettings ++ ivySettings ++ Seq(
+lazy val play2WarPlugin = Project(id = "play2-war-plugin", base = file("plugin"))
+  .settings(commonSettings ++ ivySettings ++ Seq(
     publishArtifact := true,
     scalaVersion := buildScalaVersionForSbt,
     scalaBinaryVersion := buildScalaVersionForSbtBinaryCompatible,
     sbtPlugin := true,
 
-    sourceGenerators in Compile <+= sourceManaged in Compile map Play2WarVersion,
+    sourceGenerators in Compile += (sourceManaged in Compile).map(Play2WarVersion),
 
-    libraryDependencies <++= (scalaVersion, sbtVersion) { (scalaVersion, sbtVersion) =>
-      Seq(
-        "com.typesafe.play" % "sbt-plugin" % play2Version % "provided->default(compile)" extra ("scalaVersion" -> buildScalaVersionForSbtBinaryCompatible, "sbtVersion" -> buildSbtVersionBinaryCompatible),
+    libraryDependencies ++= Seq(
+        "com.typesafe.play" % "sbt-plugin" % play2Version % "provided->default(compile)" extra (
+          "scalaVersion" -> buildScalaVersionForSbtBinaryCompatible, "sbtVersion" -> buildSbtVersionBinaryCompatible),
         "com.typesafe" % "config" % "1.3.2"
       )
-    }))
+    ))
 
 //
 // Integration tests
@@ -102,7 +103,7 @@ lazy val play2WarIntegrationTests = project(id = "integration-tests",
     sbtPlugin := false,
     publishArtifact := false,
 
-    libraryDependencies += "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test",
     libraryDependencies += "junit" % "junit" % "4.10" % "test",
     libraryDependencies += "org.codehaus.cargo" % "cargo-core-uberjar" % "1.4.13" % "test",
     libraryDependencies += "net.sourceforge.htmlunit" % "htmlunit" % "2.13" % "test",
@@ -112,12 +113,12 @@ lazy val play2WarIntegrationTests = project(id = "integration-tests",
     testOptions in Test += Tests.Argument("-Dwar.servlet31=" + servlet31SampleWarPath),
     testOptions in Test += Tests.Argument("-Dwar.servlet30=" + servlet30SampleWarPath),
     testOptions in Test += Tests.Argument("-Dwar.servlet25=" + servlet25SampleWarPath),
-    testListeners <<= target.map(t => Seq(new eu.henkelmann.sbt.JUnitXmlTestsListener(t.getAbsolutePath)))))
+    testListeners := Seq(new eu.henkelmann.sbt.JUnitXmlTestsListener(target.value.getAbsolutePath))))
 
 //
 // Settings
 //
-def commonSettings = buildSettings ++ Seq(ScalastylePlugin.Settings: _*) ++ Seq(
+def commonSettings: Seq[Def.Setting[_]] = buildSettings ++ Seq(
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
   scalacOptions ++= Seq("-unchecked", "-deprecation"),
   publishArtifact in Test := false)
@@ -128,14 +129,14 @@ def commonIvyMavenSettings: Seq[Setting[_]] = Seq(
   homepage := Some(url("https://github.com/play2war/play2-war-plugin"))
 )
 
-def ivySettings = commonIvyMavenSettings ++ Seq(
+def ivySettings: Seq[sbt.Setting[_]] = commonIvyMavenSettings ++ Seq(
   publishMavenStyle := false,
   bintrayReleaseOnPublish := false,
   bintrayRepository := "sbt-plugins",
   bintrayOrganization := Some("play2war")
 )
 
-def mavenSettings = commonIvyMavenSettings ++ Seq(
+def mavenSettings: Seq[sbt.Setting[_]] = commonIvyMavenSettings ++ Seq(
   publishMavenStyle := true,
   pomIncludeRepository := { _ => false },
   publishTo := {
@@ -182,5 +183,5 @@ val Play2WarVersion = { dir: File =>
   Seq(file)
 }
 
-def project(id: String, base: File, settings: Seq[Def.Setting[_]] = Nil) =
-  Project(id, base, settings = settings)
+def project(id: String, base: File, settings: Seq[Def.Setting[_]] = Nil): Project =
+  Project(id, base).settings(settings)

@@ -24,20 +24,19 @@ trait Play2WarSettings {
 
   lazy val play2WarSettings: Seq[Setting[_]] = Seq[Setting[_]](
 
-    libraryDependencies ++= servletVersion {
-      v =>
-        val servletVersionString = v match {
-          case "2.5" => "25"
-          case "3.1" => "31"
-          case _ => "30"
-        }
-        Seq("com.github.play2war" %% ("play2-war-core-servlet" + servletVersionString) % com.github.play2war.plugin.Play2WarVersion.current)
-    }.value,
+    libraryDependencies ++=  {
+      val servletVersionString = servletVersion.value match {
+        case "2.5" => "25"
+        case "3.1" => "31"
+        case _ => "30"
+      }
+      Seq("com.github.play2war" %% ("play2-war-core-servlet" + servletVersionString) % com.github.play2war.plugin.Play2WarVersion.current)
+    },
 
     webappResource := baseDirectory.value / "war",
 
     // War artifact
-    artifact in war := moduleName(n => Artifact(n, "war", "war")).value,
+    artifact in war := Artifact(moduleName.value, "war", "war"),
 
     targetName := None,
 
