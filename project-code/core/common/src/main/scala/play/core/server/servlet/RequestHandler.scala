@@ -17,8 +17,10 @@ package play.core.server.servlet
 
 import java.io.ByteArrayOutputStream
 import java.net.URLDecoder
+import java.util.Collections
 
-import akka.stream.{Graph, Materializer, Shape}
+import akka.NotUsed
+import akka.stream._
 import akka.stream.scaladsl.{Keep, RunnableGraph, Sink, Source, StreamConverters}
 import akka.util.ByteString
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse, Cookie => ServletCookie}
@@ -31,9 +33,10 @@ import play.api.libs.typedmap.{TypedEntry, TypedMap}
 import play.api.mvc._
 import play.api.mvc.request.{RemoteConnection, RequestAttrKey, RequestTarget}
 
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.util.control.Exception
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 trait RequestHandler {
 
@@ -57,6 +60,8 @@ trait HttpServletRequestHandler extends RequestHandler {
    */
   protected def getServletCookies(flatCookie: String): Seq[ServletCookie]
 
+  protected def getServletCookie(pCookie: Cookie): ServletCookie
+
   /**
    * Get HTTP request.
    */
@@ -78,38 +83,18 @@ trait HttpServletRequestHandler extends RequestHandler {
   protected def onHttpResponseComplete(): Unit
 
   /** Create the source for the request body */
-  protected def convertRequestBody()(implicit mat: Materializer): Option[Source[ByteString, Any]] = {
+  protected def convertRequestBody(): Option[Source[ByteString, Future[_]]] = {
     getHttpRequest().getRichInputStream.map { is ⇒
       StreamConverters.fromInputStream(() ⇒ is)
     }
   }
 
   /** Create the sink for the response body */
-  protected def convertResponseBody()(implicit mat: Materializer): Option[Sink[ByteString, Any]] = {
+  protected def convertResponseBody(): Option[Sink[ByteString, Future[_]]] = {
     getHttpResponse().getRichOutputStream.map { os ⇒
       StreamConverters.fromOutputStream(() ⇒ os)
     }
   }
-
-//  // TODO #321 delete?
-//  @deprecated
-//  protected def feedBodyParser(bodyParser: Sink[ByteString, Result]): Future[Result] = {
-//    getHttpRequest().getRichInputStream.map { is =>
-//      StreamConverters.fromInputStream( () => is).toMat(bodyParser)
-//    }
-////    val bodySource = getHttpRequest().getRichInputStream.fold(Source.empty[Array[Byte]]) { is =>
-////      val output = new java.io.ByteArrayOutputStream()
-////      val buffer = new Array[Byte](1024 * 8)
-////      var length = is.read(buffer)
-////      while(length != -1){
-////        output.write(buffer, 0, length)
-////        length = is.read(buffer)
-////      }
-////      Enumerator(output.toByteArray) andThen Enumerator.eof
-////    }
-////
-////    bodyEnumerator |>>> bodyParser
-//  }
 
   protected def setHeaders(headers: Map[String, String], httpResponse: HttpServletResponse): Unit = {
     // Set response headers
@@ -128,6 +113,18 @@ trait HttpServletRequestHandler extends RequestHandler {
 
       case (name, value) =>
         httpResponse.setHeader(name, value)
+    }
+  }
+
+  protected def setCookies(newCookies: Seq[Cookie], httpResponse: HttpServletResponse): Unit = {
+    newCookies.foreach { pCookie =>
+      httpResponse.addCookie(getServletCookie(pCookie))
+    }
+  }
+
+  protected def setFlash(newFlash: Option[Flash], httpResponse: HttpServletResponse): Unit = {
+    newFlash.foreach { pFlash =>
+      httpResponse.addCookie(getServletCookie(Flash.encodeAsCookie(pFlash)))
     }
   }
 
@@ -152,6 +149,8 @@ trait HttpServletRequestHandler extends RequestHandler {
         httpResponse.setStatus(status)
 
         setHeaders(headers, httpResponse)
+        setCookies(result.newCookies, httpResponse)
+        setFlash(result.newFlash, httpResponse)
         body.contentLength.foreach { contentLength =>
           httpResponse.addHeader(CONTENT_LENGTH, contentLength.toString)
         }
@@ -168,18 +167,15 @@ trait HttpServletRequestHandler extends RequestHandler {
         val source: Source[ByteString, _] = body.dataStream
 
         if (withContentLength || chunked) {
-          val sourceWithTermination: Source[ByteString, _] = source.watchTermination() { (_, done) =>
-            done.onComplete {
-              case Success(_) =>
-                onHttpResponseComplete()
-              case Failure(ex) =>
-                logger.debug(ex.toString)
-                onHttpResponseComplete()
-            }
+          val sink: Sink[ByteString, Future[_]] = convertResponseBody().getOrElse(Sink.ignore)
+          val graph: RunnableGraph[Future[_]] = source.toMat(sink)(Keep.right)
+          graph.run().andThen{
+            case Success(_) =>
+              onHttpResponseComplete()
+            case Failure(ex) =>
+              logger.debug(ex.toString)
+              onHttpResponseComplete()
           }
-          val sink: Sink[ByteString, Any] = convertResponseBody().getOrElse(Sink.ignore)
-          val flow: RunnableGraph[Any] = sourceWithTermination.toMat(sink)(Keep.right)
-          flow.run()
         } else {
           // No Content-Length header specified, buffer in-memory
           val buffer = new ByteArrayOutputStream
@@ -187,8 +183,8 @@ trait HttpServletRequestHandler extends RequestHandler {
             buffer.write(e.toArray); b
           })
 
-          val flow = source.toMat(sink)(Keep.right)
-          flow.run().andThen {
+          val graph: RunnableGraph[Future[ByteArrayOutputStream]] = source.toMat(sink)(Keep.right)
+          graph.run().andThen {
             case Success(_) =>
               logger.trace(s"Buffer size to send: ${buffer.size()}")
               getHttpResponse.getHttpServletResponse.map { response =>
@@ -203,95 +199,7 @@ trait HttpServletRequestHandler extends RequestHandler {
               logger.debug(ex.toString)
               onHttpResponseComplete()
           }
-
         }
-
-        // TODO #321 delete?
-//        // Stream the result
-//        if (withContentLength || chunked) {
-//
-//          val hasError: AtomicBoolean = new AtomicBoolean(false)
-//
-//          val bodyIteratee: Iteratee[Array[Byte], Unit] = {
-//
-//            def step(in: Input[Array[Byte]]): Iteratee[Array[Byte], Unit] = (!hasError.get, in) match {
-//              case (true, Input.El(x)) =>
-//                Iteratee.flatten(
-//                  Future.successful(
-//                    if (hasError.get) {
-//                      ()
-//                    } else {
-//                      getHttpResponse().getRichOutputStream.map {
-//                        os =>
-//                          os.write(x)
-//                          os.flush()
-//                      }
-//                    })
-//                    .map { _ => if (!hasError.get) Cont(step) else Done((), Input.Empty: Input[Array[Byte]]) }
-//                    .andThen {
-//                      case Failure(ex) =>
-//                        hasError.set(true)
-//                        Logger("play").debug(ex.toString)
-//                        throw ex
-//                    })
-//              case (true, Input.Empty) => Cont(step)
-//              case (_, inp) => Done((), inp)
-//            }
-//            Iteratee.flatten(
-//              Future.successful(())
-//                .map(_ => if (!hasError.get) Cont(step) else Done((), Input.Empty: Input[Array[Byte]])))
-//          }
-//
-//          val bodyConsumer = if (chunked) {
-//            // if the result body is chunked, the chunks are already encoded with metadata in Results.chunk
-//            // The problem is that the servlet container adds metadata again, leading the chunks encoded 2 times.
-//            // As workaround, we 'dechunk' the body one time before sending it to the servlet container
-//            body &> Results.dechunk |>>> bodyIteratee
-//          } else {
-//            body |>>> bodyIteratee
-//          }
-//          bodyConsumer.andThen {
-//            case Success(_) =>
-//              cleanup()
-//              onHttpResponseComplete()
-//            case Failure(ex) =>
-//              Logger("play").debug(ex.toString)
-//              hasError.set(true)
-//              onHttpResponseComplete()
-//          }
-//        } else {
-//          Logger("play").trace("Result without Content-length")
-//
-//          // No Content-Length header specified, buffer in-memory
-//          val byteBuffer = new ByteArrayOutputStream
-//          val byteArrayOSIteratee = Iteratee.fold(byteBuffer)((b, e: Array[Byte]) => {
-//            b.write(e); b
-//          })
-//
-//          val p = body |>>> Enumeratee.grouped(byteArrayOSIteratee) &>> Cont {
-//            case Input.El(buffer) =>
-//              Logger("play").trace("Buffer size to send: " + buffer.size)
-//              getHttpResponse().getHttpServletResponse.map { response =>
-//                // set the content length ourselves
-//                response.setContentLength(buffer.size)
-//                val os = response.getOutputStream
-//                os.flush()
-//                buffer.writeTo(os)
-//              }
-//              val p = Future.successful(())
-//              Iteratee.flatten(p.map(_ => Done(1, Input.Empty: Input[ByteArrayOutputStream])))
-//
-//            case other => Error("unexpected input", other)
-//          }
-//          p.andThen {
-//            case Success(_) =>
-//              cleanup()
-//              onHttpResponseComplete()
-//            case Failure(ex) =>
-//              Logger("play").debug(ex.toString)
-//              onHttpResponseComplete()
-//          }
-//        }
 
       } // end match foreach
 
@@ -359,15 +267,6 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       }
     )
 
-    // TODO #321 delete?
-//    // Call onRequestCompletion after all request processing is done. Protected with an AtomicBoolean to ensure can't be executed more than once.
-//    val alreadyClean = new java.util.concurrent.atomic.AtomicBoolean(false)
-//    def cleanup() {
-//      if (!alreadyClean.getAndSet(true)) {
-//        play.api.Play.maybeApplication.foreach(_.global.onRequestCompletion(requestHeader))
-//      }
-//    }
-
     trait Response {
       def handle(result: Result): Unit
     }
@@ -378,7 +277,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       val flashCookie = {
         header.headers.get(HeaderNames.SET_COOKIE)
           .map(Cookies.decodeSetCookieHeader)
-          .flatMap(_.find(_.name == Flash.COOKIE_NAME)).orElse {
+          .flatMap(_.find(_.name == Flash.COOKIE_NAME)).orElse { // TODO #321 Flash.COOKIE_NAME is deprecated
             Option(requestHeader.flash).filterNot(_.isEmpty).map { _ =>
               Flash.discard.toCookie
             }
@@ -399,15 +298,6 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
           action(rh).recoverWith {
             case error => app.errorHandler.onServerError(rh, error)
           }
-
-          // TODO #321 delete?
-//          import play.api.libs.iteratee.Execution.Implicits.trampoline
-//          Iteratee.flatten(action(rh).unflatten.map(_.it).recover {
-//            case error =>
-//              Iteratee.flatten(
-//                app.errorHandler.onServerError(requestHeader, error).map(result => Done(result, Input.Empty))
-//              ): Iteratee[Array[Byte], Result]
-//          })
         }
         handleAction(recovered, requestHeader, Some(app))
 
@@ -432,9 +322,9 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
       implicit val mat: Materializer = app.fold(server.materializer)(_.materializer)
 
-      val body = convertRequestBody()
-      val bodyParser = action(requestHeader)
-      val resultFuture = body match {
+      val body: Option[Source[ByteString, Future[_]]] = convertRequestBody()
+      val bodyParser: Accumulator[ByteString, Result] = action(requestHeader)
+      val resultFuture: Future[Result] = body match {
         case None =>
           bodyParser.run()
         case Some(source) =>
@@ -445,7 +335,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
       import play.api.libs.streams.Execution.Implicits.trampoline
 
-      val eventuallyResultWithError = resultFuture.recoverWith {
+      val eventuallyResultWithError: Future[Result] = resultFuture.recoverWith {
         case error =>
           logger.error("Cannot invoke the action", error)
           httpErrorHandler.onServerError(requestHeader, error)
@@ -453,31 +343,6 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
       pushPlayResultToServletOS(eventuallyResultWithError)
     }
-
-    // TODO #321 delete?
-//    def handleAction(action: EssentialAction, app: Option[Application]) {
-//      val bodyParser = Iteratee.flatten(
-//        scala.concurrent.Future(action(requestHeader))(play.api.libs.concurrent.Execution.defaultContext)
-//      )
-//
-//      import play.api.libs.iteratee.Execution.Implicits.trampoline
-//
-//      // Remove Except: 100-continue handling, since it's impossible to handle it
-//      //val expectContinue: Option[_] = requestHeader.headers.get("Expect").filter(_.equalsIgnoreCase("100-continue"))
-//
-//      val eventuallyResult: Future[Result] = feedBodyParser(bodyParser)
-//
-//      val eventuallyResultWithError = eventuallyResult.recoverWith {
-//        case error =>
-//          Logger("play").error("Cannot invoke the action, eventually got an error: " + error)
-//          app.fold(DefaultGlobal.onError(requestHeader, error)) {
-//            _.errorHandler.onServerError(requestHeader, error)
-//          }
-//      }.map { result => cleanFlashCookie(result) }
-//
-//      pushPlayResultToServletOS(eventuallyResultWithError, cleanup)
-//    }
-
 
     onFinishService()
 

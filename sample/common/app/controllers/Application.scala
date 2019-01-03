@@ -122,7 +122,7 @@ class Application @Inject()(environment: Environment) extends InjectedController
 
               counter = tempCounter
 
-              Future.successful(Some((sb.toString(), s)))
+              Future.successful(Some((s, sb.toString())))
             }
           }
       }.getOrElse {

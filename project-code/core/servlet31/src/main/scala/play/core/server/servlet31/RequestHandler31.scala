@@ -68,27 +68,28 @@ class Play2Servlet31RequestHandler(servletRequest: HttpServletRequest)
     !asyncListener.withError.get && !asyncListener.withTimeout.get
   }
 
-  override protected def convertRequestBody()(implicit mat: Materializer): Option[Source[ByteString, Any]] = {
-    if (asyncContextAvailable(asyncListener)) {
-      Some(Source
-        .fromPublisher(new RequestPublisher(asyncContext, 8192))
-        .map(bb => ByteString(bb)))
-    } else {
-      None
-    }
-  }
-
-  /** Create the sink for the response body */
-  override protected def convertResponseBody()(implicit mat: Materializer): Option[Sink[ByteString, Any]] = {
-
-    if (asyncContextAvailable(asyncListener)) {
-      Some(Sink
-        .fromSubscriber(new ResponseSubscriber(asyncContext))
-        .contramap(_.asByteBuffer))
-    } else {
-      None
-    }
-  }
+  // TODO #321 Sink.fromSubscriber and Source.fromPulisher return Source[ByteString, NotUsed] - without materialized Future value - probably to remove
+//  override protected def convertRequestBody(): Option[Source[ByteString, _]] = {
+//    if (asyncContextAvailable(asyncListener)) {
+//      Some(Source
+//        .fromPublisher(new RequestPublisher(asyncContext, 8192))
+//        .map(bb => ByteString(bb)))
+//    } else {
+//      None
+//    }
+//  }
+//
+//  /** Create the sink for the response body */
+//  override protected def convertResponseBody(): Option[Sink[ByteString, _]] = {
+//
+//    if (asyncContextAvailable(asyncListener)) {
+//      Some(Sink
+//        .fromSubscriber(new ResponseSubscriber(asyncContext))
+//        .contramap(_.asByteBuffer))
+//    } else {
+//      None
+//    }
+//  }
 
   // TODO #321 delete?
 //  private def readServletRequest[A](servletInputStream: ServletInputStream, consumer: => Iteratee[Array[Byte], A]): Future[A] = {
