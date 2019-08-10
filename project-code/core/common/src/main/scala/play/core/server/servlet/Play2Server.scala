@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import akka.stream.Materializer
 import javax.servlet.ServletContext
 import play.api._
+import play.api.mvc.{CookieHeaderEncoding, FlashCookieBaker, SessionCookieBaker}
 import play.core.ApplicationProvider
 import play.core.server.Server
 
@@ -117,6 +118,10 @@ private[servlet] class WarApplication(val mode: Mode, contextPath: Option[String
     val loader = ApplicationLoader(context)
     loader.load(context)
   }
+
+  val cookieHeaderEncoding = application.injector.instanceOf(classOf[CookieHeaderEncoding])
+  val sessionBaker = application.injector.instanceOf(classOf[SessionCookieBaker])
+  val flashBaker = application.injector.instanceOf(classOf[FlashCookieBaker])
 
   Play.start(application)
 
