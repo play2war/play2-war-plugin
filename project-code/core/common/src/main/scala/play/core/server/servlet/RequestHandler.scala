@@ -15,13 +15,14 @@
  */
 package play.core.server.servlet
 
-import java.io.ByteArrayOutputStream
+import java.io.{ByteArrayOutputStream, InputStream, OutputStream}
 import java.net.URLDecoder
 import java.util.Collections
 
 import akka.NotUsed
-import akka.stream._
-import akka.stream.scaladsl.{Keep, RunnableGraph, Sink, Source, StreamConverters}
+import akka.stream.impl.fusing.FlattenMerge
+import akka.stream.{Graph, _}
+import akka.stream.scaladsl.{Flow, GraphDSL, Keep, Merge, Partition, RunnableGraph, Sink, Source, StreamConverters, SubFlow}
 import akka.util.ByteString
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse, Cookie => ServletCookie}
 import play.api.{Logger, _}
@@ -33,6 +34,8 @@ import play.api.libs.typedmap.{TypedEntry, TypedMap}
 import play.api.mvc._
 import play.api.mvc.request.{RemoteConnection, RequestAttrKey, RequestTarget}
 
+import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.collection.JavaConverters.enumerationAsScalaIteratorConverter
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.util.control.Exception
@@ -85,14 +88,14 @@ trait HttpServletRequestHandler extends RequestHandler {
   /** Create the source for the request body */
   protected def convertRequestBody(): Option[Source[ByteString, Future[_]]] = {
     getHttpRequest().getRichInputStream.map { is ⇒
-      StreamConverters.fromInputStream(() ⇒ is)
+      StreamConverters.fromInputStream(() => is)
     }
   }
 
   /** Create the sink for the response body */
   protected def convertResponseBody(): Option[Sink[ByteString, Future[_]]] = {
     getHttpResponse().getRichOutputStream.map { os ⇒
-      StreamConverters.fromOutputStream(() ⇒ os)
+      StreamConverters.fromOutputStream(() => os)
     }
   }
 
@@ -133,9 +136,6 @@ trait HttpServletRequestHandler extends RequestHandler {
    * @param futureResult the result of the play action
    */
   protected def pushPlayResultToServletOS(futureResult: Future[Result])(implicit mat: Materializer): Unit = {
-    // TODO: should use the servlet thread here or use special thread pool for blocking IO operations
-    // (https://github.com/dlecan/play2-war-plugin/issues/223)
-    import play.api.libs.streams.Execution.Implicits.trampoline
 
     futureResult.map { result =>
       getHttpResponse().getHttpServletResponse.foreach { httpResponse =>
@@ -167,6 +167,7 @@ trait HttpServletRequestHandler extends RequestHandler {
         val source: Source[ByteString, _] = body.dataStream
 
         if (withContentLength || chunked) {
+          // TODO #321 maybe use response instead of outputstream? https://stackoverflow.com/questions/12085235/servlet-3-async-context-how-to-do-asynchronous-writes
           val sink: Sink[ByteString, Future[_]] = convertResponseBody().getOrElse(Sink.ignore)
           val graph: RunnableGraph[Future[_]] = source.toMat(sink)(Keep.right)
           graph.run().andThen{
@@ -175,7 +176,7 @@ trait HttpServletRequestHandler extends RequestHandler {
             case Failure(ex) =>
               logger.debug(ex.toString)
               onHttpResponseComplete()
-          }
+          }(mat.executionContext)
         } else {
           // No Content-Length header specified, buffer in-memory
           val buffer = new ByteArrayOutputStream
@@ -190,20 +191,22 @@ trait HttpServletRequestHandler extends RequestHandler {
               getHttpResponse.getHttpServletResponse.map { response =>
                 // set the content length ourselves
                 response.setContentLength(buffer.size)
+                response.setBufferSize(buffer.size)
                 val os = response.getOutputStream
                 os.flush()
                 buffer.writeTo(os)
+                os.flush()
               }
               onHttpResponseComplete()
             case Failure(ex) =>
               logger.debug(ex.toString)
               onHttpResponseComplete()
-          }
+          }(mat.executionContext)
         }
 
       } // end match foreach
 
-    }
+    }(mat.executionContext)
   }
 }
 
@@ -267,8 +270,24 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       }
     )
 
-    trait Response {
-      def handle(result: Result): Unit
+    def bakeCookies(result: Result): Result = {
+      val requestHasFlash = requestHeader.attrs.get(RequestAttrKey.Flash) match {
+        case None =>
+          // The request didn't have a flash object in it, either because we
+          // used a custom RequestFactory which didn't install the flash object
+          // or because there was an error in request processing which caused
+          // us to bypass the application's RequestFactory. In this case we
+          // can assume that there is no flash object we need to clear.
+          false
+        case Some(flashCell) =>
+          // The request had a flash object and it was non-empty, so the flash
+          // cookie value may need to be cleared.
+          !flashCell.value.isEmpty
+      }
+      result.bakeCookies( server.applicationProvider.cookieHeaderEncoding,
+                          server.applicationProvider.sessionBaker,
+                          server.applicationProvider.flashBaker,
+                          requestHasFlash)
     }
 
     def cleanFlashCookie(result: Result): Result = {
@@ -293,13 +312,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
       //execute normal action
       case Right((action: EssentialAction, app)) =>
-        val recovered = EssentialAction { rh =>
-          import play.api.libs.streams.Execution.Implicits.trampoline
-          action(rh).recoverWith {
-            case error => app.errorHandler.onServerError(rh, error)
-          }
-        }
-        handleAction(recovered, requestHeader, Some(app))
+        handleAction(action, requestHeader, Some(app))
 
       //handle all websocket request as bad, since websocket are not handled
       //handle bad websocket request
@@ -333,14 +346,13 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
 
       val httpErrorHandler = app.fold[HttpErrorHandler](DefaultHttpErrorHandler)(_.errorHandler)
 
-      import play.api.libs.streams.Execution.Implicits.trampoline
-
       val eventuallyResultWithError: Future[Result] = resultFuture.recoverWith {
         case error =>
           logger.error("Cannot invoke the action", error)
           httpErrorHandler.onServerError(requestHeader, error)
-      }.map(cleanFlashCookie)
-
+      }(mat.executionContext)
+        .map(bakeCookies)(mat.executionContext)
+        .map(cleanFlashCookie)(mat.executionContext)
       pushPlayResultToServletOS(eventuallyResultWithError)
     }
 
