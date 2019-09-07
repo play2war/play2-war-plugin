@@ -167,7 +167,6 @@ trait HttpServletRequestHandler extends RequestHandler {
         val source: Source[ByteString, _] = body.dataStream
 
         if (withContentLength || chunked) {
-          // TODO #321 maybe use response instead of outputstream? https://stackoverflow.com/questions/12085235/servlet-3-async-context-how-to-do-asynchronous-writes
           val sink: Sink[ByteString, Future[_]] = convertResponseBody().getOrElse(Sink.ignore)
           val graph: RunnableGraph[Future[_]] = source.toMat(sink)(Keep.right)
           graph.run().andThen{
@@ -296,7 +295,7 @@ abstract class Play2GenericServletRequestHandler(val servletRequest: HttpServlet
       val flashCookie = {
         header.headers.get(HeaderNames.SET_COOKIE)
           .map(Cookies.decodeSetCookieHeader)
-          .flatMap(_.find(_.name == Flash.COOKIE_NAME)).orElse { // TODO #321 Flash.COOKIE_NAME is deprecated
+          .flatMap(_.find(_.name == server.applicationProvider.flashBaker.COOKIE_NAME)).orElse {
             Option(requestHeader.flash).filterNot(_.isEmpty).map { _ =>
               Flash.discard.toCookie
             }

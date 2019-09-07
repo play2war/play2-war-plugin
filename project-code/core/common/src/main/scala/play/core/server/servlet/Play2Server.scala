@@ -40,9 +40,8 @@ object Play2WarServer {
 
   val context = ApplicationLoader.createContext(
     new Environment(new File("."), ApplicationLoader.getClass.getClassLoader, Mode.Prod))
-//  Logger.configure(context.environment) // TODO #321 what about Logger?
 
-  lazy val configuration = Play.current.configuration // TODO #321 use DI instead of Play.current
+  lazy val configuration = playServer.get.applicationProvider.application.configuration
 
   private val started = new AtomicBoolean(true)
 
@@ -111,9 +110,6 @@ private[servlet] class WarApplication(val mode: Mode, contextPath: Option[String
         Map("play.http.context" -> cp)
       }
     val context = ApplicationLoader.createContext(environment, initialSettings = initialSettings)
-    // Because of https://play.lighthouseapp.com/projects/82401-play-20/tickets/275, reconfigure Logger
-    // without substitutions
-//    Logger.configure(context.environment) // TODO #321 what about Logger?
 
     val loader = ApplicationLoader(context)
     loader.load(context)

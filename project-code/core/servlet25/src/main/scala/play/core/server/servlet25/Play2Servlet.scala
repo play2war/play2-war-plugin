@@ -25,7 +25,7 @@ object Play2Servlet {
 
   val DEFAULT_TIMEOUT = 60 * 1000
 
-  val syncTimeout = Play2WarServer.configuration.getInt("servlet25.synctimeout").getOrElse(DEFAULT_TIMEOUT)
+  val syncTimeout: Int = Play2WarServer.configuration.getOptional[Int]("servlet25.synctimeout").getOrElse(DEFAULT_TIMEOUT)
   Logger("play").debug("Sync timeout for HTTP requests: " + syncTimeout + " ms")
 }
 
